@@ -1,0 +1,260 @@
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 1024px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        transform: translateX(-100%);
+        width: 280px;
+    }
+    
+    .sidebar.open {
+        transform: translateX(0);
+    }
+    
+    .main-content {
+        margin-left: 0;
+    }
+    
+    .menu-toggle {
+        display: block !important;
+    }
+    
+    .top-header {
+        padding: 14px 16px;
+        flex-wrap: wrap;
+    }
+    
+    .header-left .text-muted {
+        display: none;
+    }
+    
+    .user-info {
+        display: none;
+    }
+    
+    .stats-grid {
+        padding: 12px 16px;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+    
+    .stat-card {
+        padding: 14px 16px;
+    }
+    
+    .stat-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
+    
+    .stat-info .stat-value {
+        font-size: 1.125rem;
+    }
+    
+    .charts-grid {
+        padding: 0 16px 16px;
+    }
+    
+    .chart-card {
+        padding: 16px;
+    }
+    
+    .table-container {
+        padding: 0 16px 16px;
+    }
+    
+    .data-table th,
+    .data-table td {
+        padding: 10px 12px;
+        font-size: 0.8rem;
+    }
+    
+    .login-card {
+        padding: 28px 20px;
+    }
+    
+    .theme-toggle {
+        bottom: 16px;
+        right: 16px;
+        width: 44px;
+        height: 44px;
+        font-size: 1.1rem;
+    }
+    
+    .settings-container {
+        padding: 12px 16px;
+    }
+    
+    .settings-card {
+        padding: 16px 18px;
+    }
+    
+    .settings-actions {
+        flex-direction: column;
+    }
+    
+    .settings-actions .btn-secondary,
+    .settings-actions .btn-danger {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .form-container {
+        padding: 12px 16px;
+    }
+    
+    .app-form {
+        padding: 16px;
+    }
+    
+    .app-form .form-actions {
+        flex-direction: column;
+    }
+    
+    .toolbar {
+        padding: 12px 16px;
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .filter-box {
+        justify-content: stretch;
+    }
+    
+    .filter-box select {
+        flex: 1;
+    }
+    
+    .subscription-card {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .theme-options {
+        flex-wrap: wrap;
+    }
+    
+    .theme-option {
+        flex: 1;
+        min-width: 60px;
+        padding: 12px 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .login-card {
+        padding: 24px 16px;
+    }
+
+    .logo-visual {
+        width: min(100%, 190px);
+        padding: 12px;
+        border-radius: 18px;
+    }
+
+    .login-illustration {
+        max-width: 150px;
+    }
+    
+    .login-logo h1 {
+        font-size: 1.25rem;
+    }
+    
+    .logo-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 16px;
+    }
+    
+    .logo-icon i {
+        font-size: 24px;
+    }
+    
+    .login-logo {
+        margin-bottom: 24px;
+    }
+    
+    .form-group {
+        margin-bottom: 14px;
+    }
+    
+    .input-wrapper input,
+    .input-wrapper select,
+    .input-wrapper textarea {
+        padding: 10px 14px;
+        font-size: 0.875rem;
+        border-radius: 8px;
+    }
+    
+    .input-wrapper input[type="password"] {
+        padding-right: 80px;
+    }
+    
+    .input-wrapper .input-icon {
+        right: 12px;
+    }
+
+    .input-wrapper input[type="password"] ~ .input-icon {
+        right: 38px;
+    }
+    
+    .password-toggle {
+        width: 28px;
+        height: 28px;
+        font-size: 0.875rem;
+        right: 38px;
+    }
+    
+    .btn-primary,
+    .btn-secondary,
+    .btn-danger,
+    .btn-warning {
+        padding: 10px 16px;
+        font-size: 0.875rem;
+        border-radius: 8px;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .theme-toggle {
+        bottom: 16px;
+        right: 16px;
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
+    
+    .data-table th,
+    .data-table td {
+        padding: 8px 10px;
+        font-size: 0.7rem;
+    }
+}
+
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 99;
+}
+
+.sidebar-overlay.show {
+    display: block;
+}

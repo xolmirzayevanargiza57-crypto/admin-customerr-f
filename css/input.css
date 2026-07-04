@@ -1,0 +1,598 @@
+/* ============================================
+   INPUTS - BARCHA PANELLAR UCHUN
+   ============================================ */
+
+/* ============================================
+   FORM GROUP
+   ============================================ */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-bottom: 6px;
+    color: var(--text-secondary);
+    transition: all 0.3s ease;
+}
+
+.form-group label i {
+    margin-right: 8px;
+    color: var(--text-muted);
+    width: 16px;
+    text-align: center;
+}
+
+/* ============================================
+   INPUT WRAPPER
+   ============================================ */
+.input-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.input-wrapper input,
+.input-wrapper select,
+.input-wrapper textarea {
+    width: 100%;
+    padding: 12px 16px;
+    padding-right: 52px;
+    border: 2px solid var(--border-color);
+    border-radius: 10px;
+    font-size: 0.9375rem;
+    background: var(--bg-input);
+    color: var(--text-primary);
+    transition: all 0.3s ease;
+    outline: none;
+    font-family: 'Inter', sans-serif;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.input-wrapper input[type="password"] {
+    padding-right: 92px;
+}
+
+.input-wrapper input:focus,
+.input-wrapper select:focus,
+.input-wrapper textarea:focus {
+    border-color: var(--border-focus);
+    box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="dark"] .input-wrapper input:focus,
+[data-theme="dark"] .input-wrapper select:focus,
+[data-theme="dark"] .input-wrapper textarea:focus {
+    border-color: var(--border-focus);
+    box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.05);
+}
+
+.input-wrapper input:hover,
+.input-wrapper select:hover,
+.input-wrapper textarea:hover {
+    border-color: var(--text-muted);
+}
+
+.input-wrapper input::placeholder,
+.input-wrapper textarea::placeholder {
+    color: var(--text-muted);
+    font-weight: 400;
+}
+
+.input-wrapper input:disabled,
+.input-wrapper input:read-only,
+.input-wrapper select:disabled,
+.input-wrapper textarea:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background: var(--bg-hover);
+}
+
+/* ============================================
+   INPUT ICONLAR
+   ============================================ */
+.input-wrapper .input-icon {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1rem;
+    display: none !important;
+    pointer-events: none;
+    z-index: 2;
+    width: 24px;
+    height: 24px;
+    align-items: center;
+    justify-content: center;
+}
+
+.input-wrapper input[type="password"] ~ .input-icon {
+    right: 42px;
+}
+
+.input-wrapper input.success + .input-icon.success {
+    display: flex !important;
+    color: var(--color-success);
+}
+
+.input-wrapper input.error + .input-icon.error {
+    display: flex !important;
+    color: var(--color-danger);
+}
+
+.input-wrapper input.success {
+    border-color: var(--color-success);
+}
+
+.input-wrapper input.error {
+    border-color: var(--color-danger);
+}
+
+/* ============================================
+   SELECT - MAXSUS
+   ============================================ */
+.input-wrapper select {
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238e8e93' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 40px;
+    cursor: pointer;
+}
+
+.input-wrapper select:focus {
+    border-color: var(--border-focus);
+    box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="dark"] .input-wrapper select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23636366' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+}
+
+[data-theme="dark"] .input-wrapper select:focus {
+    border-color: var(--border-focus);
+    box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.05);
+}
+
+/* ============================================
+   SEARCH INPUT
+   ============================================ */
+.search-box {
+    position: relative;
+    flex: 1;
+    min-width: 200px;
+}
+
+.search-box i {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    z-index: 2;
+}
+
+.search-box input {
+    width: 100%;
+    padding: 10px 14px 10px 40px;
+    border: 2px solid var(--border-color);
+    border-radius: 10px;
+    font-size: 0.875rem;
+    background: var(--bg-input);
+    color: var(--text-primary);
+    transition: all 0.3s ease;
+    outline: none;
+}
+
+.search-box input:focus {
+    border-color: var(--border-focus);
+    box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="dark"] .search-box input:focus {
+    border-color: var(--border-focus);
+    box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.05);
+}
+
+/* ============================================
+   FILTER BOX
+   ============================================ */
+.filter-box {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.filter-box select {
+    padding: 10px 14px;
+    border: 2px solid var(--border-color);
+    border-radius: 10px;
+    font-size: 0.875rem;
+    background: var(--bg-input);
+    color: var(--text-primary);
+    cursor: pointer;
+    outline: none;
+    min-width: 140px;
+    -webkit-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238e8e93' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 40px;
+}
+
+.filter-box select:focus {
+    border-color: var(--border-focus);
+    box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="dark"] .filter-box select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23636366' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+}
+
+[data-theme="dark"] .filter-box select:focus {
+    border-color: var(--border-focus);
+    box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.05);
+}
+
+/* ============================================
+   TOOLBAR
+   ============================================ */
+.toolbar {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 32px;
+    flex-wrap: wrap;
+}
+
+.toolbar .search-box {
+    flex: 1;
+    min-width: 200px;
+}
+
+.toolbar .filter-box {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+/* ============================================
+   TEXTAREA
+   ============================================ */
+.input-wrapper textarea {
+    min-height: 80px;
+    resize: vertical;
+    padding: 12px 16px;
+    line-height: 1.6;
+    font-family: 'Inter', sans-serif;
+}
+
+.input-wrapper textarea:focus {
+    border-color: var(--border-focus);
+    box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="dark"] .input-wrapper textarea:focus {
+    border-color: var(--border-focus);
+    box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.05);
+}
+
+/* ============================================
+   DATE INPUT
+   ============================================ */
+input[type="date"] {
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    padding-right: 40px;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+    opacity: 0.6;
+    cursor: pointer;
+    padding: 4px;
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+[data-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    opacity: 0.6;
+}
+
+input[type="date"]:hover::-webkit-calendar-picker-indicator {
+    opacity: 1;
+}
+
+/* ============================================
+   CHECKBOX
+   ============================================ */
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--text-primary);
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.checkbox-label:hover {
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .checkbox-label input[type="checkbox"] {
+    accent-color: var(--text-primary);
+}
+
+/* ============================================
+   RADIO
+   ============================================ */
+.radio-group {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.radio-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.radio-label input[type="radio"] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--text-primary);
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.radio-label:hover {
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .radio-label input[type="radio"] {
+    accent-color: var(--text-primary);
+}
+
+/* ============================================
+   INPUT HELP TEXT
+   ============================================ */
+.input-help {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 4px;
+}
+
+.input-help i {
+    margin-right: 4px;
+}
+
+/* ============================================
+   FORM ACTIONS
+   ============================================ */
+.form-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+}
+
+.form-actions .btn-primary,
+.form-actions .btn-secondary {
+    flex: 1;
+    justify-content: center;
+}
+
+/* ============================================
+   FORM MESSAGE
+   ============================================ */
+.form-message {
+    margin-top: 16px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    display: none;
+}
+
+.form-message.success {
+    display: block;
+    background: #e8f5e9;
+    color: var(--color-success);
+    border: 1px solid #a5d6a7;
+}
+
+.form-message.error {
+    display: block;
+    background: #fef2f2;
+    color: var(--color-danger);
+    border: 1px solid #fecaca;
+}
+
+[data-theme="dark"] .form-message.success {
+    background: #1a3a2a;
+    color: #4ac759;
+    border-color: #4ac759;
+}
+
+[data-theme="dark"] .form-message.error {
+    background: #3a1a1a;
+    color: #ff3b30;
+    border-color: #ff3b30;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 768px) {
+    .input-wrapper input,
+    .input-wrapper select,
+    .input-wrapper textarea {
+        padding: 10px 14px;
+        font-size: 0.875rem;
+    }
+    
+    .input-wrapper input[type="password"] {
+        padding-right: 44px;
+    }
+    
+    .input-wrapper .input-icon {
+        right: 44px;
+    }
+    
+    .password-toggle {
+        width: 28px;
+        height: 28px;
+        font-size: 0.875rem;
+        right: 10px;
+    }
+    
+    .toolbar {
+        padding: 12px 16px;
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .toolbar .search-box {
+        min-width: unset;
+    }
+    
+    .filter-box {
+        justify-content: stretch;
+    }
+    
+    .filter-box select {
+        flex: 1;
+        min-width: unset;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .form-actions .btn-primary,
+    .form-actions .btn-secondary {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .input-wrapper input,
+    .input-wrapper select,
+    .input-wrapper textarea {
+        padding: 8px 12px;
+        font-size: 0.8125rem;
+        border-radius: 8px;
+    }
+    
+    .input-wrapper input[type="password"] {
+        padding-right: 40px;
+    }
+    
+    .input-wrapper .input-icon {
+        right: 40px;
+        font-size: 0.875rem;
+    }
+    
+    .password-toggle {
+        width: 24px;
+        height: 24px;
+        font-size: 0.8125rem;
+        right: 8px;
+    }
+    
+    .search-box input {
+        padding: 8px 10px 8px 32px;
+        font-size: 0.8125rem;
+    }
+    
+    .form-group label {
+        font-size: 0.8125rem;
+    }
+    
+    .filter-box {
+        flex-direction: column;
+    }
+    
+    .filter-box select {
+        width: 100%;
+    }
+}
+
+/* ============================================
+   DARK THEME
+   ============================================ */
+[data-theme="dark"] .input-wrapper input,
+[data-theme="dark"] .input-wrapper select,
+[data-theme="dark"] .input-wrapper textarea,
+[data-theme="dark"] .search-box input,
+[data-theme="dark"] .filter-box select {
+    background: var(--bg-input);
+    color: var(--text-primary);
+    border-color: var(--border-color);
+}
+
+[data-theme="dark"] .input-wrapper input:focus,
+[data-theme="dark"] .input-wrapper select:focus,
+[data-theme="dark"] .input-wrapper textarea:focus,
+[data-theme="dark"] .search-box input:focus,
+[data-theme="dark"] .filter-box select:focus {
+    border-color: var(--border-focus);
+    box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="dark"] .input-wrapper input::placeholder,
+[data-theme="dark"] .input-wrapper textarea::placeholder {
+    color: var(--text-muted);
+}
+
+[data-theme="dark"] .input-wrapper input.success {
+    border-color: var(--color-success);
+}
+
+[data-theme="dark"] .input-wrapper input.error {
+    border-color: var(--color-danger);
+}
+
+[data-theme="dark"] .input-help {
+    color: var(--text-muted);
+}
+
+[data-theme="dark"] .checkbox-label {
+    color: var(--text-secondary);
+}
+
+[data-theme="dark"] .radio-label {
+    color: var(--text-secondary);
+}
+
+[data-theme="dark"] .form-message.success {
+    background: #1a3a2a;
+    color: #4ac759;
+    border-color: #4ac759;
+}
+
+[data-theme="dark"] .form-message.error {
+    background: #3a1a1a;
+    color: #ff3b30;
+    border-color: #ff3b30;
+}

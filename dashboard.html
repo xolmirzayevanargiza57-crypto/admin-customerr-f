@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="light">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Customer v1.0 - Dashboard</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    
+    <!-- ⭐ Chart.js - CDN dan yuklanadi (MUHIM!) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+    <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-brand">
+                <div class="brand-icon"><i class="fas fa-crown"></i></div>
+                <div class="brand-text">
+                    <span class="brand-name">Admin Customer</span>
+                    <span class="brand-version">v1.0</span>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-link active">
+                    <i class="fas fa-chart-pie"></i> <span data-i18n="dashboard">Dashboard</span>
+                </a>
+                <a href="teachers.html" class="nav-link">
+                    <i class="fas fa-chalkboard-teacher"></i> <span data-i18n="teachers">O'qituvchilar</span>
+                </a>
+                <a href="students.html" class="nav-link">
+                    <i class="fas fa-graduation-cap"></i> <span data-i18n="students">O'quvchilar</span>
+                </a>
+                <a href="payments.html" class="nav-link">
+                    <i class="fas fa-money-bill"></i> <span data-i18n="payments">To'lovlar</span>
+                </a>
+                <a href="attendance.html" class="nav-link">
+                    <i class="fas fa-calendar-check"></i> <span data-i18n="attendance">Davomat</span>
+                </a>
+                <a href="reports.html" class="nav-link">
+                    <i class="fas fa-file-alt"></i> <span data-i18n="reports">Hisobotlar</span>
+                </a>
+                <a href="subjects.html" class="nav-link">
+                    <i class="fas fa-book"></i> <span data-i18n="subjects">Fanlar</span>
+                </a>
+                <a href="all.html" class="nav-link">
+                    <i class="fas fa-th-list"></i> <span data-i18n="all">Barchasi</span>
+                </a>
+                <a href="settings.html" class="nav-link">
+                    <i class="fas fa-cog"></i> <span data-i18n="settings">Sozlamalar</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <button id="logoutBtn" class="btn-logout">
+                    <i class="fas fa-sign-out-alt"></i> <span data-i18n="logout">Chiqish</span>
+                </button>
+            </div>
+        </aside>
+
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-header">
+                <div class="header-left">
+                    <button id="menuToggle" class="menu-toggle"><i class="fas fa-bars"></i></button>
+                    <div>
+                        <h2><i class="fas fa-chart-pie"></i> <span data-i18n="dashboard">Dashboard</span></h2>
+                        <p class="text-muted" id="schoolName">Nurli Ta'lim Markazi</p>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <div class="user-profile">
+                        <div class="user-avatar"><span id="userInitial">A</span></div>
+                        <div class="user-info">
+                            <p class="user-name" id="userName">Admin</p>
+                            <p class="user-role text-muted">Admin Customer</p>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Stats Grid -->
+            <section class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon blue"><i class="fas fa-chalkboard-teacher"></i></div>
+                    <div class="stat-info">
+                        <p class="stat-label"><i class="fas fa-users"></i> <span data-i18n="total_teachers">Jami O'qituvchilar</span></p>
+                        <p class="stat-value" id="teacherCount">0</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon green"><i class="fas fa-graduation-cap"></i></div>
+                    <div class="stat-info">
+                        <p class="stat-label"><i class="fas fa-user-graduate"></i> <span data-i18n="total_students">Jami O'quvchilar</span></p>
+                        <p class="stat-value" id="studentCount">0</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon purple"><i class="fas fa-star"></i></div>
+                    <div class="stat-info">
+                        <p class="stat-label"><i class="fas fa-trophy"></i> <span data-i18n="total_xp">Jami XP</span></p>
+                        <p class="stat-value" id="totalXP">0</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon orange"><i class="fas fa-calendar-check"></i></div>
+                    <div class="stat-info">
+                        <p class="stat-label"><i class="fas fa-clock"></i> <span data-i18n="today_attendance">Bugungi davomat</span></p>
+                        <p class="stat-value" id="todayAttendance">0</p>
+                        <span class="stat-change" id="attendancePercent">0%</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Attendance Cards -->
+            <section class="attendance-cards">
+                <div class="stat-card present-card">
+                    <div class="stat-icon green"><i class="fas fa-check-circle"></i></div>
+                    <div class="stat-info">
+                        <p class="stat-label"><i class="fas fa-user-check"></i> <span data-i18n="present">Keldi</span></p>
+                        <p class="stat-value" id="presentCount" style="color: var(--color-success);">0</p>
+                    </div>
+                </div>
+                <div class="stat-card" style="border-left: 4px solid var(--color-warning);">
+                    <div class="stat-icon" style="background: #fff3e0; color: var(--color-warning);"><i class="fas fa-exclamation-triangle"></i></div>
+                    <div class="stat-info">
+                        <p class="stat-label"><i class="fas fa-comment"></i> <span data-i18n="absent_reason">Sababli</span></p>
+                        <p class="stat-value" id="absentReasonCount" style="color: var(--color-warning);">0</p>
+                    </div>
+                </div>
+                <div class="stat-card absent-card">
+                    <div class="stat-icon" style="background: #fef2f2; color: var(--color-danger);"><i class="fas fa-times-circle"></i></div>
+                    <div class="stat-info">
+                        <p class="stat-label"><i class="fas fa-user-times"></i> <span data-i18n="absent">Kelmadi</span></p>
+                        <p class="stat-value" id="absentCount" style="color: var(--color-danger);">0</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ⭐ Charts - Canvas elementlari -->
+            <section class="charts-grid">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3><i class="fas fa-chart-bar"></i> <span data-i18n="weekly_attendance">Haftalik davomat</span></h3>
+                    </div>
+                    <canvas id="attendanceChart" style="max-height:220px;width:100%;"></canvas>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3><i class="fas fa-chart-doughnut"></i> <span data-i18n="attendance_distribution">Davomat taqsimoti</span></h3>
+                    </div>
+                    <canvas id="attendancePieChart" style="max-height:220px;width:100%;"></canvas>
+                </div>
+            </section>
+
+            <!-- Subscription -->
+            <section class="subscription-card">
+                <div class="sub-item">
+                    <span class="label"><i class="fas fa-circle"></i> <span data-i18n="status">Holati</span></span>
+                    <span class="value" id="subscriptionStatus">Faol</span>
+                </div>
+                <div class="sub-item">
+                    <span class="label"><i class="fas fa-tag"></i> <span data-i18n="type">Turi</span></span>
+                    <span class="value" id="subscriptionType">Yillik</span>
+                </div>
+                <div class="sub-item">
+                    <span class="label"><i class="fas fa-calendar-end"></i> <span data-i18n="end_date">Tugash vaqti</span></span>
+                    <span class="value" id="subscriptionEnd">-</span>
+                </div>
+                <div class="sub-item">
+                    <span class="label"><i class="fas fa-clock"></i> <span data-i18n="days_left">Qolgan kun</span></span>
+                    <span class="value" id="subscriptionDays">-</span>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Theme Toggle -->
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <i class="fas fa-moon moon"></i>
+        <i class="fas fa-sun sun"></i>
+    </button>
+
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/theme.js"></script>
+    <script src="js/i18n.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+</html>

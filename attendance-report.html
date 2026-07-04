@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="light">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Customer - Davomat Hisoboti</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/input.css" />
+    <link rel="stylesheet" href="css/theme.css" />
+    <link rel="stylesheet" href="css/responsive.css" />
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-brand">
+                <div class="brand-icon"><i class="fas fa-crown"></i></div>
+                <span>Admin Customer</span>
+                <span class="brand-version">v1.0</span>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-link">
+                    <i class="fas fa-chart-pie"></i> Dashboard
+                </a>
+                <a href="teachers.html" class="nav-link">
+                    <i class="fas fa-chalkboard-teacher"></i> O'qituvchilar
+                </a>
+                <a href="students.html" class="nav-link">
+                    <i class="fas fa-graduation-cap"></i> O'quvchilar
+                </a>
+                <a href="attendance-report.html" class="nav-link active">
+                    <i class="fas fa-calendar-check"></i> Davomat hisoboti
+                </a>
+                <a href="payments.html" class="nav-link">
+                    <i class="fas fa-money-bill"></i> To'lovlar
+                </a>
+                 <a href="attendance.html" class="nav-link">
+                    <i class="fas fa-calendar-check"></i> <span data-i18n="attendance">Davomat</span>
+                </a>
+                <a href="reports.html" class="nav-link">
+                    <i class="fas fa-file-alt"></i> Hisobotlar
+                </a>
+                <a href="subjects.html" class="nav-link">
+                    <i class="fas fa-book"></i> Fanlar
+                </a>
+                <a href="settings.html" class="nav-link">
+                    <i class="fas fa-cog"></i> Sozlamalar
+                </a>
+                <a href="audit.html" class="nav-link">
+                    <i class="fas fa-history"></i> Aslaha
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <button id="logoutBtn" class="btn-logout">
+                    <i class="fas fa-sign-out-alt"></i> Chiqish
+                </button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="top-header">
+                <div class="header-left">
+                    <button id="menuToggle" class="menu-toggle"><i class="fas fa-bars"></i></button>
+                    <div>
+                        <h2>Davomat Hisoboti</h2>
+                        <p class="text-muted">Barcha davomat ma'lumotlarini ko'ring</p>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <button class="theme-toggle-small" id="themeToggleSmall"><i class="fas fa-moon"></i></button>
+                </div>
+            </header>
+
+            <!-- Filters -->
+            <section class="toolbar">
+                <div class="filter-box">
+                    <select id="teacherFilter">
+                        <option value="all">Barcha o'qituvchilar</option>
+                    </select>
+                    <select id="studentFilter">
+                        <option value="all">Barcha o'quvchilar</option>
+                    </select>
+                    <input type="date" id="dateFrom" />
+                    <input type="date" id="dateTo" />
+                    <button id="filterBtn" class="btn-primary"><i class="fas fa-filter"></i> Filtr</button>
+                    <button id="resetBtn" class="btn-secondary"><i class="fas fa-undo"></i></button>
+                </div>
+            </section>
+
+            <!-- Summary -->
+            <section class="attendance-summary" style="padding: 0 32px 16px;">
+                <div class="summary-cards" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;">
+                    <div class="stat-card" style="border-left: 4px solid var(--color-success);">
+                        <div class="stat-info">
+                            <p class="stat-label">✅ Keldi</p>
+                            <p class="stat-value" id="presentCount" style="color: var(--color-success);">0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card" style="border-left: 4px solid var(--color-danger);">
+                        <div class="stat-info">
+                            <p class="stat-label">❌ Kelmadi</p>
+                            <p class="stat-value" id="absentCount" style="color: var(--color-danger);">0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card" style="border-left: 4px solid var(--color-warning);">
+                        <div class="stat-info">
+                            <p class="stat-label">⚠️ Sababli</p>
+                            <p class="stat-value" id="absentWithReasonCount" style="color: var(--color-warning);">0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card" style="border-left: 4px solid var(--color-purple);">
+                        <div class="stat-info">
+                            <p class="stat-label">📊 Davomat foizi</p>
+                            <p class="stat-value" id="attendancePercent" style="color: var(--color-purple);">0%</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Table -->
+            <section class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Sana</th>
+                            <th>O'quvchi</th>
+                            <th>O'qituvchi</th>
+                            <th>Holati</th>
+                            <th>Sabab</th>
+                            <th>XP</th>
+                        </tr>
+                    </thead>
+                    <tbody id="attendanceTableBody">
+                        <tr>
+                            <td colspan="7" class="text-center">
+                                <div class="loading-spinner"></div>
+                                <p>Yuklanmoqda...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+        </main>
+    </div>  
+
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <i class="fas fa-moon moon"></i>
+        <i class="fas fa-sun sun"></i>
+    </button>
+
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/theme.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/attendance-report.js"></script>
+</body>
+</html>

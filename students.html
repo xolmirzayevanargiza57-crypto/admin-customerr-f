@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="light">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Customer v1.0 - O'quvchilar</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-brand">
+                <div class="brand-icon"><i class="fas fa-crown"></i></div>
+                <div class="brand-text">
+                    <span class="brand-name">Admin Customer</span>
+                    <span class="brand-version">v1.0</span>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-link"><i class="fas fa-chart-pie"></i> <span data-i18n="dashboard">Dashboard</span></a>
+                <a href="teachers.html" class="nav-link"><i class="fas fa-chalkboard-teacher"></i> <span data-i18n="teachers">O'qituvchilar</span></a>
+                <a href="students.html" class="nav-link active"><i class="fas fa-graduation-cap"></i> <span data-i18n="students">O'quvchilar</span></a>
+                <a href="payments.html" class="nav-link"><i class="fas fa-money-bill"></i> <span data-i18n="payments">To'lovlar</span></a>
+                <a href="attendance.html" class="nav-link"><i class="fas fa-calendar-check"></i> <span data-i18n="attendance">Davomat</span></a>
+                <a href="reports.html" class="nav-link"><i class="fas fa-file-alt"></i> <span data-i18n="reports">Hisobotlar</span></a>
+                <a href="subjects.html" class="nav-link"><i class="fas fa-book"></i> <span data-i18n="subjects">Fanlar</span></a>
+                <a href="all.html" class="nav-link"><i class="fas fa-th-list"></i> <span data-i18n="all">Barchasi</span></a>
+                <a href="settings.html" class="nav-link"><i class="fas fa-cog"></i> <span data-i18n="settings">Sozlamalar</span></a>
+            </nav>
+            <div class="sidebar-footer">
+                <button id="logoutBtn" class="btn-logout"><i class="fas fa-sign-out-alt"></i> <span data-i18n="logout">Chiqish</span></button>
+            </div>
+        </aside>
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+        <main class="main-content">
+            <header class="top-header">
+                <div class="header-left">
+                    <button id="menuToggle" class="menu-toggle"><i class="fas fa-bars"></i></button>
+                    <div>
+                        <h2><i class="fas fa-graduation-cap"></i> <span data-i18n="students">O'quvchilar</span></h2>
+                        <p class="text-muted" data-i18n="students_desc">O'quvchilarni boshqarish</p>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <div class="user-profile">
+                        <div class="user-avatar"><span id="userInitial">A</span></div>
+                        <div class="user-info">
+                            <p class="user-name" id="userName">Admin</p>
+                            <p class="user-role text-muted">Admin Customer</p>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <section class="toolbar">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Qidirish..." data-i18n-placeholder="search" />
+                </div>
+                <div class="filter-box">
+                    <select id="statusFilter">
+                        <option value="all">Barchasi</option>
+                        <option value="active">Faol</option>
+                        <option value="inactive">Faol emas</option>
+                    </select>
+                </div>
+                <button class="btn-primary" id="addStudentBtn" style="width:auto;padding:8px 18px;font-size:0.8rem;">
+                    <i class="fas fa-plus"></i> <span data-i18n="add_student">Yangi qo'shish</span>
+                </button>
+            </section>
+
+            <section class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th><span data-i18n="full_name">F.I.SH</span></th>
+                            <th><span data-i18n="email">Email</span></th>
+                            <th><span data-i18n="phone">Telefon</span></th>
+                            <th><span data-i18n="student_teacher">O'qituvchi</span></th>
+                            <th><span data-i18n="age">Yosh</span></th>
+                            <th><span data-i18n="total_xp_label">XP</span></th>
+                            <th><span data-i18n="monthly_payment">Oylik to'lov</span></th>
+                            <th>Fanlar</th>
+                            <th><span data-i18n="status">Holati</span></th>
+                            <th><span data-i18n="actions">Amallar</span></th>
+                        </tr>
+                    </thead>
+                    <tbody id="studentsBody">
+                        <tr><td colspan="10" class="text-center text-muted" data-i18n="loading">Yuklanmoqda...</td></tr>
+                    </tbody>
+                </table>
+            </section>
+        </main>
+    </div>
+
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <i class="fas fa-moon moon"></i><i class="fas fa-sun sun"></i>
+    </button>
+
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/theme.js"></script>
+    <script src="js/i18n.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/students.js"></script>
+</body>
+</html>

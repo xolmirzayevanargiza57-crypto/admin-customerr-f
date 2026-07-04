@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="light">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Customer v1.0 - O'qituvchi profili</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-brand">
+                <div class="brand-icon"><i class="fas fa-crown"></i></div>
+                <div class="brand-text">
+                    <span class="brand-name">Admin Customer</span>
+                    <span class="brand-version">v1.0</span>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-link"><i class="fas fa-chart-pie"></i> <span data-i18n="dashboard">Dashboard</span></a>
+                <a href="teachers.html" class="nav-link"><i class="fas fa-chalkboard-teacher"></i> <span data-i18n="teachers">O'qituvchilar</span></a>
+                <a href="students.html" class="nav-link"><i class="fas fa-graduation-cap"></i> <span data-i18n="students">O'quvchilar</span></a>
+                <a href="payments.html" class="nav-link"><i class="fas fa-money-bill"></i> <span data-i18n="payments">To'lovlar</span></a>
+                <a href="attendance.html" class="nav-link"><i class="fas fa-calendar-check"></i> <span data-i18n="attendance">Davomat</span></a>
+                <a href="reports.html" class="nav-link"><i class="fas fa-file-alt"></i> <span data-i18n="reports">Hisobotlar</span></a>
+                <a href="subjects.html" class="nav-link"><i class="fas fa-book"></i> <span data-i18n="subjects">Fanlar</span></a>
+                <a href="all.html" class="nav-link"><i class="fas fa-th-list"></i> <span data-i18n="all">Barchasi</span></a>
+                <a href="settings.html" class="nav-link"><i class="fas fa-cog"></i> <span data-i18n="settings">Sozlamalar</span></a>
+            </nav>
+            <div class="sidebar-footer">
+                <button id="logoutBtn" class="btn-logout"><i class="fas fa-sign-out-alt"></i> <span data-i18n="logout">Chiqish</span></button>
+            </div>
+        </aside>
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+        <main class="main-content">
+            <header class="top-header">
+                <div class="header-left">
+                    <button id="menuToggle" class="menu-toggle"><i class="fas fa-bars"></i></button>
+                    <div>
+                        <h2><i class="fas fa-chalkboard-teacher"></i> <span data-i18n="teacher_profile">O'qituvchi profili</span></h2>
+                        <p class="text-muted" id="teacherProfileName">O'qituvchi ma'lumotlari</p>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <div class="user-profile">
+                        <div class="user-avatar"><span id="userInitial">A</span></div>
+                        <div class="user-info">
+                            <p class="user-name" id="userName">Admin</p>
+                            <p class="user-role text-muted">Admin Customer</p>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div id="profileContainer" class="profile-section">
+                <div class="profile-card">
+                    <div class="profile-avatar" id="teacherAvatar">👨‍🏫</div>
+                    <h2 id="teacherFullName" style="font-size:1.1rem; font-weight:700;">-</h2>
+                    <p class="text-muted" id="teacherEmail">-</p>
+                    <p class="text-muted" id="teacherSubject" style="font-size:0.8rem;">📚 Fani: -</p>
+                    <div style="margin-top:12px; display:flex; gap:6px; justify-content:center; flex-wrap:wrap;">
+                        <span class="status-badge active" id="teacherStatus">✅ Faol</span>
+                        <span class="status-badge" style="background:var(--bg-hover); color:var(--text-muted); font-size:0.7rem;"><i class="fas fa-users"></i> <span id="teacherStudentCount">0</span> o'quvchi</span>
+                        <span class="status-badge" style="background:var(--bg-hover); color:var(--color-purple); font-size:0.7rem;"><i class="fas fa-money-bill"></i> <span id="teacherSalary">0 so'm</span></span>
+                    </div>
+                    <hr style="border:none; border-top:1px solid var(--border-color); margin:12px 0;" />
+                    <div style="text-align:left;">
+                        <p style="font-size:0.8rem; color:var(--text-muted);"><i class="fas fa-phone"></i> <span id="teacherPhone">-</span></p>
+                        <p style="font-size:0.8rem; color:var(--text-muted); margin-top:6px;"><i class="fas fa-calendar"></i> Qo'shilgan: <span id="teacherJoined">-</span></p>
+                        <p style="font-size:0.8rem; color:var(--text-muted); margin-top:6px;"><i class="fas fa-calendar-alt"></i> Tug'ilgan: <span id="teacherBirthDate">-</span></p>
+                    </div>
+                    <button class="btn-primary" style="margin-top:16px; padding:8px; font-size:0.8rem;" onclick="window.location.href='teachers.html'">
+                        <i class="fas fa-arrow-left"></i> Orqaga
+                    </button>
+                </div>
+
+                <div style="display:flex;flex-direction:column;gap:16px;">
+                    <div class="teacher-profile-view">
+                        <div class="profile-header">
+                            <div class="avatar" id="profileAvatar">👨‍🏫</div>
+                            <div class="info">
+                                <h3 id="profileName">-</h3>
+                                <p id="profileEmail">-</p>
+                            </div>
+                        </div>
+                        <div class="profile-stats">
+                            <div class="stat-item"><div class="number" id="statStudents">0</div><div class="label">O'quvchilar</div></div>
+                            <div class="stat-item"><div class="number" id="statAge">-</div><div class="label">Yosh</div></div>
+                            <div class="stat-item"><div class="number" id="statStatus">-</div><div class="label">Holati</div></div>
+                        </div>
+                    </div>
+
+                    <!-- Ish vaqtlari -->
+                    <div class="teacher-profile-view">
+                        <h4 style="font-size:0.9rem;font-weight:600;margin-bottom:8px;"><i class="fas fa-clock"></i> Ish vaqtlari</h4>
+                        <div id="teacherWorkingHours"><p class="text-muted" style="font-size:0.8rem;">Yuklanmoqda...</p></div>
+                        <div style="display:flex;gap:16px;margin-top:8px;font-size:0.8rem;color:var(--text-muted);">
+                            <span><i class="fas fa-calendar-day"></i> Kunlik dars: <strong id="teacherDailyLessons">4</strong></span>
+                            <span><i class="fas fa-clock"></i> Dars davomiyligi: <strong id="teacherLessonDuration">60 daqiqa</strong></span>
+                        </div>
+                    </div>
+
+                    <div class="teacher-profile-view">
+                        <h4 style="font-size:0.9rem;font-weight:600;margin-bottom:8px;"><i class="fas fa-users"></i> O'quvchilar ro'yxati</h4>
+                        <div id="studentsList"><p class="text-muted" style="text-align:center; padding:10px 0;">O'quvchilar mavjud emas</p></div>
+                    </div>
+
+                    <div class="teacher-profile-view">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                            <h4 style="font-size:0.9rem;font-weight:600;"><i class="fas fa-money-bill-wave"></i> Olgan oyliklari</h4>
+                            <span style="font-size:0.8rem;font-weight:600;color:var(--color-success);">Jami: <span id="teacherTotalSalary">0 so'm</span></span>
+                        </div>
+                        <div id="teacherPaymentsList"><p class="text-muted" style="text-align:center; padding:10px 0;">To'lovlar mavjud emas</p></div>
+                    </div>
+
+                    <div class="teacher-profile-view">
+                        <h4 style="font-size:0.9rem;font-weight:600;margin-bottom:8px;"><i class="fas fa-calendar-check"></i> Davomat tarixi</h4>
+                        <div id="teacherAttendanceList"><p class="text-muted" style="text-align:center; padding:10px 0;">Davomat ma'lumotlari mavjud emas</p></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <i class="fas fa-moon moon"></i><i class="fas fa-sun sun"></i>
+    </button>
+
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/theme.js"></script>
+    <script src="js/i18n.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/teacher-profile.js"></script>
+</body>
+</html>

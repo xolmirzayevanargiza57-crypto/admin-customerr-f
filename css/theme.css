@@ -1,0 +1,81 @@
+/* ============================================
+   THEME - LIGHT / DARK
+   ============================================ */
+
+:root {
+    --bg-primary: #f5f5f7;
+    --bg-secondary: #ffffff;
+    --bg-card: #ffffff;
+    --bg-sidebar: #ffffff;
+    --bg-header: #ffffff;
+    --bg-input: #ffffff;
+    --bg-hover: #f1f1f3;
+    --bg-active: #e8e8ed;
+    --text-primary: #1c1c1e;
+    --text-secondary: #48484a;
+    --text-muted: #8e8e93;
+    --border-color: #d1d1d6;
+    --border-focus: #1c1c1e;
+    --shadow-focus: 0 0 0 4px rgba(0, 0, 0, 0.05);
+    --color-success: #34c759;
+    --color-danger: #ff3b30;
+    --color-warning: #ff9500;
+}
+
+[data-theme="dark"] {
+    --bg-primary: #0a0a0a;
+    --bg-secondary: #1c1c1e;
+    --bg-card: #1c1c1e;
+    --bg-sidebar: #1c1c1e;
+    --bg-header: #1c1c1e;
+    --bg-input: #2c2c2e;
+    --bg-hover: #2c2c2e;
+    --bg-active: #3a3a3c;
+    --text-primary: #ffffff;
+    --text-secondary: #aeaeb2;
+    --text-muted: #636366;
+    --border-color: #3a3a3c;
+    --border-focus: #ffffff;
+    --shadow-focus: 0 0 0 4px rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="dark"] .logo-icon {
+    background: var(--text-primary);
+}
+
+[data-theme="dark"] .logo-icon i {
+    color: var(--bg-primary);
+}
+
+[data-theme="dark"] .brand-icon {
+    background: var(--text-primary);
+}
+
+[data-theme="dark"] .brand-icon i {
+    color: var(--bg-primary);
+}
+
+[data-theme="dark"] .user-avatar {
+    background: var(--text-primary);
+    color: var(--bg-primary);
+}
+
+[data-theme="dark"] .theme-option.active {
+    border-color: var(--text-primary);
+    background: var(--bg-active);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .stat-icon.blue { background: #1a2a4a; color: #4a9aff; }
+[data-theme="dark"] .stat-icon.green { background: #1a3a2a; color: #4ac759; }
+[data-theme="dark"] .stat-icon.purple { background: #2a1a4a; color: #9a6aff; }
+[data-theme="dark"] .stat-icon.orange { background: #3a2a1a; color: #ff9a4a; }
+
+[data-theme="dark"] .subscription-badge.monthly { background: #1a3a2a; color: #4ac759; }
+[data-theme="dark"] .subscription-badge.sixmonths { background: #1a2a4a; color: #4a9aff; }
+[data-theme="dark"] .subscription-badge.yearly { background: #2a1a4a; color: #9a6aff; }
+[data-theme="dark"] .subscription-badge.inactive { background: var(--bg-hover); color: var(--text-muted); }
+
+[data-theme="dark"] .status-badge.active { background: #1a3a2a; color: #4ac759; }
+[data-theme="dark"] .status-badge.blocked { background: #3a1a1a; color: #ff3b30; }
+[data-theme="dark"] .status-badge.inactive { background: var(--bg-hover); color: var(--text-muted); }
