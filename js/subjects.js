@@ -156,13 +156,17 @@ function showAddSubjectModal() {
             if (data.success) {
                 document.querySelector('.modal').remove();
                 showSuccess(I18N.t('success'));
-                await loadData();
+                try {
+                    await loadData();
+                } catch (loadError) {
+                    console.warn('⚠️ Fan yaratildi, ammo ma\'lumotlar qayta yuklanmadi:', loadError);
+                }
             } else {
                 showError(data.message || I18N.t('error'));
             }
         } catch (error) {
             console.error('❌ Subject yaratish xatosi:', error);
-            showError(I18N.t('network_error'));
+            showError(error.message || I18N.t('network_error'));
         }
     });
 }
