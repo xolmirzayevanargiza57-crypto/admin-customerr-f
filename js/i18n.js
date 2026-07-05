@@ -46,6 +46,9 @@ const I18N = {
                 absent_reason: "Sababli",
                 weekly_attendance: "Haftalik davomat",
                 attendance_distribution: "Davomat taqsimoti",
+                groups_by_students: "Guruhlar bo'yicha o'quvchilar",
+                student_attendance: "O'quvchilar davomat",
+                weekly_summary: "Haftalik keldi / sababli / sababsiz",
                 status: "Holati",
                 type: "Turi",
                 end_date: "Tugash vaqti",
@@ -53,6 +56,8 @@ const I18N = {
                 active: "Faol",
                 inactive: "Faol emas",
                 expired: "Muddati tugagan",
+                unknown: "Noma'lum",
+                days: "kun",
                 monthly: "Oylik",
                 sixmonths: "6 oylik",
                 yearly: "Yillik",
@@ -178,6 +183,9 @@ const I18N = {
                 absent_reason: "По причине",
                 weekly_attendance: "Еженедельная посещаемость",
                 attendance_distribution: "Распределение посещаемости",
+                groups_by_students: "Ученики по группам",
+                student_attendance: "Посещаемость учеников",
+                weekly_summary: "Еженедельно пришел / по причине / без причины",
                 status: "Статус",
                 type: "Тип",
                 end_date: "Дата окончания",
@@ -185,6 +193,8 @@ const I18N = {
                 active: "Активный",
                 inactive: "Неактивный",
                 expired: "Истек",
+                unknown: "Неизвестно",
+                days: "дней",
                 monthly: "Ежемесячный",
                 sixmonths: "6 месяцев",
                 yearly: "Годовой",
@@ -306,6 +316,9 @@ const I18N = {
                 absent_reason: "Absent with reason",
                 weekly_attendance: "Weekly Attendance",
                 attendance_distribution: "Attendance Distribution",
+                groups_by_students: "Students by groups",
+                student_attendance: "Student attendance",
+                weekly_summary: "Weekly present / with reason / absent",
                 status: "Status",
                 type: "Type",
                 end_date: "End Date",
@@ -313,6 +326,8 @@ const I18N = {
                 active: "Active",
                 inactive: "Inactive",
                 expired: "Expired",
+                unknown: "Unknown",
+                days: "days",
                 monthly: "Monthly",
                 sixmonths: "6 Months",
                 yearly: "Yearly",
@@ -421,6 +436,7 @@ const I18N = {
         localStorage.setItem('admin-language', lang);
         this._cache = {};
         this.updateUI();
+        document.dispatchEvent(new CustomEvent('i18n:language-changed', { detail: { language: lang } }));
         this.saveLanguageToServer(lang);
         setTimeout(() => { this._isUpdating = false; }, 100);
     },
@@ -484,6 +500,7 @@ const I18N = {
                     localStorage.setItem('admin-language', lang);
                     this._cache = {};
                     this.updateUI();
+                    document.dispatchEvent(new CustomEvent('i18n:language-changed', { detail: { language: lang } }));
                 }
             }
         } catch (error) {

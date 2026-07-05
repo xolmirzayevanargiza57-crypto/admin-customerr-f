@@ -6,6 +6,76 @@ let attendanceChart = null;
 let attendancePieChart = null;
 let groupChart = null;
 let studentAttendanceChart = null;
+let lastDashboardStats = null;
+
+function getDashboardLocale() {
+    if (!window.I18N || !window.I18N.currentLanguage) return 'uz';
+    return window.I18N.currentLanguage === 'ru' ? 'ru' : window.I18N.currentLanguage === 'en' ? 'en' : 'uz';
+}
+
+function updateDashboardChartTranslations() {
+    if (attendanceChart) {
+        attendanceChart.data.datasets[0].label = I18N.t('present');
+        attendanceChart.data.datasets[1].label = I18N.t('absent_reason');
+        attendanceChart.data.datasets[2].label = I18N.t('absent');
+        attendanceChart.update();
+    }
+
+    if (attendancePieChart) {
+        attendancePieChart.data.labels = [I18N.t('present'), I18N.t('absent_reason'), I18N.t('absent')];
+        attendancePieChart.update();
+    }
+
+    if (groupChart) {
+        groupChart.data.datasets[0].label = I18N.t('students');
+        groupChart.update();
+    }
+
+    if (studentAttendanceChart) {
+        studentAttendanceChart.data.datasets[0].label = I18N.t('present');
+        studentAttendanceChart.data.datasets[1].label = I18N.t('absent_reason');
+        studentAttendanceChart.data.datasets[2].label = I18N.t('absent');
+        studentAttendanceChart.update();
+    }
+
+    if (lastDashboardStats?.subscription) {
+        const elements = {
+            subscriptionStatus: document.getElementById('subscriptionStatus'),
+            subscriptionType: document.getElementById('subscriptionType'),
+            subscriptionEnd: document.getElementById('subscriptionEnd'),
+            subscriptionDays: document.getElementById('subscriptionDays')
+        };
+
+        const statusMap = {
+            active: I18N.t('active'),
+            inactive: I18N.t('inactive'),
+            expired: I18N.t('expired')
+        };
+        const typeMap = {
+            monthly: I18N.t('monthly'),
+            sixmonths: I18N.t('sixmonths'),
+            yearly: I18N.t('yearly'),
+            none: I18N.t('none')
+        };
+
+        if (elements.subscriptionStatus) {
+            elements.subscriptionStatus.textContent = statusMap[lastDashboardStats.subscription.status] || I18N.t('unknown');
+        }
+        if (elements.subscriptionType) {
+            elements.subscriptionType.textContent = typeMap[lastDashboardStats.subscription.type] || I18N.t('unknown');
+        }
+        if (lastDashboardStats.subscription.endDate && elements.subscriptionEnd) {
+            const end = new Date(lastDashboardStats.subscription.endDate);
+            elements.subscriptionEnd.textContent = end.toLocaleDateString(getDashboardLocale());
+            const days = Math.ceil((end - new Date()) / (1000 * 60 * 60 * 24));
+            if (elements.subscriptionDays) {
+                elements.subscriptionDays.textContent = days > 0 ? `${days} ${I18N.t('days')}` : I18N.t('expired');
+            }
+        }
+    }
+}
+
+document.addEventListener('i18n:language-changed', updateDashboardChartTranslations);
 
 // ⭐ XATOLIKLARNI USHLASH VA LOGGA YOZISH
 window.addEventListener('error', function(e) {
@@ -242,7 +312,7 @@ function initCharts() {
                 labels: getWeeklyChartLabels(),
                 datasets: [
                     {
-                        label: 'Keldi',
+                        label: I18N.t('present'),
                         data: [0, 0, 0, 0, 0, 0, 0],
                         backgroundColor: 'rgba(52, 199, 89, 0.7)',
                         borderColor: '#34c759',
@@ -250,7 +320,7 @@ function initCharts() {
                         borderRadius: 4
                     },
                     {
-                        label: 'Sababli',
+                        label: I18N.t('absent_reason'),
                         data: [0, 0, 0, 0, 0, 0, 0],
                         backgroundColor: 'rgba(255, 149, 0, 0.7)',
                         borderColor: '#ff9500',
@@ -258,7 +328,7 @@ function initCharts() {
                         borderRadius: 4
                     },
                     {
-                        label: 'Kelmadi',
+                        label: I18N.t('absent'),
                         data: [0, 0, 0, 0, 0, 0, 0],
                         backgroundColor: 'rgba(255, 59, 48, 0.7)',
                         borderColor: '#ff3b30',
@@ -326,7 +396,7 @@ function initCharts() {
         attendancePieChart = new Chart(pieCtx, {
             type: 'doughnut',
             data: {
-                labels: ['Keldi', 'Sababli', 'Kelmadi'],
+                labels: [I18N.t('present'), I18N.t('absent_reason'), I18N.t('absent')],
                 datasets: [{
                     data: [0, 0, 0],
                     backgroundColor: ['#34c759', '#ff9500', '#ff3b30'],
@@ -367,7 +437,7 @@ function initCharts() {
                 data: {
                     labels: ['A', 'B', 'C', 'Boshqa'],
                     datasets: [{
-                        label: 'O\'quvchilar',
+                        label: I18N.t('students'),
                         data: [0, 0, 0, 0],
                         backgroundColor: ['#007aff', '#34c759', '#ff9500', '#8e8e93'],
                         borderRadius: 6
@@ -397,21 +467,21 @@ function initCharts() {
                     labels: [],
                     datasets: [
                         {
-                            label: 'Keldi',
+                            label: I18N.t('present'),
                             data: [],
                             backgroundColor: '#34c759',
                             borderRadius: 4,
                             stack: 'Stack 0'
                         },
                         {
-                            label: 'Sababli',
+                            label: I18N.t('absent_reason'),
                             data: [],
                             backgroundColor: '#ff9500',
                             borderRadius: 4,
                             stack: 'Stack 0'
                         },
                         {
-                            label: 'Sababsiz',
+                            label: I18N.t('absent'),
                             data: [],
                             backgroundColor: '#ff3b30',
                             borderRadius: 4,
@@ -475,6 +545,7 @@ async function loadDashboardStats() {
         }
         
         const stats = data.data;
+        lastDashboardStats = stats;
         console.log('📊 Statistika ma\'lumotlari:', stats);
         
         // Stats cards
@@ -526,20 +597,29 @@ async function loadDashboardStats() {
 
         // Subscription
         if (stats.subscription) {
-            const statusMap = { active: 'Faol', inactive: 'Faol emas', expired: 'Muddati tugagan' };
-            const typeMap = { monthly: 'Oylik', sixmonths: '6 oylik', yearly: 'Yillik', none: "Yo'q" };
+            const statusMap = {
+                active: I18N.t('active'),
+                inactive: I18N.t('inactive'),
+                expired: I18N.t('expired')
+            };
+            const typeMap = {
+                monthly: I18N.t('monthly'),
+                sixmonths: I18N.t('sixmonths'),
+                yearly: I18N.t('yearly'),
+                none: I18N.t('none')
+            };
             if (elements.subscriptionStatus) {
-                elements.subscriptionStatus.textContent = statusMap[stats.subscription.status] || 'Noma\'lum';
+                elements.subscriptionStatus.textContent = statusMap[stats.subscription.status] || I18N.t('unknown');
             }
             if (elements.subscriptionType) {
-                elements.subscriptionType.textContent = typeMap[stats.subscription.type] || 'Noma\'lum';
+                elements.subscriptionType.textContent = typeMap[stats.subscription.type] || I18N.t('unknown');
             }
             if (stats.subscription.endDate && elements.subscriptionEnd) {
                 const end = new Date(stats.subscription.endDate);
-                elements.subscriptionEnd.textContent = end.toLocaleDateString('uz');
+                elements.subscriptionEnd.textContent = end.toLocaleDateString(getDashboardLocale());
                 const days = Math.ceil((end - new Date()) / (1000 * 60 * 60 * 24));
                 if (elements.subscriptionDays) {
-                    elements.subscriptionDays.textContent = days > 0 ? `${days} kun` : 'Tugagan';
+                    elements.subscriptionDays.textContent = days > 0 ? `${days} ${I18N.t('days')}` : I18N.t('expired');
                 }
             }
         }
