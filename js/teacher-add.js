@@ -2,6 +2,8 @@
 // TEACHER ADD - YANGI O'QITUVCHI
 // ============================================
 
+let subjectSelect = null;
+
 document.addEventListener('DOMContentLoaded', () => {
     if (!Auth.isAuthenticated()) {
         window.location.href = 'index.html';
@@ -13,6 +15,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const messageDiv = document.getElementById('formMessage');
     const passwordInput = document.getElementById('password');
     const passwordToggle = document.getElementById('passwordToggle');
+    subjectSelect = document.getElementById('subject');
+    
+    // Load subjects for teacher assignment
+    loadSubjects();
     
     // Password toggle
     if (passwordToggle && passwordInput) {
@@ -38,11 +44,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const email = document.getElementById('email').value.trim();
         const phone = document.getElementById('phone').value.trim();
         const password = passwordInput.value;
-        const subject = document.getElementById('subject').value.trim();
+        const subject = subjectSelect.value.trim();
         
         // Validatsiya
-        if (!fullName || !email || !password) {
-            showMessage((getTranslation('all_fields_required') || 'F.I.SH, Email va Parol majburiy!'), 'error');
+        if (!fullName || !email || !password || !subject) {
+            showMessage((getTranslation('all_fields_required') || 'F.I.SH, Email, Fan va Parol majburiy!'), 'error');
             return;
         }
         
@@ -97,3 +103,28 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 5000);
     }
 });
+
+async function loadSubjects() {
+    try {
+        const data = await API.getSubjects();
+        const subjects = data.data || [];
+        subjectSelect.innerHTML = '<option value="" selected disabled>' + (getTranslation('select_subject') || 'Fan tanlang...') + '</option>';
+
+        if (data.success && subjects.length > 0) {
+            subjectSelect.disabled = false;
+            subjects.forEach(subject => {
+                const option = document.createElement('option');
+                option.value = subject.name || subject.title || '';
+                option.textContent = subject.name || subject.title || '—';
+                subjectSelect.appendChild(option);
+            });
+        } else {
+            subjectSelect.disabled = true;
+            subjectSelect.innerHTML = '<option value="" selected disabled>' + (getTranslation('no_subjects_available') || 'Fanlar mavjud emas. Avval fan qo\'shing.') + '</option>';
+        }
+    } catch (error) {
+        console.error('Fanlar yuklash xatosi:', error);
+        subjectSelect.innerHTML = '<option value="" selected disabled>' + (getTranslation('no_subjects_available') || 'Fanlar mavjud emas. Avval fan qo\'shing.') + '</option>';
+        subjectSelect.disabled = true;
+    }
+}

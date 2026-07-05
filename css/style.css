@@ -1109,10 +1109,11 @@ body {
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    padding: 3px 10px;
+    padding: 4px 10px;
     border-radius: 20px;
-    font-size: 0.7rem;
-    font-weight: 500;
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
 }
 
 .status-badge.active {
@@ -1505,14 +1506,20 @@ body {
 .attendance-page-card .card-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
     margin-bottom: 16px;
 }
 
 .attendance-page-card .card-header h3 {
+    flex: 1 1 100%;
+    min-width: 0;
     font-size: 1rem;
     font-weight: 600;
     color: var(--text-primary);
+    white-space: normal;
+    word-break: break-word;
 }
 
 .attendance-page-card .card-header .date {
@@ -1536,15 +1543,21 @@ body {
 
 .attendance-page-card .teacher-item .info .name,
 .attendance-page-card .student-item .info .name {
-    font-weight: 500;
-    font-size: 0.85rem;
+    font-weight: 600;
+    font-size: 0.95rem;
     color: var(--text-primary);
 }
 
 .attendance-page-card .teacher-item .info .role,
 .attendance-page-card .student-item .info .role {
-    font-size: 0.7rem;
+    font-size: 0.8rem;
     color: var(--text-muted);
+}
+
+.attendance-page-card .teacher-item .reason,
+.attendance-page-card .student-item .reason {
+    font-size: 0.78rem;
+    margin-top: 4px;
 }
 
 .attendance-page-card .salary {
@@ -3839,19 +3852,26 @@ body {
     border-radius: var(--radius);
     padding: 16px 20px;
     border: 1px solid var(--border-color);
+    min-width: 0;
 }
 
 .chart-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
     margin-bottom: 12px;
 }
 
 .chart-header h3 {
+    flex: 1 1 0;
+    min-width: 0;
     font-size: 0.85rem;
     font-weight: 600;
     color: var(--text-primary);
+    white-space: normal;
+    word-break: break-word;
 }
 
 .chart-header h3 i {

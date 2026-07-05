@@ -9,6 +9,17 @@ let currentDate = new Date().toISOString().split('T')[0];
 let teacherGroupFilterValue = 'all';
 let teacherFilterValue = 'all';
 
+function getAttendanceStatusMeta(status) {
+    const normalized = status || 'not_marked';
+    const statusMap = {
+        present: { label: I18N.t('present'), className: 'present' },
+        absent_reason: { label: I18N.t('absent_reason'), className: 'absent-reason' },
+        absent: { label: I18N.t('absent'), className: 'absent' },
+        not_marked: { label: I18N.t('not_marked'), className: 'inactive' }
+    };
+    return statusMap[normalized] || { label: normalized || I18N.t('not_marked'), className: 'inactive' };
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
     const token = localStorage.getItem('customerToken') || sessionStorage.getItem('customerToken');
     if (!token) {
@@ -56,6 +67,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     await loadAttendanceData();
     setupListeners();
+});
+
+document.addEventListener('i18n:language-changed', () => {
+    if (document.getElementById('teachersAttendanceList') || document.getElementById('studentsAttendanceList')) {
+        loadAttendanceData();
+    }
 });
 
 // ============================================================
@@ -141,11 +158,11 @@ async function loadTeacherAttendance(teachers) {
                 teacher.attendanceId = att.data[0]._id;
                 teacher.attendanceReason = att.data[0].reason || '';
             } else {
-                teacher.attendanceStatus = 'absent';
+                teacher.attendanceStatus = 'not_marked';
                 teacher.attendanceReason = '';
             }
         } catch (e) {
-            teacher.attendanceStatus = 'absent';
+            teacher.attendanceStatus = 'not_marked';
             teacher.attendanceReason = '';
         }
     }
@@ -174,11 +191,11 @@ async function loadStudentAttendance(students) {
                     }
                 }
             } else {
-                student.attendanceStatus = 'absent';
+                student.attendanceStatus = 'not_marked';
                 student.attendanceReason = '';
             }
         } catch (e) {
-            student.attendanceStatus = 'absent';
+            student.attendanceStatus = 'not_marked';
             student.attendanceReason = '';
         }
     }
@@ -260,7 +277,7 @@ async function renderTeacherHistoryWeeks() {
             <div class="chart-card" style="padding:14px 16px;">
                 <div style="display:flex;justify-content:space-between;gap:8px;align-items:center;">
                     <strong>${range.start} — ${range.end}</strong>
-                    <span class="text-muted" style="font-size:0.75rem;">${present} keldi / ${absentReason} sababli / ${absent} kelmadi</span>
+                    <span class="text-muted" style="font-size:0.75rem;">${present} ${I18N.t('present').toLowerCase()} / ${absentReason} ${I18N.t('absent_reason').toLowerCase()} / ${absent} ${I18N.t('absent').toLowerCase()}</span>
                 </div>
                 <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px;">
                     ${teacherItems.slice(0, 8).map(item => `<span class="status-badge ${item.attendance === 'present' ? 'present' : item.attendance === 'absent_reason' ? 'absent-reason' : 'absent'}">${item.teacherName || 'O\'qituvchi'}</span>`).join('')}
@@ -311,12 +328,7 @@ function renderTeacherWeeklyAttendance(teacherEntries = []) {
             if (!entry) {
                 return '<td><span class="text-muted">—</span></td>';
             }
-            const statusMap = {
-                present: { label: 'Keldi', className: 'present' },
-                absent_reason: { label: 'Sababli', className: 'absent-reason' },
-                absent: { label: 'Kelmadi', className: 'absent' }
-            };
-            const status = statusMap[entry.attendance] || { label: entry.attendance || '—', className: 'inactive' };
+            const status = getAttendanceStatusMeta(entry.attendance);
             return `
                 <td>
                     <div class="status-badge ${status.className}">${status.label}</div>
@@ -390,12 +402,7 @@ function renderStudentWeeklyAttendance(studentEntries = []) {
             if (!entry) {
                 return '<td><span class="text-muted">—</span></td>';
             }
-            const statusMap = {
-                present: { label: 'Keldi', className: 'present' },
-                absent_reason: { label: 'Sababli', className: 'absent-reason' },
-                absent: { label: 'Kelmadi', className: 'absent' }
-            };
-            const status = statusMap[entry.attendance] || { label: entry.attendance || '—', className: 'inactive' };
+            const status = getAttendanceStatusMeta(entry.attendance);
             return `
                 <td>
                     <div class="status-badge ${status.className}">${status.label}</div>
@@ -443,23 +450,16 @@ function renderTeacherAttendance(teachers, attendanceMap = new Map()) {
 
     container.innerHTML = teachers.map(teacher => {
         const attendance = attendanceMap.get(String(teacher._id));
-        const status = attendance?.attendance || 'absent';
+        const status = attendance?.attendance || 'not_marked';
         const reason = attendance?.reason || teacher.attendanceReason || '';
         
         const showReasonInput = (status === 'absent_reason');
         
         console.log(`👤 ${teacher.fullName} - Status: ${status}, ShowReasonInput: ${showReasonInput}`);
         
-        const statusMap = {
-            'present': '✅ Keldi',
-            'absent_reason': '⚠️ Sababli',
-            'absent': '❌ Kelmadi'
-        };
-        const statusClass = {
-            'present': 'present',
-            'absent_reason': 'absent-reason',
-            'absent': 'absent'
-        };
+        const statusMeta = getAttendanceStatusMeta(status);
+        const statusLabel = `✅ ${statusMeta.label}`;
+        const statusClass = statusMeta.className;
         
         return `
             <div class="teacher-item" data-id="${teacher._id}">
@@ -469,26 +469,26 @@ function renderTeacherAttendance(teachers, attendanceMap = new Map()) {
                     ${reason ? `<div class="reason" style="font-size:0.7rem;color:var(--text-muted);"><i class="fas fa-comment"></i> ${reason}</div>` : ''}
                 </div>
                 <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-                    <span class="status-badge ${statusClass[status]}">${statusMap[status]}</span>
+                    <span class="status-badge ${statusClass}">${statusLabel}</span>
                     <div class="attendance-btn-group">
                         <button class="btn-attendance ${status === 'present' ? 'active-present' : ''}" 
                                 data-id="${teacher._id}" data-type="teacher" data-status="present" 
-                                title="Keldi">✅</button>
+                                title="${I18N.t('present')}">✅</button>
                         <button class="btn-attendance ${status === 'absent_reason' ? 'active-absent-reason' : ''}" 
                                 data-id="${teacher._id}" data-type="teacher" data-status="absent_reason" 
-                                title="Sababli kelmadi">⚠️</button>
+                                title="${I18N.t('absent_reason')}">⚠️</button>
                         <button class="btn-attendance ${status === 'absent' ? 'active-absent' : ''}" 
                                 data-id="${teacher._id}" data-type="teacher" data-status="absent" 
-                                title="Kelmadi">❌</button>
+                                title="${I18N.t('absent')}">❌</button>
                     </div>
                 </div>
                 <div class="reason-container" style="display:${showReasonInput ? 'flex' : 'none'};align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap;width:100%;padding-top:8px;border-top:1px solid var(--border-color);">
-                    <input type="text" class="reason-input" placeholder="Sababni yozing..." 
+                    <input type="text" class="reason-input" placeholder="${I18N.t('reason_placeholder')}" 
                            data-id="${teacher._id}" value="${reason}"
                            style="flex:1;min-width:200px;padding:8px 12px;border:2px solid var(--border-color);border-radius:8px;font-size:0.85rem;background:var(--bg-input);color:var(--text-primary);outline:none;transition:var(--transition);" />
                     <button class="btn-save-reason" data-id="${teacher._id}" 
                             style="padding:8px 18px;background:var(--color-purple);color:#fff;border:none;border-radius:8px;font-size:0.8rem;cursor:pointer;transition:var(--transition);display:flex;align-items:center;gap:6px;white-space:nowrap;">
-                        <i class="fas fa-save"></i> Saqlash
+                        <i class="fas fa-save"></i> ${I18N.t('save')}
                     </button>
                 </div>
             </div>
@@ -530,20 +530,9 @@ function renderStudentAttendance(students, attendanceMap = new Map()) {
         return;
     }
 
-    const statusMap = {
-        'present': '✅ Keldi',
-        'absent_reason': '⚠️ Sababli',
-        'absent': '❌ Kelmadi'
-    };
-    const statusClass = {
-        'present': 'present',
-        'absent_reason': 'absent-reason',
-        'absent': 'absent'
-    };
-
     container.innerHTML = filteredStudents.map(student => {
         const attendance = attendanceMap.get(String(student._id));
-        const status = attendance?.attendance || 'absent';
+        const status = attendance?.attendance || 'not_marked';
         const reason = attendance?.reason || student.attendanceReason || '';
         return `
             <div class="student-item" data-id="${student._id}">
@@ -553,9 +542,9 @@ function renderStudentAttendance(students, attendanceMap = new Map()) {
                     ${reason ? `<div class="reason" style="font-size:0.7rem;color:var(--text-muted);"><i class="fas fa-comment"></i> ${reason}</div>` : ''}
                 </div>
                 <div>
-                    <span class="status-badge ${statusClass[status]}">${statusMap[status]}</span>
+                    <span class="status-badge ${getAttendanceStatusMeta(status).className}">${'✅ ' + getAttendanceStatusMeta(status).label}</span>
                     <span style="font-size:0.65rem;color:var(--text-muted);margin-left:8px;">
-                        <i class="fas fa-lock"></i> Faqat o'qituvchi belgilaydi
+                        <i class="fas fa-lock"></i> ${I18N.t('teacher_marks_attendance')}
                     </span>
                 </div>
             </div>
@@ -576,27 +565,19 @@ function renderAttendanceHistory(attendances) {
         return;
     }
 
-    const statusMap = {
-        'present': '✅ Keldi',
-        'absent_reason': '⚠️ Sababli',
-        'absent': '❌ Kelmadi'
-    };
-    const statusClass = {
-        'present': 'present',
-        'absent_reason': 'absent-reason',
-        'absent': 'absent'
-    };
-
-    container.innerHTML = attendances.map(att => `
+    container.innerHTML = attendances.map(att => {
+        const statusMeta = getAttendanceStatusMeta(att.attendance);
+        return `
         <div class="attendance-history-item" style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-bottom:1px solid var(--border-color);">
             <div>
                 <strong>${att.studentName || att.teacherName || 'Noma\'lum'}</strong>
                 <span style="font-size:0.7rem;color:var(--text-muted);margin-left:8px;">${att.type === 'teacher' ? '👨‍🏫 O\'qituvchi' : '🎓 O\'quvchi'}</span>
                 ${att.reason ? `<span style="font-size:0.7rem;color:var(--text-muted);margin-left:8px;"><i class="fas fa-comment"></i> ${att.reason}</span>` : ''}
             </div>
-            <span class="status-badge ${statusClass[att.attendance] || 'inactive'}">${statusMap[att.attendance] || att.attendance}</span>
+            <span class="status-badge ${statusMeta.className}">${'✅ ' + statusMeta.label}</span>
         </div>
-    `).join('');
+    `;
+    }).join('');
 }
 
 // ============================================================
@@ -619,9 +600,9 @@ async function handleTeacherAttendanceClick(e) {
     try {
         // ⭐ Agar status absent_reason bo'lsa, avval sabab so'raladi
         if (status === 'absent_reason') {
-            const reason = prompt('Sababni yozing:');
+            const reason = prompt(I18N.t('reason_placeholder'));
             if (!reason || reason.trim() === '') {
-                showError('Sabab yozilishi kerak!');
+                showError(I18N.t('reason_required') || 'Sabab yozilishi kerak!');
                 btn.disabled = false;
                 btn.style.opacity = '1';
                 return;
@@ -641,7 +622,7 @@ async function handleTeacherAttendanceClick(e) {
                     const badge = item.querySelector('.status-badge');
                     if (badge) {
                         badge.className = 'status-badge absent-reason';
-                        badge.textContent = '⚠️ Sababli';
+                        badge.textContent = `⚠️ ${I18N.t('absent_reason')}`;
                     }
                     
                     let reasonDiv = item.querySelector('.reason');
@@ -699,19 +680,10 @@ async function handleTeacherAttendanceClick(e) {
             const item = btn.closest('.teacher-item');
             if (item) {
                 const badge = item.querySelector('.status-badge');
-                const statusMap = {
-                    'present': '✅ Keldi',
-                    'absent_reason': '⚠️ Sababli',
-                    'absent': '❌ Kelmadi'
-                };
-                const statusClass = {
-                    'present': 'present',
-                    'absent_reason': 'absent-reason',
-                    'absent': 'absent'
-                };
+                const statusMeta = getAttendanceStatusMeta(status);
                 if (badge) {
-                    badge.className = `status-badge ${statusClass[status]}`;
-                    badge.textContent = statusMap[status];
+                    badge.className = `status-badge ${statusMeta.className}`;
+                    badge.textContent = `✅ ${statusMeta.label}`;
                 }
                 
                 const btns = item.querySelectorAll('.btn-attendance');
@@ -801,7 +773,7 @@ async function handleReasonSave(e) {
             const badge = item.querySelector('.status-badge');
             if (badge) {
                 badge.className = 'status-badge absent-reason';
-                badge.textContent = '⚠️ Sababli';
+                badge.textContent = `⚠️ ${I18N.t('absent_reason')}`;
             }
             
             let reasonDiv = item.querySelector('.reason');
