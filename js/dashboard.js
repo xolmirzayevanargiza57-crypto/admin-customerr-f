@@ -5,6 +5,7 @@
 let attendanceChart = null;
 let attendancePieChart = null;
 let groupChart = null;
+let studentAttendanceChart = null;
 
 // ⭐ XATOLIKLARNI USHLASH VA LOGGA YOZISH
 window.addEventListener('error', function(e) {
@@ -383,6 +384,72 @@ function initCharts() {
                 }
             });
         }
+
+        const studentChartCtx = document.getElementById('studentAttendanceChart');
+        if (studentChartCtx) {
+            if (studentAttendanceChart) {
+                studentAttendanceChart.destroy();
+                studentAttendanceChart = null;
+            }
+            studentAttendanceChart = new Chart(studentChartCtx, {
+                type: 'bar',
+                data: {
+                    labels: [],
+                    datasets: [
+                        {
+                            label: 'Keldi',
+                            data: [],
+                            backgroundColor: '#34c759',
+                            borderRadius: 4,
+                            stack: 'Stack 0'
+                        },
+                        {
+                            label: 'Sababli',
+                            data: [],
+                            backgroundColor: '#ff9500',
+                            borderRadius: 4,
+                            stack: 'Stack 0'
+                        },
+                        {
+                            label: 'Sababsiz',
+                            data: [],
+                            backgroundColor: '#ff3b30',
+                            borderRadius: 4,
+                            stack: 'Stack 0'
+                        }
+                    ]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                usePointStyle: true,
+                                pointStyle: 'circle',
+                                font: { size: 11 },
+                                padding: 12
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            ticks: { font: { size: 11 }, stepSize: 1 },
+                            stacked: true,
+                            grid: { color: 'rgba(0,0,0,0.05)' }
+                        },
+                        y: {
+                            ticks: { font: { size: 11 } },
+                            stacked: true,
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
         
     } catch (error) {
         console.error('❌ Chart yaratish xatosi:', error);
@@ -503,6 +570,7 @@ async function loadDashboardStats() {
         }
 
         await loadGroupChartData();
+        updateStudentAttendanceChart(stats.studentAttendanceSummary || []);
         
         console.log('✅ Dashboard statistikasi yuklandi!');
         
@@ -583,6 +651,26 @@ function updateGroupChart(counts) {
     groupChart.update();
 }
 
+function updateStudentAttendanceChart(summary) {
+    if (!studentAttendanceChart) {
+        if (document.getElementById('studentAttendanceChart')) {
+            initCharts();
+        }
+        if (!studentAttendanceChart) return;
+    }
+
+    const labels = summary.map(item => item.studentName || 'Noma\'lum');
+    const presentData = summary.map(item => item.present || 0);
+    const absentReasonData = summary.map(item => item.absent_reason || 0);
+    const absentData = summary.map(item => item.absent || 0);
+
+    studentAttendanceChart.data.labels = labels;
+    studentAttendanceChart.data.datasets[0].data = presentData;
+    studentAttendanceChart.data.datasets[1].data = absentReasonData;
+    studentAttendanceChart.data.datasets[2].data = absentData;
+    studentAttendanceChart.update();
+}
+
 function updatePieChart(stats) {
     console.log('📊 Pie chart yangilanmoqda...');
     
@@ -643,6 +731,10 @@ function setupListeners() {
             if (attendancePieChart) {
                 attendancePieChart.resize();
                 console.log('✅ attendancePieChart resize qilindi');
+            }
+            if (studentAttendanceChart) {
+                studentAttendanceChart.resize();
+                console.log('✅ studentAttendanceChart resize qilindi');
             }
         }, 500);
     });

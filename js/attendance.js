@@ -4,6 +4,7 @@
 
 let allTeachers = [];
 let allStudents = [];
+let allAttendances = [];
 let currentDate = new Date().toISOString().split('T')[0];
 let teacherGroupFilterValue = 'all';
 let teacherFilterValue = 'all';
@@ -35,6 +36,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         groupFilter.addEventListener('change', (e) => {
             teacherGroupFilterValue = e.target.value;
             renderTeacherWeeklyAttendance();
+            renderStudentAttendance(allStudents, new Map(allAttendances.filter(att => att.type === 'student').map(att => [String(att.studentId || ''), att])));
+            loadStudentWeeklyAttendance();
         });
     }
 
@@ -61,25 +64,58 @@ document.addEventListener('DOMContentLoaded', async () => {
 async function loadAttendanceData() {
     try {
         console.log('📊 Davomat yuklanmoqda... Sana:', currentDate);
-        
-        const teachersRes = await API.getTeachers();
+
+        const [teachersRes, studentsRes, attendancesRes] = await Promise.all([
+            API.getTeachers(),
+            API.getStudents(),
+            API.getAttendances({ date: currentDate })
+        ]);
+
         if (teachersRes.success) {
             allTeachers = (teachersRes.data || []).map(teacher => ({
                 ...teacher,
                 group: teacher.group || 'A'
             }));
             populateTeacherFilter();
-            await loadTeacherAttendance(allTeachers);
         }
 
-        const studentsRes = await API.getStudents();
         if (studentsRes.success) {
-            allStudents = studentsRes.data || [];
-            await loadStudentAttendance(allStudents);
+            const teacherNameMap = new Map((allTeachers || []).map(t => [String(t._id), t.fullName]));
+            allStudents = (studentsRes.data || []).map(student => ({
+                ...student,
+                group: student.group || 'A',
+                teacherName: teacherNameMap.get(String(student.teacherId)) || '—'
+            }));
         }
 
-        await loadAttendanceHistory();
+        if (attendancesRes.success) {
+            allAttendances = attendancesRes.data || [];
+        } else {
+            allAttendances = [];
+        }
+
+        const teacherAttendanceMap = new Map();
+        const studentAttendanceMap = new Map();
+
+        allAttendances.forEach(att => {
+            if (att.type === 'teacher') {
+                teacherAttendanceMap.set(String(att.teacherId || att.studentId || ''), att);
+            } else if (att.type === 'student') {
+                studentAttendanceMap.set(String(att.studentId || ''), att);
+            }
+        });
+
+        renderTeacherAttendance(allTeachers, teacherAttendanceMap);
+        renderStudentAttendance(allStudents, studentAttendanceMap);
+        renderAttendanceHistory(allAttendances);
+
+        const historyDateEl = document.getElementById('historyDate');
+        if (historyDateEl) {
+            historyDateEl.textContent = currentDate;
+        }
+
         await loadTeacherWeeklyAttendance();
+        await loadStudentWeeklyAttendance();
 
         console.log('✅ Davomat ma\'lumotlari yuklandi!');
         I18N.updateUI();
@@ -299,6 +335,84 @@ function renderTeacherWeeklyAttendance(teacherEntries = []) {
 }
 
 // ============================================================
+// O'QUVCHILAR HAFTALIK DAVOMATI
+async function loadStudentWeeklyAttendance() {
+    try {
+        const range = getWeekRange(currentDate);
+        const response = await API.getAttendances({
+            dateFrom: range.start,
+            dateTo: range.end
+        });
+
+        if (response.success) {
+            const studentEntries = (response.data || []).filter(item => item.type === 'student');
+            renderStudentWeeklyAttendance(studentEntries);
+        } else {
+            renderStudentWeeklyAttendance([]);
+        }
+    } catch (error) {
+        console.error('❌ Haftalik o\'quvchi davomatini yuklash xatosi:', error);
+        renderStudentWeeklyAttendance([]);
+    }
+}
+
+function renderStudentWeeklyAttendance(studentEntries = []) {
+    const container = document.getElementById('studentWeeklyAttendanceBody');
+    if (!container) return;
+
+    const weekDates = getWeekDates(currentDate);
+    const filteredStudents = allStudents.filter(student => {
+        return teacherGroupFilterValue === 'all' || String(student.group || 'A').toUpperCase() === teacherGroupFilterValue.toUpperCase();
+    });
+
+    if (!filteredStudents.length) {
+        container.innerHTML = '<tr><td colspan="8" class="text-center text-muted">Ma\'lumot yo\'q</td></tr>';
+        return;
+    }
+
+    const attendanceMap = new Map();
+    studentEntries.forEach(entry => {
+        const key = String(entry.studentId || '');
+        if (!key) return;
+        if (!attendanceMap.has(key)) attendanceMap.set(key, {});
+        attendanceMap.get(key)[entry.date] = entry;
+    });
+
+    const selectedStudents = filteredStudents;
+    if (!selectedStudents.length) {
+        container.innerHTML = '<tr><td colspan="8" class="text-center text-muted">Ma\'lumot yo\'q</td></tr>';
+        return;
+    }
+
+    container.innerHTML = selectedStudents.map(student => {
+        const rows = weekDates.map(date => {
+            const entry = attendanceMap.get(String(student._id))?.[date];
+            if (!entry) {
+                return '<td><span class="text-muted">—</span></td>';
+            }
+            const statusMap = {
+                present: { label: 'Keldi', className: 'present' },
+                absent_reason: { label: 'Sababli', className: 'absent-reason' },
+                absent: { label: 'Kelmadi', className: 'absent' }
+            };
+            const status = statusMap[entry.attendance] || { label: entry.attendance || '—', className: 'inactive' };
+            return `
+                <td>
+                    <div class="status-badge ${status.className}">${status.label}</div>
+                </td>
+            `;
+        }).join('');
+
+        return `
+            <tr>
+                <td><strong>${student.fullName || 'Noma\'lum'}</strong></td>
+                ${rows}
+            </tr>
+        `;
+    }).join('');
+}
+
+// ============================================================
 // DAVOMAT TARIXI
 // ============================================================
 async function loadAttendanceHistory() {
@@ -315,7 +429,7 @@ async function loadAttendanceHistory() {
 // ============================================================
 // ⭐ O'QITUVCHILAR RO'YXATI - INPUT VA TUGMA SHU YERDA
 // ============================================================
-function renderTeacherAttendance(teachers) {
+function renderTeacherAttendance(teachers, attendanceMap = new Map()) {
     const container = document.getElementById('teachersAttendanceList');
     if (!container) return;
     
@@ -328,9 +442,10 @@ function renderTeacherAttendance(teachers) {
     console.log('📊 O\'qituvchilar render qilinmoqda:', teachers.length);
 
     container.innerHTML = teachers.map(teacher => {
-        const status = teacher.attendanceStatus || 'absent';
+        const attendance = attendanceMap.get(String(teacher._id));
+        const status = attendance?.attendance || 'absent';
+        const reason = attendance?.reason || teacher.attendanceReason || '';
         
-        // ⭐ MUHIM: showReasonInput = true agar status 'absent_reason' bo'lsa
         const showReasonInput = (status === 'absent_reason');
         
         console.log(`👤 ${teacher.fullName} - Status: ${status}, ShowReasonInput: ${showReasonInput}`);
@@ -344,14 +459,14 @@ function renderTeacherAttendance(teachers) {
             'present': 'present',
             'absent_reason': 'absent-reason',
             'absent': 'absent'
-        };  
+        };
         
         return `
             <div class="teacher-item" data-id="${teacher._id}">
                 <div class="info">
                     <div class="name"><i class="fas fa-user-circle"></i> ${teacher.fullName || 'Noma\'lum'}</div>
                     <div class="role">${teacher.subject || 'Fani yo\'q'} • Oylik: ${Utils.formatMoney(teacher.salary || 0, 'UZS')}</div>
-                    ${teacher.attendanceReason ? `<div class="reason" style="font-size:0.7rem;color:var(--text-muted);"><i class="fas fa-comment"></i> ${teacher.attendanceReason}</div>` : ''}
+                    ${reason ? `<div class="reason" style="font-size:0.7rem;color:var(--text-muted);"><i class="fas fa-comment"></i> ${reason}</div>` : ''}
                 </div>
                 <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
                     <span class="status-badge ${statusClass[status]}">${statusMap[status]}</span>
@@ -367,10 +482,9 @@ function renderTeacherAttendance(teachers) {
                                 title="Kelmadi">❌</button>
                     </div>
                 </div>
-                <!-- ⭐ SABAB INPUTI VA SAQLASH TUGMASI - SHU YERDA -->
                 <div class="reason-container" style="display:${showReasonInput ? 'flex' : 'none'};align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap;width:100%;padding-top:8px;border-top:1px solid var(--border-color);">
                     <input type="text" class="reason-input" placeholder="Sababni yozing..." 
-                           data-id="${teacher._id}" value="${teacher.attendanceReason || ''}"
+                           data-id="${teacher._id}" value="${reason}"
                            style="flex:1;min-width:200px;padding:8px 12px;border:2px solid var(--border-color);border-radius:8px;font-size:0.85rem;background:var(--bg-input);color:var(--text-primary);outline:none;transition:var(--transition);" />
                     <button class="btn-save-reason" data-id="${teacher._id}" 
                             style="padding:8px 18px;background:var(--color-purple);color:#fff;border:none;border-radius:8px;font-size:0.8rem;cursor:pointer;transition:var(--transition);display:flex;align-items:center;gap:6px;white-space:nowrap;">
@@ -381,7 +495,6 @@ function renderTeacherAttendance(teachers) {
         `;
     }).join('');
     
-    // ⭐ EVENT LISTENERLAR
     document.querySelectorAll('#teachersAttendanceList .btn-attendance').forEach(btn => {
         btn.removeEventListener('click', handleTeacherAttendanceClick);
         btn.addEventListener('click', handleTeacherAttendanceClick);
@@ -403,11 +516,15 @@ function renderTeacherAttendance(teachers) {
 // ============================================================
 // O'QUVCHILAR RO'YXATI - FAQAT KO'RISH
 // ============================================================
-function renderStudentAttendance(students) {
+function renderStudentAttendance(students, attendanceMap = new Map()) {
     const container = document.getElementById('studentsAttendanceList');
     if (!container) return;
     
-    if (!students || students.length === 0) {
+    const filteredStudents = (students || []).filter(student => {
+        return teacherGroupFilterValue === 'all' || String(student.group || 'A').toUpperCase() === teacherGroupFilterValue.toUpperCase();
+    });
+
+    if (!filteredStudents.length) {
         container.innerHTML = `<div class="text-muted" style="text-align:center;padding:20px 0;" data-i18n="no_data">Ma'lumot yo'q</div>`;
         I18N.updateUI();
         return;
@@ -424,14 +541,16 @@ function renderStudentAttendance(students) {
         'absent': 'absent'
     };
 
-    container.innerHTML = students.map(student => {
-        const status = student.attendanceStatus || 'absent';
+    container.innerHTML = filteredStudents.map(student => {
+        const attendance = attendanceMap.get(String(student._id));
+        const status = attendance?.attendance || 'absent';
+        const reason = attendance?.reason || student.attendanceReason || '';
         return `
             <div class="student-item" data-id="${student._id}">
                 <div class="info">
                     <div class="name"><i class="fas fa-user-circle"></i> ${student.fullName || 'Noma\'lum'}</div>
                     <div class="role">${student.teacherName || 'O\'qituvchi yo\'q'} • To'lov: ${Utils.formatMoney(student.monthlyPayment || 0, 'UZS')}</div>
-                    ${student.attendanceReason ? `<div class="reason" style="font-size:0.7rem;color:var(--text-muted);"><i class="fas fa-comment"></i> ${student.attendanceReason}</div>` : ''}
+                    ${reason ? `<div class="reason" style="font-size:0.7rem;color:var(--text-muted);"><i class="fas fa-comment"></i> ${reason}</div>` : ''}
                 </div>
                 <div>
                     <span class="status-badge ${statusClass[status]}">${statusMap[status]}</span>

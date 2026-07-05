@@ -3,6 +3,8 @@
 // ============================================================
 
 let teacherId = null;
+let teacherAttendanceData = [];
+let teacherAttendanceExpanded = false;
 
 document.addEventListener('DOMContentLoaded', async () => {
     const token = localStorage.getItem('customerToken') || sessionStorage.getItem('customerToken');
@@ -65,12 +67,20 @@ async function loadTeacherPayments() {
 // ============================================================
 async function loadTeacherAttendance() {
     try {
-        const data = await API.getAttendances({ 
+        const endDate = new Date();
+        const startDate = new Date();
+        startDate.setDate(endDate.getDate() - 9);
+
+        const data = await API.getAttendances({
             studentId: teacherId,
-            type: 'teacher'
+            type: 'teacher',
+            dateFrom: startDate.toISOString().split('T')[0],
+            dateTo: endDate.toISOString().split('T')[0]
         });
+
         if (data.success) {
-            renderAttendance(data.data || []);
+            teacherAttendanceData = data.data || [];
+            renderAttendance(teacherAttendanceData);
         }
     } catch (error) {
         console.error('❌ Davomatni yuklash xatosi:', error);
@@ -190,7 +200,10 @@ function renderAttendance(attendances) {
         return;
     }
 
-    container.innerHTML = attendances.slice(0, 10).map(a => `
+    const visible = teacherAttendanceExpanded ? attendances : attendances.slice(0, 5);
+    const moreCount = Math.max(attendances.length - visible.length, 0);
+
+    container.innerHTML = visible.map(a => `
         <div class="attendance-item" style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-bottom:1px solid var(--border-color);">
             <div>
                 <span style="font-weight:500;">${a.date || '-'}</span>
@@ -199,6 +212,22 @@ function renderAttendance(attendances) {
             <span class="status-badge ${Utils.getStatusClass(a.attendance)}" style="font-size:0.7rem;">${Utils.formatStatus(a.attendance)}</span>
         </div>
     `).join('');
+
+    if (moreCount > 0) {
+        container.innerHTML += `
+            <button id="toggleTeacherAttendance" class="btn-secondary" style="margin:12px auto 0;display:block;padding:8px 16px;font-size:0.85rem;">
+                ${teacherAttendanceExpanded ? 'Yopish' : `Barchasini ko'rsatish (${moreCount}+)`}
+            </button>
+        `;
+
+        const toggleButton = document.getElementById('toggleTeacherAttendance');
+        if (toggleButton) {
+            toggleButton.addEventListener('click', () => {
+                teacherAttendanceExpanded = !teacherAttendanceExpanded;
+                renderAttendance(teacherAttendanceData);
+            });
+        }
+    }
 }
 
 // ============================================================

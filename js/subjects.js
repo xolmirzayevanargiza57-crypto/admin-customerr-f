@@ -22,7 +22,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 // ============================================================
 // MA'LUMOTLARNI YUKLASH
 // ============================================================
-async function loadData() {
+async function loadData(options = {}) {
+    const { suppressError = false } = options;
     try {
         const teachersRes = await API.getTeachers();
         if (teachersRes.success) {
@@ -38,7 +39,12 @@ async function loadData() {
         }
     } catch (error) {
         console.error('❌ Ma\'lumotlarni yuklash xatosi:', error);
-        showError(I18N.t('network_error'));
+        if (!suppressError) {
+            showError(I18N.t('network_error'));
+        }
+        if (suppressError) {
+            throw error;
+        }
     }
 }
 
@@ -154,10 +160,11 @@ function showAddSubjectModal() {
         try {
             const data = await API.createSubject({ name, teacherId, price });
             if (data.success) {
-                document.querySelector('.modal').remove();
+                const modal = document.querySelector('.modal');
+                if (modal) modal.remove();
                 showSuccess(I18N.t('success'));
                 try {
-                    await loadData();
+                    await loadData({ suppressError: true });
                 } catch (loadError) {
                     console.warn('⚠️ Fan yaratildi, ammo ma\'lumotlar qayta yuklanmadi:', loadError);
                 }
@@ -248,7 +255,8 @@ async function editSubject(id) {
         try {
             const data = await API.updateSubject(id, { name, teacherId, price, status });
             if (data.success) {
-                document.querySelector('.modal').remove();
+                const modal = document.querySelector('.modal');
+                if (modal) modal.remove();
                 showSuccess(I18N.t('success'));
                 await loadData();
             } else {

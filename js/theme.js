@@ -140,9 +140,72 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
+    // Mobile pull-to-refresh for top-of-page swipe down
+    setupPullToRefresh();
+
     // Hozir saqlangan themeni qo'llash (serverdan ham)
     Theme.applyTheme(Theme.currentTheme);
     await Theme.loadThemeFromServer();
 });
+
+function setupPullToRefresh() {
+    let touchStartY = 0;
+    let pullDistance = 0;
+    const threshold = 90;
+    let indicator = null;
+
+    const createIndicator = () => {
+        if (indicator) return;
+        indicator = document.createElement('div');
+        indicator.style.cssText = `position: fixed; top: 0; left: 0; right: 0; z-index: 9999; display: flex; justify-content: center; align-items: center; height: 0; overflow: hidden; background: rgba(255,255,255,0.95); color: var(--text-primary); font-size: 0.85rem; border-bottom: 1px solid rgba(0,0,0,0.08); transition: height 0.2s ease;`;
+        indicator.textContent = 'Yuklanmoqda...';
+        document.body.appendChild(indicator);
+    };
+
+    const updateIndicator = (distance) => {
+        if (!indicator) createIndicator();
+        const height = Math.min(distance, 120);
+        indicator.style.height = `${height}px`;
+        indicator.textContent = distance >= threshold ? 'Ekran yangilanadi...' : 'Pastga torting yangilash uchun';
+    };
+
+    const resetIndicator = () => {
+        if (!indicator) return;
+        indicator.style.height = '0';
+        setTimeout(() => {
+            if (indicator && indicator.parentNode) {
+                indicator.parentNode.removeChild(indicator);
+                indicator = null;
+            }
+        }, 250);
+    };
+
+    window.addEventListener('touchstart', (event) => {
+        if (window.scrollY === 0 && event.touches.length === 1) {
+            touchStartY = event.touches[0].clientY;
+            pullDistance = 0;
+        }
+    }, { passive: true });
+
+    window.addEventListener('touchmove', (event) => {
+        if (touchStartY <= 0 || event.touches.length !== 1) return;
+        const currentY = event.touches[0].clientY;
+        pullDistance = currentY - touchStartY;
+        if (pullDistance > 10 && window.scrollY === 0) {
+            updateIndicator(pullDistance);
+        }
+    }, { passive: true });
+
+    window.addEventListener('touchend', () => {
+        if (pullDistance > threshold && window.scrollY === 0) {
+            indicator && (indicator.textContent = 'Yangilanmoqda...');
+            window.location.reload();
+        } else {
+            resetIndicator();
+        }
+        touchStartY = 0;
+        pullDistance = 0;
+    });
+}
 
 console.log('✅ theme.js yuklandi');
