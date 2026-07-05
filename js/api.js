@@ -53,8 +53,29 @@ const API = {
                     ...options.headers
                 }
             });
-            
-            const data = await response.json();
+
+            const contentType = response.headers.get('content-type') || '';
+            let data;
+
+            if (contentType.includes('application/json')) {
+                data = await response.json();
+            } else {
+                const text = await response.text();
+                if (!text) {
+                    data = { success: false, message: `Server ${response.status} javob qaytarmadi.` };
+                } else {
+                    try {
+                        data = JSON.parse(text);
+                    } catch (parseError) {
+                        data = {
+                            success: false,
+                            message: 'Server JSON emas javob qaytardi.',
+                            status: response.status,
+                            rawText: text
+                        };
+                    }
+                }
+            }
             
             if (!response.ok) {
                 console.error(`❌ ${response.status} ${url}`, data);
