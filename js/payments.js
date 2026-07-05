@@ -5,6 +5,7 @@
 let paymentsData = [];
 let studentsData = [];
 let teachersData = [];
+let paymentTypeFilterValue = 'all';
 
 document.addEventListener('DOMContentLoaded', async () => {
     const token = localStorage.getItem('customerToken') || sessionStorage.getItem('customerToken');
@@ -52,32 +53,90 @@ async function loadData() {
 // TO'LOVLARNI KO'RSATISH
 // ============================================================
 function renderPayments(payments) {
-    const tbody = document.getElementById('paymentsBody');
-    if (!payments || payments.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="text-center text-muted" data-i18n="no_data">Ma'lumot yo'q</td></tr>`;
-        I18N.updateUI();
-        return;
+    const studentBody = document.getElementById('studentPaymentsBody');
+    const teacherBody = document.getElementById('teacherPaymentsBody');
+    const studentFeeExpected = document.getElementById('studentFeeExpected');
+    const studentFeePaid = document.getElementById('studentFeePaid');
+    const studentFeePending = document.getElementById('studentFeePending');
+    const studentFeeStatus = document.getElementById('studentFeeStatus');
+    const teacherSalaryExpected = document.getElementById('teacherSalaryExpected');
+    const teacherSalaryPaid = document.getElementById('teacherSalaryPaid');
+    const teacherSalaryPending = document.getElementById('teacherSalaryPending');
+    const teacherSalaryStatus = document.getElementById('teacherSalaryStatus');
+
+    const studentPayments = (payments || []).filter(payment => payment.paymentType !== 'teacher_salary');
+    const teacherPayments = (payments || []).filter(payment => payment.paymentType === 'teacher_salary');
+
+    const renderRows = (rows, type) => {
+        if (!rows.length) {
+            return `<tr><td colspan="${type === 'student' ? 6 : 5}" class="text-center text-muted" data-i18n="no_data">Ma'lumot yo'q</td></tr>`;
+        }
+
+        if (type === 'teacher') {
+            return rows.map(payment => `
+                <tr>
+                    <td><strong><i class="fas fa-user-circle"></i> ${payment.teacherName || 'Noma\'lum'}</strong></td>
+                    <td><i class="fas fa-money-bill"></i> ${Utils.formatMoney(payment.amount, 'UZS')}</td>
+                    <td><i class="fas fa-calendar"></i> ${payment.month || '-'}</td>
+                    <td><span class="payment-status ${Utils.getStatusClass(payment.status)}">${Utils.formatStatus(payment.status)}</span></td>
+                    <td>
+                        <div class="actions-container">
+                            <button class="btn-secondary" onclick="editPayment('${payment._id}')" title="${I18N.t('edit')}">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn-danger" onclick="deletePayment('${payment._id}')" title="${I18N.t('delete')}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        return rows.map(payment => `
+            <tr>
+                <td><strong><i class="fas fa-user-circle"></i> ${payment.studentName || 'Noma\'lum'}</strong></td>
+                <td><i class="fas fa-user"></i> ${payment.teacherName || '-'}</td>
+                <td><i class="fas fa-money-bill"></i> ${Utils.formatMoney(payment.amount, 'UZS')}</td>
+                <td><i class="fas fa-calendar"></i> ${payment.month || '-'}</td>
+                <td><span class="payment-status ${Utils.getStatusClass(payment.status)}">${Utils.formatStatus(payment.status)}</span></td>
+                <td>
+                    <div class="actions-container">
+                        <button class="btn-secondary" onclick="editPayment('${payment._id}')" title="${I18N.t('edit')}">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn-danger" onclick="deletePayment('${payment._id}')" title="${I18N.t('delete')}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `).join('');
+    };
+
+    if (studentBody) {
+        studentBody.innerHTML = renderRows(studentPayments, 'student');
+    }
+    if (teacherBody) {
+        teacherBody.innerHTML = renderRows(teacherPayments, 'teacher');
     }
 
-    tbody.innerHTML = payments.map(payment => `
-        <tr>
-            <td><strong><i class="fas fa-user-circle"></i> ${payment.studentName || 'Noma\'lum'}</strong></td>
-            <td><i class="fas fa-user"></i> ${payment.teacherName || '-'}</td>
-            <td><i class="fas fa-money-bill"></i> ${Utils.formatMoney(payment.amount, 'UZS')}</td>
-            <td><i class="fas fa-calendar"></i> ${payment.month || '-'}</td>
-            <td><span class="payment-status ${Utils.getStatusClass(payment.status)}">${Utils.formatStatus(payment.status)}</span></td>
-            <td>
-                <div class="actions-container">
-                    <button class="btn-secondary" onclick="editPayment('${payment._id}')" title="${I18N.t('edit')}">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="btn-danger" onclick="deletePayment('${payment._id}')" title="${I18N.t('delete')}">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </div>
-            </td>
-        </tr>
-    `).join('');
+    const studentPaid = studentPayments.filter(item => item.status === 'paid').reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
+    const studentExpected = studentPayments.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
+    const studentPending = studentPayments.filter(item => item.status !== 'paid').length;
+    const teacherPaid = teacherPayments.filter(item => item.status === 'paid').reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
+    const teacherExpected = teacherPayments.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
+    const teacherPending = teacherPayments.filter(item => item.status !== 'paid').length;
+
+    if (studentFeeExpected) studentFeeExpected.textContent = Utils.formatMoney(studentExpected, 'UZS');
+    if (studentFeePaid) studentFeePaid.textContent = Utils.formatMoney(studentPaid, 'UZS');
+    if (studentFeePending) studentFeePending.textContent = `${studentPending} ta qolgan`;
+    if (studentFeeStatus) studentFeeStatus.textContent = studentPayments.length ? `${studentPayments.length} ta yozuv` : 'Ma\'lumot yo\'q';
+    if (teacherSalaryExpected) teacherSalaryExpected.textContent = Utils.formatMoney(teacherExpected, 'UZS');
+    if (teacherSalaryPaid) teacherSalaryPaid.textContent = Utils.formatMoney(teacherPaid, 'UZS');
+    if (teacherSalaryPending) teacherSalaryPending.textContent = `${teacherPending} ta qolgan`;
+    if (teacherSalaryStatus) teacherSalaryStatus.textContent = teacherPayments.length ? `${teacherPayments.length} ta yozuv` : 'Ma\'lumot yo\'q';
+
     I18N.updateUI();
 }
 
@@ -95,9 +154,18 @@ function showAddPaymentModal() {
             </div>
             <form id="addPaymentForm">
                 <div class="form-group">
+                    <label>To'lov turi</label>
+                    <div class="input-wrapper">
+                        <select id="paymentType" required>
+                            <option value="student_fee">O'quvchi to'lovi</option>
+                            <option value="teacher_salary">O'qituvchi maoshi</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group" id="studentPaymentGroup">
                     <label>${I18N.t('select_student')}</label>
                     <div class="input-wrapper">
-                        <select id="paymentStudent" required>
+                        <select id="paymentStudent">
                             <option value="">${I18N.t('select_student')}</option>
                             ${studentsData.map(s => `<option value="${s._id}" data-teacher="${s.teacherId}">${s.fullName}</option>`).join('')}
                         </select>
@@ -146,21 +214,36 @@ function showAddPaymentModal() {
     document.body.appendChild(modal);
     I18N.updateUI();
 
+    const paymentTypeSelect = document.getElementById('paymentType');
+    const studentPaymentGroup = document.getElementById('studentPaymentGroup');
+    const togglePaymentType = () => {
+        if (studentPaymentGroup) {
+            studentPaymentGroup.style.display = paymentTypeSelect.value === 'student_fee' ? 'block' : 'none';
+        }
+    };
+    paymentTypeSelect.addEventListener('change', togglePaymentType);
+    togglePaymentType();
+
     document.getElementById('addPaymentForm').addEventListener('submit', async (e) => {
         e.preventDefault();
-        const studentId = document.getElementById('paymentStudent').value;
+        const paymentType = document.getElementById('paymentType').value;
+        const studentId = paymentType === 'student_fee' ? document.getElementById('paymentStudent').value : '';
         const teacherId = document.getElementById('paymentTeacher').value;
         const amount = parseInt(document.getElementById('paymentAmount').value) || 0;
         const month = document.getElementById('paymentMonth').value;
         const status = document.getElementById('paymentStatus').value;
 
-        if (!studentId || !teacherId || !amount || !month) {
+        if (!teacherId || !amount || !month) {
             showError(I18N.t('all_fields_required'));
+            return;
+        }
+        if (paymentType === 'student_fee' && !studentId) {
+            showError('O\'quvchi tanlanishi kerak');
             return;
         }
 
         try {
-            const data = await API.createPayment({ studentId, teacherId, amount, month, status });
+            const data = await API.createPayment({ studentId, teacherId, amount, month, status, paymentType });
             if (data.success) {
                 document.querySelector('.modal').remove();
                 showSuccess(I18N.t('success'));
@@ -259,6 +342,10 @@ async function deletePayment(id) {
 function setupListeners() {
     document.getElementById('searchInput').addEventListener('input', filterPayments);
     document.getElementById('statusFilter').addEventListener('change', filterPayments);
+    document.getElementById('paymentTypeFilter').addEventListener('change', (e) => {
+        paymentTypeFilterValue = e.target.value;
+        filterPayments();
+    });
     document.getElementById('addPaymentBtn').addEventListener('click', showAddPaymentModal);
     document.getElementById('logoutBtn').addEventListener('click', () => Auth.logout());
 
@@ -274,6 +361,8 @@ function filterPayments() {
         p.teacherName?.toLowerCase().includes(search)
     );
     if (status !== 'all') filtered = filtered.filter(p => p.status === status);
+    if (paymentTypeFilterValue === 'student_fee') filtered = filtered.filter(p => p.paymentType !== 'teacher_salary');
+    if (paymentTypeFilterValue === 'teacher_salary') filtered = filtered.filter(p => p.paymentType === 'teacher_salary');
     renderPayments(filtered);
 }
 

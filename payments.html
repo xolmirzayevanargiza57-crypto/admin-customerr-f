@@ -70,12 +70,55 @@
                         <option value="unpaid">To'lanmagan</option>
                     </select>
                 </div>
+                <div class="filter-box">
+                    <select id="paymentTypeFilter">
+                        <option value="all">Barchasi</option>
+                        <option value="student_fee">O'quvchi to'lovi</option>
+                        <option value="teacher_salary">O'qituvchi maoshi</option>
+                    </select>
+                </div>
                 <button class="btn-primary" id="addPaymentBtn" style="width:auto;padding:8px 18px;font-size:0.8rem;">
                     <i class="fas fa-plus"></i> <span data-i18n="add_payment">Yangi qo'shish</span>
                 </button>
             </section>
 
+            <section class="stats-grid" style="padding: 0 24px 18px;">
+                <div class="stat-card">
+                    <div class="stat-icon green"><i class="fas fa-user-graduate"></i></div>
+                    <div class="stat-info">
+                        <p class="stat-label">O'quvchi to'lovi</p>
+                        <p class="stat-value" id="studentFeeExpected">0</p>
+                        <span class="stat-change positive" id="studentFeePending">0 ta qolgan</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon purple"><i class="fas fa-money-bill-wave"></i></div>
+                    <div class="stat-info">
+                        <p class="stat-label">To'langan o'quvchi to'lovlari</p>
+                        <p class="stat-value" id="studentFeePaid">0</p>
+                        <span class="stat-change" id="studentFeeStatus">-</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon blue"><i class="fas fa-chalkboard-teacher"></i></div>
+                    <div class="stat-info">
+                        <p class="stat-label">O'qituvchi maoshi</p>
+                        <p class="stat-value" id="teacherSalaryExpected">0</p>
+                        <span class="stat-change positive" id="teacherSalaryPending">0 ta qolgan</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon orange"><i class="fas fa-wallet"></i></div>
+                    <div class="stat-info">
+                        <p class="stat-label">To'langan maosh</p>
+                        <p class="stat-value" id="teacherSalaryPaid">0</p>
+                        <span class="stat-change" id="teacherSalaryStatus">-</span>
+                    </div>
+                </div>
+            </section>
+
             <section class="table-container">
+                <h3 style="margin-bottom:10px;font-size:0.95rem;"><i class="fas fa-user-graduate"></i> O'quvchi to'lovlari</h3>
                 <table class="data-table">
                     <thead>
                         <tr>
@@ -87,8 +130,26 @@
                             <th><span data-i18n="actions">Amallar</span></th>
                         </tr>
                     </thead>
-                    <tbody id="paymentsBody">
+                    <tbody id="studentPaymentsBody">
                         <tr><td colspan="6" class="text-center text-muted" data-i18n="loading">Yuklanmoqda...</td></tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="table-container" style="margin-top:16px;">
+                <h3 style="margin-bottom:10px;font-size:0.95rem;"><i class="fas fa-chalkboard-teacher"></i> O'qituvchi maoshlari</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>O'qituvchi</th>
+                            <th>Maosh</th>
+                            <th>Oy</th>
+                            <th>Holati</th>
+                            <th>Amallar</th>
+                        </tr>
+                    </thead>
+                    <tbody id="teacherPaymentsBody">
+                        <tr><td colspan="5" class="text-center text-muted" data-i18n="loading">Yuklanmoqda...</td></tr>
                     </tbody>
                 </table>
             </section>

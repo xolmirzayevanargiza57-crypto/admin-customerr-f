@@ -5,6 +5,8 @@
 let allTeachers = [];
 let allStudents = [];
 let currentDate = new Date().toISOString().split('T')[0];
+let teacherGroupFilterValue = 'all';
+let teacherFilterValue = 'all';
 
 document.addEventListener('DOMContentLoaded', async () => {
     const token = localStorage.getItem('customerToken') || sessionStorage.getItem('customerToken');
@@ -28,6 +30,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
+    const groupFilter = document.getElementById('teacherGroupFilter');
+    if (groupFilter) {
+        groupFilter.addEventListener('change', (e) => {
+            teacherGroupFilterValue = e.target.value;
+            renderTeacherWeeklyAttendance();
+        });
+    }
+
+    const teacherFilter = document.getElementById('teacherFilter');
+    if (teacherFilter) {
+        teacherFilter.addEventListener('change', (e) => {
+            teacherFilterValue = e.target.value;
+            renderTeacherWeeklyAttendance();
+        });
+    }
+
     const today = new Date();
     const dateStr = today.toLocaleDateString('uz', { year: 'numeric', month: 'long', day: 'numeric' });
     document.getElementById('todayDate').textContent = dateStr;
@@ -46,7 +64,11 @@ async function loadAttendanceData() {
         
         const teachersRes = await API.getTeachers();
         if (teachersRes.success) {
-            allTeachers = teachersRes.data || [];
+            allTeachers = (teachersRes.data || []).map(teacher => ({
+                ...teacher,
+                group: teacher.group || 'A'
+            }));
+            populateTeacherFilter();
             await loadTeacherAttendance(allTeachers);
         }
 
@@ -57,6 +79,7 @@ async function loadAttendanceData() {
         }
 
         await loadAttendanceHistory();
+        await loadTeacherWeeklyAttendance();
 
         console.log('✅ Davomat ma\'lumotlari yuklandi!');
         I18N.updateUI();
@@ -124,6 +147,155 @@ async function loadStudentAttendance(students) {
         }
     }
     renderStudentAttendance(students);
+}
+
+function getWeekRange(dateString) {
+    const baseDate = new Date(dateString || currentDate);
+    const day = baseDate.getDay();
+    const monday = new Date(baseDate);
+    const dayOffset = day === 0 ? -6 : 1 - day;
+    monday.setDate(baseDate.getDate() + dayOffset);
+    monday.setHours(12, 0, 0, 0);
+
+    const sunday = new Date(monday);
+    sunday.setDate(monday.getDate() + 6);
+    sunday.setHours(12, 0, 0, 0);
+
+    return {
+        start: monday.toISOString().split('T')[0],
+        end: sunday.toISOString().split('T')[0],
+        monday,
+        sunday
+    };
+}
+
+function getWeekDates(dateString) {
+    const range = getWeekRange(dateString);
+    const days = [];
+    for (let i = 0; i < 7; i++) {
+        const date = new Date(range.monday);
+        date.setDate(range.monday.getDate() + i);
+        days.push(date.toISOString().split('T')[0]);
+    }
+    return days;
+}
+
+async function loadTeacherWeeklyAttendance() {
+    try {
+        const range = getWeekRange(currentDate);
+        const response = await API.getAttendances({
+            dateFrom: range.start,
+            dateTo: range.end
+        });
+
+        if (response.success) {
+            const teacherEntries = (response.data || []).filter(item => item.type === 'teacher');
+            renderTeacherWeeklyAttendance(teacherEntries);
+            renderTeacherHistoryWeeks();
+        } else {
+            renderTeacherWeeklyAttendance([]);
+        }
+    } catch (error) {
+        console.error('❌ Haftalik o\'qituvchi davomatini yuklash xatosi:', error);
+        renderTeacherWeeklyAttendance([]);
+    }
+}
+
+async function renderTeacherHistoryWeeks() {
+    const container = document.getElementById('teacherHistoryWeeks');
+    if (!container) return;
+
+    container.innerHTML = '<div class="text-muted" style="text-align:center;padding:20px 0;">Yuklanmoqda...</div>';
+
+    const historyCards = [];
+    for (let offset = 1; offset <= 8; offset++) {
+        const base = new Date(currentDate);
+        base.setDate(base.getDate() - (offset * 7));
+        const range = getWeekRange(base.toISOString().split('T')[0]);
+        const response = await API.getAttendances({ dateFrom: range.start, dateTo: range.end });
+        if (!response.success) continue;
+
+        const teacherItems = (response.data || []).filter(item => item.type === 'teacher');
+        const present = teacherItems.filter(item => item.attendance === 'present').length;
+        const absentReason = teacherItems.filter(item => item.attendance === 'absent_reason').length;
+        const absent = teacherItems.filter(item => item.attendance === 'absent').length;
+
+        historyCards.push(`
+            <div class="chart-card" style="padding:14px 16px;">
+                <div style="display:flex;justify-content:space-between;gap:8px;align-items:center;">
+                    <strong>${range.start} — ${range.end}</strong>
+                    <span class="text-muted" style="font-size:0.75rem;">${present} keldi / ${absentReason} sababli / ${absent} kelmadi</span>
+                </div>
+                <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px;">
+                    ${teacherItems.slice(0, 8).map(item => `<span class="status-badge ${item.attendance === 'present' ? 'present' : item.attendance === 'absent_reason' ? 'absent-reason' : 'absent'}">${item.teacherName || 'O\'qituvchi'}</span>`).join('')}
+                </div>
+            </div>
+        `);
+    }
+
+    container.innerHTML = historyCards.length ? historyCards.join('') : '<div class="text-muted" style="text-align:center;padding:20px 0;">Oldingi haftalar ma\'lumotlari mavjud emas</div>';
+}
+
+function populateTeacherFilter() {
+    const select = document.getElementById('teacherFilter');
+    if (!select) return;
+
+    const currentValue = teacherFilterValue || 'all';
+    select.innerHTML = `<option value="all">Barchasi</option>${allTeachers.map(teacher => `<option value="${teacher._id}" ${currentValue === teacher._id ? 'selected' : ''}>${teacher.fullName || 'O\'qituvchi'}</option>`).join('')}`;
+    teacherFilterValue = currentValue;
+}
+
+function renderTeacherWeeklyAttendance(teacherEntries = []) {
+    const container = document.getElementById('teacherWeeklyAttendanceBody');
+    if (!container) return;
+
+    const weekDates = getWeekDates(currentDate);
+    const filteredTeachers = allTeachers.filter(teacher => {
+        const matchesGroup = teacherGroupFilterValue === 'all' || String(teacher.group || 'A').toUpperCase() === teacherGroupFilterValue.toUpperCase();
+        const matchesTeacher = teacherFilterValue === 'all' || String(teacher._id) === String(teacherFilterValue);
+        return matchesGroup && matchesTeacher;
+    });
+
+    if (!filteredTeachers.length) {
+        container.innerHTML = '<tr><td colspan="8" class="text-center text-muted">Ma\'lumot yo\'q</td></tr>';
+        return;
+    }
+
+    const attendanceMap = new Map();
+    teacherEntries.forEach(entry => {
+        const key = String(entry.teacherId || entry.studentId || '');
+        if (!key) return;
+        if (!attendanceMap.has(key)) attendanceMap.set(key, {});
+        attendanceMap.get(key)[entry.date] = entry;
+    });
+
+    container.innerHTML = filteredTeachers.map(teacher => {
+        const rows = weekDates.map(date => {
+            const entry = attendanceMap.get(String(teacher._id))?.[date];
+            if (!entry) {
+                return '<td><span class="text-muted">—</span></td>';
+            }
+            const statusMap = {
+                present: { label: 'Keldi', className: 'present' },
+                absent_reason: { label: 'Sababli', className: 'absent-reason' },
+                absent: { label: 'Kelmadi', className: 'absent' }
+            };
+            const status = statusMap[entry.attendance] || { label: entry.attendance || '—', className: 'inactive' };
+            return `
+                <td>
+                    <div class="status-badge ${status.className}">${status.label}</div>
+                    ${entry.reason ? `<div style="font-size:0.68rem;color:var(--text-muted);margin-top:4px;">${entry.reason}</div>` : ''}
+                </td>
+            `;
+        }).join('');
+
+        return `
+            <tr>
+                <td><strong>${teacher.fullName || 'O\'qituvchi'}</strong></td>
+                ${rows}
+            </tr>
+        `;
+    }).join('');
 }
 
 // ============================================================

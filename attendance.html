@@ -95,6 +95,60 @@
                 </div>
             </section>
 
+            <section style="padding: 0 24px 12px;">
+                <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                    <label style="font-weight:600;font-size:0.8rem;"><i class="fas fa-layer-group"></i> Guruh:</label>
+                    <select id="teacherGroupFilter" style="padding:8px 12px;border:2px solid var(--border-color);border-radius:10px;background:var(--bg-input);color:var(--text-primary);font-size:0.85rem;">
+                        <option value="all">Barchasi</option>
+                        <option value="A">A (20)</option>
+                        <option value="B">B (20)</option>
+                        <option value="C">C (20)</option>
+                    </select>
+                    <label style="font-weight:600;font-size:0.8rem;"><i class="fas fa-chalkboard-teacher"></i> O'qituvchi:</label>
+                    <select id="teacherFilter" style="padding:8px 12px;border:2px solid var(--border-color);border-radius:10px;background:var(--bg-input);color:var(--text-primary);font-size:0.85rem;">
+                        <option value="all">Barchasi</option>
+                    </select>
+                </div>
+            </section>
+
+            <section style="padding: 0 24px 24px;">
+                <div class="chart-card">
+                    <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                        <h3 style="font-size:0.95rem;font-weight:600;"><i class="fas fa-calendar-week"></i> Haftalik o'qituvchilar davomati</h3>
+                        <span class="text-muted" style="font-size:0.75rem;">Dush — Yakshanba</span>
+                    </div>
+                    <div class="table-container" style="overflow:auto;border:1px solid var(--border-color);border-radius:14px;">
+                        <table class="data-table" style="min-width:760px;">
+                            <thead>
+                                <tr>
+                                    <th>O'qituvchi</th>
+                                    <th>Dush</th>
+                                    <th>Sesh</th>
+                                    <th>Chor</th>
+                                    <th>Pay</th>
+                                    <th>Jum</th>
+                                    <th>Shan</th>
+                                    <th>Yak</th>
+                                </tr>
+                            </thead>
+                            <tbody id="teacherWeeklyAttendanceBody">
+                                <tr><td colspan="8" class="text-center text-muted">Yuklanmoqda...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section style="padding: 0 24px 24px;">
+                <div class="chart-card">
+                    <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                        <h3 style="font-size:0.95rem;font-weight:600;"><i class="fas fa-history"></i> Oldingi haftalar va yillar</h3>
+                        <span class="text-muted" style="font-size:0.75rem;">Scroll bilan pastga</span>
+                    </div>
+                    <div id="teacherHistoryWeeks" style="max-height:320px;overflow-y:auto;display:grid;gap:10px;padding-right:4px;"></div>
+                </div>
+            </section>
+
             <!-- Attendance Grid -->
             <section class="attendance-page-grid">
                 <!-- Teachers Attendance -->

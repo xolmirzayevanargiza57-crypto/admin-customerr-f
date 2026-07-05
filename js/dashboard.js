@@ -4,6 +4,7 @@
 
 let attendanceChart = null;
 let attendancePieChart = null;
+let groupChart = null;
 
 // ⭐ XATOLIKLARNI USHLASH VA LOGGA YOZISH
 window.addEventListener('error', function(e) {
@@ -199,6 +200,21 @@ function loadChartJS() {
 // ============================================================
 // ⭐ CHART'LARNI YARATISH
 // ============================================================
+function getWeeklyChartLabels() {
+    const dayNames = ['Dush', 'Sesh', 'Chor', 'Pay', 'Jum', 'Shan', 'Yak'];
+    const today = new Date();
+    const labels = [];
+
+    for (let i = 6; i >= 0; i--) {
+        const d = new Date(today);
+        d.setHours(12, 0, 0, 0);
+        d.setDate(d.getDate() - i);
+        labels.push(dayNames[(d.getDay() + 6) % 7]);
+    }
+
+    return labels;
+}
+
 function initCharts() {
     console.log('📊 Chart\'lar yaratilmoqda...');
     
@@ -222,7 +238,7 @@ function initCharts() {
         attendanceChart = new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: ['Dush', 'Sesh', 'Chor', 'Pay', 'Jum', 'Shan', 'Yak'],
+                labels: getWeeklyChartLabels(),
                 datasets: [
                     {
                         label: 'Keldi',
@@ -337,6 +353,36 @@ function initCharts() {
         
         console.log('✅ Pie chart yaratildi');
         console.log('📌 attendancePieChart:', attendancePieChart);
+
+        // === GROUP CHART ===
+        const groupCtx = document.getElementById('groupChart');
+        if (groupCtx) {
+            if (groupChart) {
+                groupChart.destroy();
+                groupChart = null;
+            }
+            groupChart = new Chart(groupCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['A', 'B', 'C', 'Boshqa'],
+                    datasets: [{
+                        label: 'O\'quvchilar',
+                        data: [0, 0, 0, 0],
+                        backgroundColor: ['#007aff', '#34c759', '#ff9500', '#8e8e93'],
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { stepSize: 1 } },
+                        x: { ticks: { font: { size: 11 } } }
+                    }
+                }
+            });
+        }
         
     } catch (error) {
         console.error('❌ Chart yaratish xatosi:', error);
@@ -439,15 +485,12 @@ async function loadDashboardStats() {
             updateAttendanceChart(stats.weeklyAttendance);
         } else {
             console.warn('⚠️ Haftalik davomat ma\'lumotlari mavjud emas');
-            const defaultData = [
-                { date: 'Dush', present: 0, absent_reason: 0, absent: 0 },
-                { date: 'Sesh', present: 0, absent_reason: 0, absent: 0 },
-                { date: 'Chor', present: 0, absent_reason: 0, absent: 0 },
-                { date: 'Pay', present: 0, absent_reason: 0, absent: 0 },
-                { date: 'Jum', present: 0, absent_reason: 0, absent: 0 },
-                { date: 'Shan', present: 0, absent_reason: 0, absent: 0 },
-                { date: 'Yak', present: 0, absent_reason: 0, absent: 0 }
-            ];
+            const defaultData = getWeeklyChartLabels().map((label) => ({
+                date: label,
+                present: 0,
+                absent_reason: 0,
+                absent: 0
+            }));
             updateAttendanceChart(defaultData);
         }
         
@@ -458,6 +501,8 @@ async function loadDashboardStats() {
             console.warn('⚠️ Davomat statistikasi mavjud emas');
             updatePieChart({ present: 0, absent_reason: 0, absent: 0 });
         }
+
+        await loadGroupChartData();
         
         console.log('✅ Dashboard statistikasi yuklandi!');
         
@@ -484,7 +529,7 @@ function updateAttendanceChart(weeklyData) {
     }
     
     try {
-        const labels = weeklyData.map(d => d.date || '-');
+        const labels = getWeeklyChartLabels();
         const presentData = weeklyData.map(d => d.present || 0);
         const absentReasonData = weeklyData.map(d => d.absent_reason || 0);
         const absentData = weeklyData.map(d => d.absent || 0);
@@ -502,6 +547,40 @@ function updateAttendanceChart(weeklyData) {
         console.error('❌ Bar chart yangilash xatosi:', error);
         console.error('📍 Xatolik stack:', error.stack);
     }
+}
+
+async function loadGroupChartData() {
+    try {
+        const studentsRes = await API.getStudents();
+        const counts = { A: 0, B: 0, C: 0, other: 0 };
+
+        if (studentsRes.success) {
+            (studentsRes.data || []).forEach(student => {
+                const group = String(student.group || 'A').toUpperCase();
+                if (group.startsWith('A')) counts.A += 1;
+                else if (group.startsWith('B')) counts.B += 1;
+                else if (group.startsWith('C')) counts.C += 1;
+                else counts.other += 1;
+            });
+        }
+
+        updateGroupChart(counts);
+    } catch (error) {
+        console.error('❌ Guruh chart ma\'lumotlarini yuklash xatosi:', error);
+        updateGroupChart({ A: 0, B: 0, C: 0, other: 0 });
+    }
+}
+
+function updateGroupChart(counts) {
+    if (!groupChart) {
+        if (document.getElementById('groupChart')) {
+            initCharts();
+        }
+        if (!groupChart) return;
+    }
+
+    groupChart.data.datasets[0].data = [counts.A || 0, counts.B || 0, counts.C || 0, counts.other || 0];
+    groupChart.update();
 }
 
 function updatePieChart(stats) {
