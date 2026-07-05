@@ -2,32 +2,21 @@
 // API - BACKEND BILAN BOG'LANISH (TO'LIQ)
 // ============================================================
 
-function getConfiguredBaseURL() {
+function getApiBaseURL() {
     if (typeof window === 'undefined') {
-        return 'http://localhost:5001';
+        return 'https://admin-customerr.onrender.com';
     }
 
-    const candidates = [
-        window.__API_BASE_URL__,
-        window.API_BASE_URL,
-        window.__ENV__?.API_BASE_URL,
-        document.querySelector('meta[name="api-base-url"]')?.getAttribute('content')
-    ];
-
-    const configured = candidates.find(value => typeof value === 'string' && value.trim());
-    if (configured) {
-        return configured.replace(/\/$/, '');
+    const override = window.__API_BASE_URL__ || window.API_BASE_URL || window.__ENV__?.API_BASE_URL || document.querySelector('meta[name="api-base-url"]')?.getAttribute('content');
+    if (override && typeof override === 'string' && override.trim()) {
+        return override.trim().replace(/\/$/, '');
     }
 
-    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-        return 'http://localhost:5001';
-    }
-
-    return window.location.origin;
+    return 'https://admin-customerr.onrender.com';
 }
 
 const API = {
-    baseURL: getConfiguredBaseURL(),
+    baseURL: getApiBaseURL(),
     
     getToken() {
         return localStorage.getItem('customerToken') || sessionStorage.getItem('customerToken');
@@ -61,19 +50,15 @@ const API = {
                 data = await response.json();
             } else {
                 const text = await response.text();
-                if (!text) {
-                    data = { success: false, message: `Server ${response.status} javob qaytarmadi.` };
-                } else {
-                    try {
-                        data = JSON.parse(text);
-                    } catch (parseError) {
-                        data = {
-                            success: false,
-                            message: 'Server JSON emas javob qaytardi.',
-                            status: response.status,
-                            rawText: text
-                        };
-                    }
+                try {
+                    data = JSON.parse(text);
+                } catch (parseError) {
+                    data = {
+                        success: false,
+                        message: `Server JSON emas javob qaytardi: ${response.status}`,
+                        status: response.status,
+                        rawText: text
+                    };
                 }
             }
             
