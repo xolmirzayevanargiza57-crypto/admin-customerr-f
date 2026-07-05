@@ -546,24 +546,7 @@ function setupListeners() {
     document.getElementById('addStudentBtn').addEventListener('click', showAddStudentModal);
     document.getElementById('logoutBtn').addEventListener('click', () => Auth.logout());
 
-    // ⭐ HAMBURGER MENU - BIR MARTA BOSISHDA ISHLAYDI
-    const menuToggle     = document.getElementById('menuToggle');
-    const sidebar        = document.getElementById('sidebar');
-    const sidebarOverlay = document.getElementById('sidebarOverlay');
-
-    if (menuToggle) {
-        menuToggle.addEventListener('click', (e) => {
-            e.stopPropagation();
-            sidebar.classList.toggle('open');
-            sidebarOverlay.classList.toggle('show');
-        });
-    }
-    if (sidebarOverlay) {
-        sidebarOverlay.addEventListener('click', () => {
-            sidebar.classList.remove('open');
-            sidebarOverlay.classList.remove('show');
-        });
-    }
+    // Sidebar open/close is handled globally by js/theme.js.
 }
 
 function showError(msg) {

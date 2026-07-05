@@ -18,7 +18,15 @@ const Theme = {
         }
 
         this.updateToggleIcon();
+        this.updateThemeOptionButtons();
         this.updateServerTheme(theme);
+    },
+
+    updateThemeOptionButtons() {
+        document.querySelectorAll('.theme-option[data-theme]').forEach(button => {
+            const theme = button.dataset.theme;
+            button.classList.toggle('active', theme === this.currentTheme);
+        });
     },
 
     updateToggleIcon() {
@@ -85,6 +93,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         themeToggle.parentNode.replaceChild(newBtn, themeToggle);
         newBtn.addEventListener('click', () => Theme.toggle());
     }
+
+    document.querySelectorAll('.theme-option[data-theme]').forEach(button => {
+        button.addEventListener('click', () => {
+            const theme = button.dataset.theme;
+            if (theme) {
+                Theme.applyTheme(theme);
+            }
+        });
+    });
 
     // ── Hamburger menu ────────────────────────────────────────
     // ⭐ HAR BIR SAHIFADA BU KOD ISHLAYDI (global)

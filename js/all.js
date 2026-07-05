@@ -478,16 +478,8 @@ function handleReasonKeydown(e) {
 // ============================================================
 function setupListeners() {
     document.getElementById('logoutBtn').addEventListener('click', () => Auth.logout());
-    
-    document.getElementById('menuToggle').addEventListener('click', () => {
-        document.getElementById('sidebar').classList.toggle('open');
-        document.getElementById('sidebarOverlay').classList.toggle('show');
-    });
-    
-    document.getElementById('sidebarOverlay').addEventListener('click', () => {
-        document.getElementById('sidebar').classList.remove('open');
-        document.getElementById('sidebarOverlay').classList.remove('show');
-    });
+
+    // Sidebar open/close is handled globally by js/theme.js.
 }
 
 // ============================================================

@@ -8,19 +8,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const sidebar = document.getElementById('sidebar');
     
     if (menuToggle && sidebar) {
-        menuToggle.addEventListener('click', () => {
-            sidebar.classList.toggle('open');
-        });
-        
-        document.addEventListener('click', (e) => {
-            if (window.innerWidth <= 768) {
-                const isSidebar = sidebar.contains(e.target);
-                const isToggle = menuToggle.contains(e.target);
-                if (!isSidebar && !isToggle) {
-                    sidebar.classList.remove('open');
-                }
-            }
-        });
+        // Sidebar open/close is handled globally by js/theme.js.
+        // This prevents duplicate click listeners when theme.js is also loaded.
     }
     
     // Logout

@@ -30,15 +30,9 @@ function setupListeners() {
     document.getElementById('deleteAccountBtn').addEventListener('click', deleteAccount);
     document.getElementById('logoutBtn').addEventListener('click', () => Auth.logout());
 
-    document.getElementById('menuToggle').addEventListener('click', () => {
-        document.getElementById('sidebar').classList.toggle('open');
-        document.getElementById('sidebarOverlay').classList.toggle('show');
-    });
-    document.getElementById('sidebarOverlay').addEventListener('click', () => {
-        document.getElementById('sidebar').classList.remove('open');
-        document.getElementById('sidebarOverlay').classList.remove('show');
-    });
+    // Sidebar open/close is managed globally by js/theme.js so it does not duplicate handlers.
 }
+
 
 async function saveProfile() {
     const fullName = document.getElementById('fullName').value.trim();

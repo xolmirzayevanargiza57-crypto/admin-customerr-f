@@ -275,23 +275,7 @@ function setupListeners() {
         logoutBtn.addEventListener('click', () => Auth.logout());
     }
 
-    const menuToggle = document.getElementById('menuToggle');
-    const sidebar = document.getElementById('sidebar');
-    const overlay = document.getElementById('sidebarOverlay');
-
-    if (menuToggle && sidebar && overlay) {
-        menuToggle.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            sidebar.classList.toggle('open');
-            overlay.classList.toggle('show');
-        });
-
-        overlay.addEventListener('click', function() {
-            sidebar.classList.remove('open');
-            this.classList.remove('show');
-        });
-    }
+    // Sidebar open/close is handled globally by js/theme.js.
 }
 
 function showError(msg) {

@@ -550,40 +550,7 @@ function setupListeners() {
         console.warn('⚠️ logoutBtn elementi topilmadi!');
     }
 
-    const menuToggle = document.getElementById('menuToggle');
-    const sidebar = document.getElementById('sidebar');
-    const overlay = document.getElementById('sidebarOverlay');
-
-    if (menuToggle && sidebar && overlay) {
-        const newMenuToggle = menuToggle.cloneNode(true);
-        menuToggle.parentNode.replaceChild(newMenuToggle, menuToggle);
-        
-        newMenuToggle.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            sidebar.classList.toggle('open');
-            overlay.classList.toggle('show');
-            console.log('📱 Menu toggled:', sidebar.classList.contains('open') ? 'open' : 'closed');
-        });
-        
-        console.log('✅ menuToggle event listener o\'rnatildi');
-
-        const newOverlay = overlay.cloneNode(true);
-        overlay.parentNode.replaceChild(newOverlay, overlay);
-        
-        newOverlay.addEventListener('click', function() {
-            sidebar.classList.remove('open');
-            this.classList.remove('show');
-            console.log('📱 Overlay orqali menu yopildi');
-        });
-        
-        console.log('✅ overlay event listener o\'rnatildi');
-    } else {
-        console.warn('⚠️ menuToggle, sidebar yoki overlay elementlari topilmadi!');
-        console.log('📌 menuToggle:', menuToggle);
-        console.log('📌 sidebar:', sidebar);
-        console.log('📌 overlay:', overlay);
-    }
+    // Sidebar open/close is managed globally by js/theme.js to avoid duplicate handlers.
 
     let resizeTimer;
     window.addEventListener('resize', function() {
