@@ -92,6 +92,9 @@ const I18N = {
                 student_profile: "O'quvchi profili",
                 edit_student: "O'quvchini tahrirlash",
                 select_teacher: "O'qituvchi tanlang",
+                select_student: "O'quvchi tanlang",
+                select_subject: "Fan tanlang...",
+                day_placeholder: "Kun...",
                 monthly_payment: "Oylik to'lov",
                 group: "Guruh",
                 add_payment: "Yangi to'lov qo'shish",
@@ -101,7 +104,11 @@ const I18N = {
                 paid: "To'langan",
                 pending: "Kutilmoqda",
                 unpaid: "To'lanmagan",
-                select_student: "O'quvchi tanlang",
+                student_fee: "O'quvchi to'lovi",
+                teacher_salary: "O'qituvchi maoshi",
+                blocked: "Bloklangan",
+                all_teachers: "Barcha o'qituvchilar",
+                all_students: "Barcha o'quvchilar",
                 add_subject: "Yangi fan qo'shish",
                 subject_name: "Fan nomi",
                 subject_price: "Narxi",
@@ -226,6 +233,9 @@ const I18N = {
                 paid: "Оплачен",
                 pending: "В ожидании",
                 unpaid: "Не оплачен",
+                student_fee: "Плата ученика",
+                teacher_salary: "Зарплата учителя",
+                blocked: "Заблокирован",
                 select_student: "Выберите ученика",
                 add_subject: "Добавить предмет",
                 subject_name: "Название предмета",
@@ -351,6 +361,9 @@ const I18N = {
                 paid: "Paid",
                 pending: "Pending",
                 unpaid: "Unpaid",
+                student_fee: "Student Fee",
+                teacher_salary: "Teacher Salary",
+                blocked: "Blocked",
                 select_student: "Select Student",
                 add_subject: "Add Subject",
                 subject_name: "Subject Name",
@@ -428,6 +441,13 @@ const I18N = {
                     el.placeholder = translation;
                 }
             });
+            document.querySelectorAll('select option').forEach(option => {
+                const key = option.dataset.i18n || option.value;
+                const translation = this.t(key);
+                if (translation !== key && option.textContent.trim() !== translation) {
+                    option.textContent = translation;
+                }
+            });
             document.querySelectorAll('.lang-option').forEach(el => {
                 el.classList.toggle('active', el.dataset.lang === this.currentLanguage);
             });
@@ -438,6 +458,7 @@ const I18N = {
                 if (icon) loginBtn.appendChild(icon);
                 loginBtn.appendChild(document.createTextNode(' ' + this.t('login_btn')));
             }
+            document.documentElement.lang = this.currentLanguage;
         });
     },
 
@@ -475,10 +496,15 @@ const I18N = {
         container.className = 'language-selector';
         Object.keys(this.languages).forEach(lang => {
             const btn = document.createElement('button');
+            btn.type = 'button';
             btn.className = `lang-option ${lang === this.currentLanguage ? 'active' : ''}`;
             btn.dataset.lang = lang;
             btn.innerHTML = `${this.languages[lang].flag} ${this.languages[lang].name}`;
-            btn.addEventListener('click', () => this.setLanguage(lang));
+            btn.addEventListener('click', (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                this.setLanguage(lang);
+            });
             container.appendChild(btn);
         });
         return container;

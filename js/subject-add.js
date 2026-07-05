@@ -103,7 +103,7 @@ async function loadTeachers() {
         if (data.success) {
             const select = document.getElementById('teacherId');
             const teachers = data.data || [];
-            select.innerHTML = '<option value="">' + (getTranslation('select_teacher') || 'O\'qituvchi tanlang...') + '</option>';
+            select.innerHTML = '<option value="" data-i18n="select_teacher">' + (getTranslation('select_teacher') || 'O\'qituvchi tanlang...') + '</option>';
             teachers.forEach(teacher => {
                 const option = document.createElement('option');
                 option.value = teacher._id;

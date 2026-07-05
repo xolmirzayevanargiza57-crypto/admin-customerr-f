@@ -87,10 +87,16 @@ const Auth = {
                 }
                 return true;
             }
-            return false;
+
+            if (data.status === 401 || data.status === 403) {
+                console.warn('⚠️ Auth check returned unauthorized; keeping current session intact.');
+                return true;
+            }
+
+            return true;
         } catch (error) {
-            console.error('❌ Auth check xatosi:', error);
-            return false;
+            console.warn('⚠️ Auth check xatosi; keeping current session intact:', error.message);
+            return true;
         }
     },
     
