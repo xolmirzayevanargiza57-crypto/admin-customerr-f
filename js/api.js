@@ -2,8 +2,32 @@
 // API - BACKEND BILAN BOG'LANISH (TO'LIQ)
 // ============================================================
 
+function getConfiguredBaseURL() {
+    if (typeof window === 'undefined') {
+        return 'http://localhost:5001';
+    }
+
+    const candidates = [
+        window.__API_BASE_URL__,
+        window.API_BASE_URL,
+        window.__ENV__?.API_BASE_URL,
+        document.querySelector('meta[name="api-base-url"]')?.getAttribute('content')
+    ];
+
+    const configured = candidates.find(value => typeof value === 'string' && value.trim());
+    if (configured) {
+        return configured.replace(/\/$/, '');
+    }
+
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        return 'http://localhost:5001';
+    }
+
+    return window.location.origin;
+}
+
 const API = {
-    baseURL: 'https://admin-customerr.onrender.com',
+    baseURL: getConfiguredBaseURL(),
     
     getToken() {
         return localStorage.getItem('customerToken') || sessionStorage.getItem('customerToken');
