@@ -159,9 +159,8 @@ function setupPullToRefresh() {
         indicator = document.createElement('div');
         indicator.style.cssText = `position: fixed; top: 0; left: 0; right: 0; z-index: 9999; display: flex; justify-content: center; align-items: center; padding-top: 8px; pointer-events: none;`;
         indicator.innerHTML = `
-            <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:999px;background:rgba(255,255,255,0.96);box-shadow:0 8px 24px rgba(0,0,0,0.14);backdrop-filter:blur(10px);border:1px solid rgba(0,0,0,0.06);transform:translateY(-60px);transition:transform 0.2s ease;">
+            <div style="display:flex;align-items:center;justify-content:center;padding:10px;border-radius:999px;background:rgba(255,255,255,0.96);box-shadow:0 8px 24px rgba(0,0,0,0.14);backdrop-filter:blur(10px);border:1px solid rgba(0,0,0,0.06);transform:translateY(-60px);transition:transform 0.2s ease;">
                 <div style="width:18px;height:18px;border:2px solid rgba(0,0,0,0.14);border-top-color:var(--color-purple);border-radius:50%;animation:spin 0.8s linear infinite;"></div>
-                <span style="font-size:0.8rem;font-weight:600;color:var(--text-primary);">Yangilanmoqda...</span>
             </div>
         `;
         document.body.appendChild(indicator);
@@ -170,13 +169,11 @@ function setupPullToRefresh() {
     const updateIndicator = (distance) => {
         if (!indicator) createIndicator();
         const spinnerBox = indicator.querySelector('div > div');
-        const label = indicator.querySelector('div > span');
         const content = indicator.querySelector('div');
         const progress = Math.min(distance / threshold, 1);
         const translate = Math.max(-60, -60 + progress * 60);
         if (content) content.style.transform = `translateY(${translate}px)`;
         if (spinnerBox) spinnerBox.style.opacity = distance >= threshold ? '1' : '0.8';
-        if (label) label.textContent = distance >= threshold ? 'Yangilashga tayyor' : 'Pastga torting';
     };
 
     const resetIndicator = () => {
@@ -210,8 +207,6 @@ function setupPullToRefresh() {
     window.addEventListener('touchend', () => {
         if (pullDistance > threshold && window.scrollY === 0) {
             if (indicator) {
-                const label = indicator.querySelector('div > span');
-                if (label) label.textContent = 'Yangilanmoqda...';
                 const spinnerBox = indicator.querySelector('div > div');
                 if (spinnerBox) spinnerBox.style.opacity = '1';
             }
