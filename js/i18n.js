@@ -144,6 +144,9 @@ const I18N = {
                 new_password: "Yangi parol",
                 confirm_password: "Parolni tasdiqlang",
                 change: "O'zgartirish",
+                    account_inactive: "Hisobingiz faol emas. Iltimos administrator bilan bog'laning.",
+                    subscription_expired: "Obuna muddati tugagan. Iltimos yangilang.",
+                    session_expired: "Sessiya muddati tugagan. Iltimos qayta kiring.",
                 danger_zone: "Xavfli hudud",
                 delete_account_warning: "Hisobingizni o'chirishni xohlaysizmi? Bu amal qaytarib bo'lmaydi!",
                 delete_account: "Hisobni o'chirish"
@@ -282,6 +285,9 @@ const I18N = {
                 new_password: "Новый пароль",
                 confirm_password: "Подтвердите пароль",
                 change: "Изменить",
+                    account_inactive: "Ваш аккаунт не активен. Пожалуйста, свяжитесь с администратором.",
+                    subscription_expired: "Срок подписки истёк. Пожалуйста, обновите подписку.",
+                    session_expired: "Сессия истекла. Пожалуйста, войдите снова.",
                 danger_zone: "Опасная зона",
                 delete_account_warning: "Вы уверены, что хотите удалить аккаунт? Это действие необратимо!",
                 delete_account: "Удалить аккаунт"
@@ -420,6 +426,9 @@ const I18N = {
                 new_password: "New Password",
                 confirm_password: "Confirm Password",
                 change: "Change",
+                    account_inactive: "Your account is not active. Please contact admin.",
+                    subscription_expired: "Subscription expired. Please renew.",
+                    session_expired: "Session expired. Please login again.",
                 danger_zone: "Danger Zone",
                 delete_account_warning: "Are you sure you want to delete your account? This action cannot be undone!",
                 delete_account: "Delete Account"

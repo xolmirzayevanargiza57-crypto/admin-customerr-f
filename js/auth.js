@@ -74,29 +74,47 @@ const Auth = {
     // ============================================================
     async checkAuth() {
         const token = this.getToken();
-        if (!token) return false;
-        
+        if (!token) return { valid: false, reason: 'no_token' };
+
         try {
             const data = await API.get('/api/auth/me');
-            if (data.success) {
-                const user = data.user;
-                if (localStorage.getItem('customerToken')) {
-                    localStorage.setItem('customerUser', JSON.stringify(user));
-                } else {
-                    sessionStorage.setItem('customerUser', JSON.stringify(user));
-                }
-                return true;
+            if (!data || !data.success) {
+                return { valid: false, reason: data && (data.status === 401 || data.status === 403) ? 'unauthorized' : 'server' };
             }
 
-            if (data.status === 401 || data.status === 403) {
-                console.warn('⚠️ Auth check returned unauthorized; keeping current session intact.');
-                return true;
+            const user = data.user;
+            if (!user) return { valid: false, reason: 'no_user' };
+
+            // persist fresh user
+            if (localStorage.getItem('customerToken')) {
+                localStorage.setItem('customerUser', JSON.stringify(user));
+            } else {
+                sessionStorage.setItem('customerUser', JSON.stringify(user));
             }
 
-            return true;
+            // Account active check
+            if (user.active === false || user.isActive === false || user.status === 'inactive' || user.status === 'blocked') {
+                return { valid: false, reason: 'inactive' };
+            }
+
+            // Subscription / premium check (best-effort checks against common fields)
+            if (user.isSubscribed === false || user.subscription === 'expired') {
+                return { valid: false, reason: 'expired' };
+            }
+
+            if (user.subscriptionExpiry) {
+                try {
+                    const exp = new Date(user.subscriptionExpiry);
+                    if (!isNaN(exp.getTime()) && exp < new Date()) {
+                        return { valid: false, reason: 'expired' };
+                    }
+                } catch (e) { /* ignore parse errors */ }
+            }
+
+            return { valid: true, reason: null };
         } catch (error) {
-            console.warn('⚠️ Auth check xatosi; keeping current session intact:', error.message);
-            return true;
+            console.warn('⚠️ Auth check xatosi:', error.message);
+            return { valid: false, reason: 'error' };
         }
     },
     
@@ -117,11 +135,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     if (!isLoginPage) {
         if (!Auth.isAuthenticated()) {
-            window.location.href = 'index.html';
+            window.location.href = 'index.html?reason=no_token';
         } else {
-            const isValid = await Auth.checkAuth();
-            if (!isValid) {
-                Auth.logout();
+            const result = await Auth.checkAuth();
+            if (!result || result.valid !== true) {
+                const reason = result && result.reason ? result.reason : 'unauthorized';
+                // Redirect to login with reason so the login page can show explanation
+                window.location.href = `index.html?reason=${encodeURIComponent(reason)}`;
             }
         }
     }

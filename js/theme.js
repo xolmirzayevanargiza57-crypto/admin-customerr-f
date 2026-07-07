@@ -141,7 +141,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     // Mobile pull-to-refresh for top-of-page swipe down
-    setupPullToRefresh();
+    // Disabled: removed automatic pull-to-refresh behavior for mobile
+    // setupPullToRefresh();
 
     // Hozir saqlangan themeni qo'llash (serverdan ham)
     Theme.applyTheme(Theme.currentTheme);

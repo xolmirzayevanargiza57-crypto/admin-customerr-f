@@ -17,6 +17,18 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
+    // Agar redirect bilan sabab kelsa (masalan: inactive, expired, no_token)
+    const params = new URLSearchParams(window.location.search);
+    const reason = params.get('reason');
+    if (reason) {
+        let msgKey = 'session_expired';
+        if (reason === 'inactive' || reason === 'no_user') msgKey = 'account_inactive';
+        else if (reason === 'expired') msgKey = 'subscription_expired';
+        else if (reason === 'no_token' || reason === 'unauthorized') msgKey = 'session_expired';
+        errorText.textContent = I18N.t(msgKey) || 'Sessiya muddati tugagan';
+        errorDiv.classList.add('show');
+    }
+
     // Parolni ko'rsatish/yashirish
     if (passwordToggle && passwordInput) {
         passwordToggle.addEventListener('click', function(e) {
