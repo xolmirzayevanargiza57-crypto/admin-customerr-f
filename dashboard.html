@@ -13,10 +13,7 @@
     <link rel="stylesheet" href="css/style.css" />
 
     <style>
-        /* ============================================================
-           NOTIFICATION PANEL — RESPONSIVE + SCROLL
-           ============================================================ */
-
+        /* NOTIFICATION PANEL — RESPONSIVE + SCROLL */
         .notification-wrapper {
             position: relative;
             display: inline-block;
@@ -48,26 +45,23 @@
             line-height: 1.4;
         }
 
-        /* Panel */
         #notificationPanel {
             display: none;
-            position: fixed;          /* fixed — ekrandan chiqmaydi */
+            position: fixed;
             top: 60px;
             right: 12px;
-            left: 12px;               /* mobilda to'liq kenglik */
+            left: 12px;
             max-width: 420px;
-            margin-left: auto;        /* o'ngga yopishadi */
+            margin-left: auto;
             background: var(--bg-card);
             border: 1px solid var(--border-color);
             border-radius: 14px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.18);
             z-index: 9999;
             overflow: hidden;
-            display: none;
             flex-direction: column;
         }
 
-        /* Panel header — fikslanadi */
         .notif-panel-header {
             display: flex;
             justify-content: space-between;
@@ -95,14 +89,12 @@
             padding: 4px 0;
         }
 
-        /* Scroll bo'ladigan qism */
         #notificationList {
             overflow-y: auto;
-            max-height: 360px;        /* bu yerda scroll bo'ladi */
+            max-height: 360px;
             padding: 6px 0;
         }
 
-        /* Har bir xabar */
         .notification-item {
             padding: 10px 14px;
             border-bottom: 1px solid var(--border-color);
@@ -127,7 +119,7 @@
 
         .notification-body {
             flex: 1;
-            min-width: 0;             /* matn uzun bo'lsa wrap bo'ladi */
+            min-width: 0;
         }
 
         .notification-title {
@@ -144,7 +136,7 @@
             color: var(--text-secondary);
             margin: 0 0 4px 0;
             word-break: break-word;
-            white-space: pre-wrap;    /* uzun matn pastga tushadi, height oshmaydi */
+            white-space: pre-wrap;
             line-height: 1.45;
         }
 
@@ -175,7 +167,6 @@
             align-self: flex-start;
         }
 
-        /* Katta ekranda panel o'ngdan */
         @media (min-width: 480px) {
             #notificationPanel {
                 position: absolute;
@@ -183,14 +174,12 @@
                 right: 0;
                 left: auto;
                 width: 380px;
-                fixed: unset;
             }
         }
     </style>
 </head>
 <body>
     <div class="app-container">
-        <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-brand">
                 <div class="brand-icon"><i class="fas fa-crown"></i></div>
@@ -237,7 +226,6 @@
 
         <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-        <!-- Main Content -->
         <main class="main-content">
             <header class="top-header">
                 <div class="header-left">
@@ -248,15 +236,11 @@
                     </div>
                 </div>
                 <div class="header-right">
-
-                    <!-- ⭐ NOTIFICATION BELL -->
                     <div class="notification-wrapper">
                         <button id="notificationToggle" class="notification-btn">
                             <i class="fas fa-bell"></i>
                             <span id="notificationBadge">0</span>
                         </button>
-
-                        <!-- Panel: header fikslanadi, list scroll bo'ladi -->
                         <div id="notificationPanel">
                             <div class="notif-panel-header">
                                 <h4><i class="fas fa-bell" style="margin-right:6px;"></i>Bildirishnomalar</h4>
@@ -278,7 +262,6 @@
                 </div>
             </header>
 
-            <!-- Stats Cards -->
             <section class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-icon blue"><i class="fas fa-chalkboard-teacher"></i></div>
@@ -311,7 +294,6 @@
                 </div>
             </section>
 
-            <!-- Attendance Cards -->
             <section class="attendance-cards">
                 <div class="stat-card present-card">
                     <div class="stat-icon green"><i class="fas fa-check-circle"></i></div>
@@ -336,7 +318,6 @@
                 </div>
             </section>
 
-            <!-- Subscription Card -->
             <section class="subscription-card">
                 <div class="sub-item">
                     <span class="label"><i class="fas fa-circle"></i> Holati</span>
@@ -358,7 +339,6 @@
         </main>
     </div>
 
-    <!-- Theme Toggle -->
     <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
         <i class="fas fa-moon moon"></i>
         <i class="fas fa-sun sun"></i>
