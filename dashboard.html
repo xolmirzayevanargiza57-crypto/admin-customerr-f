@@ -9,9 +9,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-    
-    <!-- ⭐ Chart.js - CDN dan yuklanadi (MUHIM!) -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
     <link rel="stylesheet" href="css/style.css" />
 </head>
@@ -85,7 +82,7 @@
                 </div>
             </header>
 
-            <!-- Stats Grid -->
+            <!-- ⭐ STATS CARDS - CHARTLAR O'CHIRILGAN -->
             <section class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-icon blue"><i class="fas fa-chalkboard-teacher"></i></div>
@@ -118,7 +115,7 @@
                 </div>
             </section>
 
-            <!-- Attendance Cards -->
+            <!-- ⭐ ATTENDANCE CARDS -->
             <section class="attendance-cards">
                 <div class="stat-card present-card">
                     <div class="stat-icon green"><i class="fas fa-check-circle"></i></div>
@@ -143,35 +140,7 @@
                 </div>
             </section>
 
-            <!-- ⭐ Charts - Canvas elementlari -->
-            <section class="charts-grid">
-                <div class="chart-card">
-                    <div class="chart-header">
-                        <h3><i class="fas fa-chart-bar"></i> <span data-i18n="weekly_attendance">Haftalik davomat</span></h3>
-                    </div>
-                    <canvas id="attendanceChart" style="max-height:220px;width:100%;"></canvas>
-                </div>
-                <div class="chart-card">
-                    <div class="chart-header">
-                        <h3><i class="fas fa-chart-doughnut"></i> <span data-i18n="attendance_distribution">Davomat taqsimoti</span></h3>
-                    </div>
-                    <canvas id="attendancePieChart" style="max-height:220px;width:100%;"></canvas>
-                </div>
-                <div class="chart-card">
-                    <div class="chart-header">
-                        <h3><i class="fas fa-users"></i> <span data-i18n="groups_by_students">Guruhlar bo'yicha o'quvchilar</span></h3>
-                    </div>
-                    <canvas id="groupChart" style="max-height:220px;width:100%;"></canvas>
-                </div>
-                <div class="chart-card">
-                    <div class="chart-header">
-                        <span class="text-muted" style="font-size:0.8rem;" data-i18n="weekly_summary">Haftalik keldi / sababli / sababsiz</span>
-                    </div>
-                    <canvas id="studentAttendanceChart" style="max-height:260px;width:100%;"></canvas>
-                </div>
-            </section>
-
-            <!-- Subscription -->
+            <!-- ⭐ SUBSCRIPTION CARD -->
             <section class="subscription-card">
                 <div class="sub-item">
                     <span class="label"><i class="fas fa-circle"></i> <span data-i18n="status">Holati</span></span>
