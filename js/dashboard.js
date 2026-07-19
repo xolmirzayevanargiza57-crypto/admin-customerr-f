@@ -1,5 +1,5 @@
 // ============================================================
-// DASHBOARD - STATISTIKALAR (TO'LIQ TUZATILGAN)
+// DASHBOARD - STATISTIKALAR (Admin-Customer)
 // ============================================================
 
 let lastDashboardStats = null;
@@ -26,15 +26,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (schoolEl) schoolEl.textContent = user.schoolName || 'Nurli Ta\'lim Markazi';
         }
 
-        // ⭐ Ma'lumotlarni yuklash
         await loadDashboardStats();
         
-        // ⭐ Har 30 soniyada yangilash
         refreshInterval = setInterval(() => {
             loadDashboardStats();
         }, 30000);
         
         setupListeners();
+        initNotifications();
         
         console.log('✅ Dashboard yuklandi!');
     } catch (error) {
@@ -44,7 +43,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 // ============================================================
-// ⭐ STATISTIKALARNI YUKLASH - TO'LIQ TUZATILGAN
+// DASHBOARD STATISTIKA
 // ============================================================
 async function loadDashboardStats() {
     try {
@@ -80,13 +79,11 @@ async function loadDashboardStats() {
             subscriptionDays: document.getElementById('subscriptionDays')
         };
         
-        // ⭐ Asosiy statistikalar
         if (elements.teacherCount) elements.teacherCount.textContent = stats.teacherCount || 0;
         if (elements.studentCount) elements.studentCount.textContent = stats.studentCount || 0;
         if (elements.totalXP) elements.totalXP.textContent = stats.totalXP || 0;
         if (elements.todayAttendance) elements.todayAttendance.textContent = stats.todayAttendance || 0;
         
-        // ⭐ Davomat statistikasi
         const present = stats.attendanceStats?.present || 0;
         const absentReason = stats.attendanceStats?.absent_reason || 0;
         const absent = stats.attendanceStats?.absent || 0;
@@ -106,13 +103,12 @@ async function loadDashboardStats() {
             }
         }
 
-        // ⭐ SUBSCRIPTION - TO'LIQ TUZATILGAN
+        // ⭐ SUBSCRIPTION - TO'LIQ
         if (stats.subscription) {
             console.log('📊 Subscription ma\'lumotlari:', stats.subscription);
             
             const sub = stats.subscription;
             
-            // Status
             const statusMap = {
                 'active': '✅ Faol',
                 'inactive': '⛔ Faol emas',
@@ -122,7 +118,6 @@ async function loadDashboardStats() {
                 elements.subscriptionStatus.textContent = statusMap[sub.status] || sub.status || 'Noma\'lum';
             }
             
-            // Turi
             const typeMap = {
                 'monthly': '📅 Oylik',
                 '6months': '📅 6 oylik',
@@ -134,7 +129,6 @@ async function loadDashboardStats() {
                 elements.subscriptionType.textContent = typeMap[sub.type] || sub.type || 'Noma\'lum';
             }
             
-            // Tugash vaqti
             if (sub.endDate && elements.subscriptionEnd) {
                 const endDate = new Date(sub.endDate);
                 const formattedDate = endDate.toLocaleString('uz-UZ', {
@@ -151,7 +145,6 @@ async function loadDashboardStats() {
                 elements.subscriptionEnd.textContent = 'Muddati yo\'q';
             }
             
-            // Qolgan kun
             if (sub.endDate && elements.subscriptionDays) {
                 const endDate = new Date(sub.endDate);
                 const now = new Date();
@@ -170,7 +163,6 @@ async function loadDashboardStats() {
                 elements.subscriptionDays.textContent = '-';
             }
         } else {
-            // Subscription ma'lumoti bo'lmasa
             if (elements.subscriptionStatus) elements.subscriptionStatus.textContent = '❌ Yo\'q';
             if (elements.subscriptionType) elements.subscriptionType.textContent = '❌ Yo\'q';
             if (elements.subscriptionEnd) elements.subscriptionEnd.textContent = '-';
@@ -185,6 +177,168 @@ async function loadDashboardStats() {
 }
 
 // ============================================================
+// ⭐ NOTIFICATIONS - Admin Customer (dashboard.js ichida)
+// ============================================================
+function initNotifications() {
+    const notificationToggle = document.getElementById('notificationToggle');
+    const notificationPanel = document.getElementById('notificationPanel');
+    const notificationList = document.getElementById('notificationList');
+    const notificationBadge = document.getElementById('notificationBadge');
+    const markAllRead = document.getElementById('markAllRead');
+
+    if (!notificationToggle) return;
+
+    notificationToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = notificationPanel.style.display === 'block';
+        notificationPanel.style.display = isOpen ? 'none' : 'block';
+        if (!isOpen) {
+            loadNotifications();
+        }
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!notificationPanel.contains(e.target) && e.target !== notificationToggle && !notificationToggle.contains(e.target)) {
+            notificationPanel.style.display = 'none';
+        }
+    });
+
+    if (markAllRead) {
+        markAllRead.addEventListener('click', async () => {
+            try {
+                const token = localStorage.getItem('customerToken') || sessionStorage.getItem('customerToken');
+                if (!token) return;
+                
+                const response = await fetch('https://admin-customerr.onrender.com/api/notifications/mark-all-read', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (response.ok) {
+                    loadNotifications();
+                }
+            } catch (error) {
+                console.error('❌ Xatolik:', error);
+            }
+        });
+    }
+
+    async function loadNotifications() {
+        try {
+            const token = localStorage.getItem('customerToken') || sessionStorage.getItem('customerToken');
+            if (!token) return;
+
+            const response = await fetch('https://admin-customerr.onrender.com/api/notifications', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            const data = await response.json();
+            console.log('📨 Xabarlar:', data);
+
+            if (response.ok && data.success) {
+                const notifications = data.data || [];
+                renderNotifications(notifications);
+            } else {
+                notificationList.innerHTML = `<p class="text-muted" style="text-align: center; padding: 20px 0; font-size: 0.85rem;">Xabarlar yuklanmadi</p>`;
+            }
+        } catch (error) {
+            console.error('❌ Xabarlarni yuklash xatosi:', error);
+            notificationList.innerHTML = `<p class="text-muted" style="text-align: center; padding: 20px 0; font-size: 0.85rem;">Xatolik yuz berdi</p>`;
+        }
+    }
+
+    function renderNotifications(notifications) {
+        if (!notificationList || !notificationBadge) return;
+
+        const unreadCount = notifications.filter(n => !n.isRead).length;
+        
+        if (unreadCount > 0) {
+            notificationBadge.style.display = 'block';
+            notificationBadge.textContent = unreadCount > 99 ? '99+' : unreadCount;
+        } else {
+            notificationBadge.style.display = 'none';
+        }
+
+        if (!notifications || notifications.length === 0) {
+            notificationList.innerHTML = `<p class="text-muted" style="text-align: center; padding: 20px 0; font-size: 0.85rem;">Hozircha xabarlar yo'q</p>`;
+            return;
+        }
+
+        notificationList.innerHTML = notifications.map(notif => {
+            const date = new Date(notif.createdAt);
+            const timeStr = date.toLocaleString('uz-UZ', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            const isRead = notif.isRead || false;
+
+            return `
+                <div class="notification-item" style="padding: 10px 12px; border-bottom: 1px solid var(--border-color); ${!isRead ? 'background: var(--bg-hover); border-left: 3px solid #007aff;' : ''}">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
+                        <div style="flex: 1; min-width: 0;">
+                            <strong style="font-size: 0.85rem; color: var(--text-primary); display: block; word-wrap: break-word;">${notif.title || 'Xabar'}</strong>
+                            <p style="font-size: 0.8rem; color: var(--text-secondary); margin: 4px 0; word-wrap: break-word;">${notif.message || ''}</p>
+                            <span style="font-size: 0.7rem; color: var(--text-muted);">${timeStr}</span>
+                        </div>
+                        ${!isRead ? `
+                            <button class="mark-read-btn" data-id="${notif._id}" style="background: none; border: none; color: #007aff; font-size: 0.7rem; cursor: pointer; white-space: nowrap; padding: 4px 8px;">
+                                O'qildi
+                            </button>
+                        ` : `
+                            <span style="font-size: 0.7rem; color: var(--text-muted); white-space: nowrap; padding: 4px 8px;">✓ O'qilgan</span>
+                        `}
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        document.querySelectorAll('.mark-read-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                const id = btn.dataset.id;
+                await markAsRead(id);
+            });
+        });
+    }
+
+    async function markAsRead(id) {
+        try {
+            const token = localStorage.getItem('customerToken') || sessionStorage.getItem('customerToken');
+            if (!token) return;
+
+            const response = await fetch(`https://admin-customerr.onrender.com/api/notifications/${id}/read`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (response.ok) {
+                loadNotifications();
+            }
+        } catch (error) {
+            console.error('❌ Xatolik:', error);
+        }
+    }
+
+    setInterval(() => {
+        if (notificationPanel && notificationPanel.style.display === 'block') {
+            loadNotifications();
+        }
+    }, 30000);
+}
+
+// ============================================================
 // EVENT LISTENERLAR
 // ============================================================
 function setupListeners() {
@@ -196,9 +350,6 @@ function setupListeners() {
     }
 }
 
-// ============================================================
-// XATOLIKNI KO'RSATISH
-// ============================================================
 function showError(msg) {
     console.error('⚠️ Xatolik:', msg);
     
