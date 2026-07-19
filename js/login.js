@@ -1,5 +1,5 @@
 // ============================================================
-// LOGIN - TIZIMGA KIRISH (TO'LIQ)
+// LOGIN - TIZIMGA KIRISH (TO'LIQ TUZATILGAN)
 // ============================================================
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -11,25 +11,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const errorText = document.getElementById('errorText');
     const passwordToggle = document.getElementById('passwordToggle');
 
-    // Agar allaqachon kirgan bo'lsa
     if (Auth.isAuthenticated()) {
         window.location.href = 'dashboard.html';
         return;
     }
 
-    // Agar redirect bilan sabab kelsa (masalan: inactive, expired, no_token)
-    const params = new URLSearchParams(window.location.search);
-    const reason = params.get('reason');
-    if (reason) {
-        let msgKey = 'session_expired';
-        if (reason === 'inactive' || reason === 'no_user') msgKey = 'account_inactive';
-        else if (reason === 'expired') msgKey = 'subscription_expired';
-        else if (reason === 'no_token' || reason === 'unauthorized') msgKey = 'session_expired';
-        errorText.textContent = I18N.t(msgKey) || 'Sessiya muddati tugagan';
-        errorDiv.classList.add('show');
-    }
-
-    // Parolni ko'rsatish/yashirish
+    // Password toggle
     if (passwordToggle && passwordInput) {
         passwordToggle.addEventListener('click', function(e) {
             e.preventDefault();
@@ -68,7 +55,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const email = emailInput.value.trim();
         const password = passwordInput.value;
 
-        // Validation
         let isValid = true;
         if (!email || !email.includes('@') || !email.includes('.')) {
             emailInput.classList.add('error');
@@ -94,7 +80,6 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // Loading state
         btn.disabled = true;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ' + I18N.t('loading');
         errorDiv.classList.remove('show');
@@ -110,10 +95,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     window.location.href = 'dashboard.html';
                 }, 500);
             } else {
-                errorText.textContent = result.error || I18N.t('error');
-                errorDiv.classList.add('show');
-                btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> ' + I18N.t('login_btn');
-                btn.disabled = false;
+                // ⭐ BLOKLANGAN YOKI OBUNA TUGAGAN USER
+                if (result.action === 'contact_support') {
+                    errorText.textContent = result.error || 'Iltimos, yordam uchun raqamga qo\'ng\'iroq qiling.';
+                    errorDiv.classList.add('show');
+                    btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> ' + I18N.t('login_btn');
+                    btn.disabled = false;
+                } else {
+                    errorText.textContent = result.error || I18N.t('error');
+                    errorDiv.classList.add('show');
+                    btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> ' + I18N.t('login_btn');
+                    btn.disabled = false;
+                }
             }
         } catch (error) {
             console.error('❌ Login xatosi:', error);
@@ -124,7 +117,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Enter tugmasi
     passwordInput.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
             e.preventDefault();
@@ -132,7 +124,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Xatolikni tozalash
     [emailInput, passwordInput].forEach(inp => {
         inp.addEventListener('input', () => {
             errorText.textContent = '';
