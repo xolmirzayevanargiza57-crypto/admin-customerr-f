@@ -4,6 +4,7 @@
 
 let lastDashboardStats = null;
 let refreshInterval = null;
+let countdownInterval = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('🚀 Dashboard yuklanmoqda...');
@@ -28,9 +29,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         await loadDashboardStats();
         
+        // ⭐ HAR 30 SONIYADA MA'LUMOTLARNI YANGILASH
         refreshInterval = setInterval(() => {
             loadDashboardStats();
         }, 30000);
+        
+        // ⭐ REAL-TIME COUNTDOWN - HAR SONIYADA YANGILANADI
+        startCountdown();
         
         setupListeners();
         initNotifications();
@@ -41,6 +46,52 @@ document.addEventListener('DOMContentLoaded', async () => {
         showError('Dashboard yuklashda xatolik: ' + error.message);
     }
 });
+
+// ============================================================
+// ⭐ REAL-TIME COUNTDOWN - HAR SONIYADA YANGILANADI
+// ============================================================
+function startCountdown() {
+    // Eski intervalni tozalash
+    if (countdownInterval) {
+        clearInterval(countdownInterval);
+        countdownInterval = null;
+    }
+    
+    countdownInterval = setInterval(() => {
+        updateCountdown();
+    }, 1000);
+}
+
+function updateCountdown() {
+    const daysEl = document.getElementById('subscriptionDays');
+    const endEl = document.getElementById('subscriptionEnd');
+    
+    if (!daysEl || !lastDashboardStats || !lastDashboardStats.subscription) return;
+    
+    const sub = lastDashboardStats.subscription;
+    if (!sub.endDate) {
+        daysEl.textContent = '-';
+        return;
+    }
+    
+    const endDate = new Date(sub.endDate);
+    const now = new Date();
+    const diff = endDate - now;
+    
+    if (diff <= 0) {
+        daysEl.textContent = '⚠️ Vaqt tugagan!';
+        return;
+    }
+    
+    // ⭐ KUN, SOAT, MINUT, SEKUNDNI HISOBLASH
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+    
+    // ⭐ TO'G'RI FORMAT: "177 kun 4s 47m 48s"
+    daysEl.textContent = `${days} kun ${hours}s ${minutes}m ${seconds}s`;
+}
 
 // ============================================================
 // DASHBOARD STATISTIKA
@@ -63,6 +114,7 @@ async function loadDashboardStats() {
         lastDashboardStats = stats;
         console.log('📊 Statistika ma\'lumotlari:', stats);
         
+        // Stats cards
         const elements = {
             teacherCount: document.getElementById('teacherCount'),
             studentCount: document.getElementById('studentCount'),
@@ -102,10 +154,11 @@ async function loadDashboardStats() {
             }
         }
 
-        // SUBSCRIPTION
+        // ⭐ SUBSCRIPTION - TO'LIQ VA TO'G'RI
         if (stats.subscription) {
             const sub = stats.subscription;
             
+            // Status
             const statusMap = {
                 'active': '✅ Faol',
                 'inactive': '⛔ Faol emas',
@@ -115,6 +168,7 @@ async function loadDashboardStats() {
                 elements.subscriptionStatus.textContent = statusMap[sub.status] || sub.status || 'Noma\'lum';
             }
             
+            // Turi
             const typeMap = {
                 'monthly': '📅 Oylik',
                 '6months': '📅 6 oylik',
@@ -126,9 +180,11 @@ async function loadDashboardStats() {
                 elements.subscriptionType.textContent = typeMap[sub.type] || sub.type || 'Noma\'lum';
             }
             
+            // ⭐ TUGASH VAQTI - TO'G'RI FORMAT
             if (sub.endDate && elements.subscriptionEnd) {
                 const endDate = new Date(sub.endDate);
-                elements.subscriptionEnd.textContent = endDate.toLocaleString('uz-UZ', {
+                // ⭐ TO'G'RI FORMAT: 2027-yil 12-yanvar 21:13:00
+                const formattedDate = endDate.toLocaleString('uz-UZ', {
                     year: 'numeric',
                     month: 'long',
                     day: 'numeric',
@@ -137,10 +193,12 @@ async function loadDashboardStats() {
                     second: '2-digit',
                     hour12: false
                 });
+                elements.subscriptionEnd.textContent = formattedDate;
             } else if (elements.subscriptionEnd) {
                 elements.subscriptionEnd.textContent = 'Muddati yo\'q';
             }
             
+            // ⭐ QOLGAN KUN - REAL-TIME COUNTDOWN
             if (sub.endDate && elements.subscriptionDays) {
                 const endDate = new Date(sub.endDate);
                 const now = new Date();
@@ -151,6 +209,7 @@ async function loadDashboardStats() {
                     const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
                     const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
                     const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+                    // ⭐ TO'G'RI FORMAT: "177 kun 4s 47m 48s"
                     elements.subscriptionDays.textContent = `${days} kun ${hours}s ${minutes}m ${seconds}s`;
                 } else {
                     elements.subscriptionDays.textContent = '⚠️ Vaqt tugagan!';
@@ -174,8 +233,6 @@ async function loadDashboardStats() {
 
 // ============================================================
 // ⭐ NOTIFICATIONS — Admin Customer
-// Panel: header fikslanadi, #notificationList scroll bo'ladi
-// Height oshmaydi, uzun matn wrap bo'ladi
 // ============================================================
 function initNotifications() {
     const notificationToggle = document.getElementById('notificationToggle');
@@ -186,7 +243,6 @@ function initNotifications() {
 
     if (!notificationToggle || !notificationPanel) return;
 
-    // ── Panel ochish / yopish ──
     notificationToggle.addEventListener('click', (e) => {
         e.stopPropagation();
         const isOpen = notificationPanel.style.display === 'flex';
@@ -194,7 +250,6 @@ function initNotifications() {
         if (!isOpen) loadNotifications();
     });
 
-    // Panel tashqarisiga bosganda yopiladi
     document.addEventListener('click', (e) => {
         if (
             notificationPanel.style.display === 'flex' &&
@@ -205,7 +260,6 @@ function initNotifications() {
         }
     });
 
-    // ── Hammasini o'qilgan deb belgilash ──
     if (markAllReadBtn) {
         markAllReadBtn.addEventListener('click', async () => {
             try {
@@ -226,13 +280,11 @@ function initNotifications() {
         });
     }
 
-    // ── Xabarlarni yuklash ──
     async function loadNotifications() {
         try {
             const token = getToken();
             if (!token) return;
 
-            // Yuklanmoqda holati
             notificationList.innerHTML = `
                 <p style="text-align:center;padding:20px 0;font-size:0.82rem;color:var(--text-muted);">
                     <i class="fas fa-spinner fa-spin"></i> Yuklanmoqda...
@@ -262,11 +314,9 @@ function initNotifications() {
         }
     }
 
-    // ── Xabarlarni chizish ──
     function renderNotifications(notifications) {
         if (!notificationList || !notificationBadge) return;
 
-        // Badge
         const unreadCount = notifications.filter(n => !n.isRead).length;
         if (unreadCount > 0) {
             notificationBadge.style.display = 'block';
@@ -275,7 +325,6 @@ function initNotifications() {
             notificationBadge.style.display = 'none';
         }
 
-        // Bo'sh holat
         if (!notifications.length) {
             notificationList.innerHTML = `
                 <p style="text-align:center;padding:24px 0;font-size:0.85rem;color:var(--text-muted);">
@@ -285,9 +334,6 @@ function initNotifications() {
             return;
         }
 
-        // ⭐ Har bir xabar:
-        //    - .notification-message → white-space:pre-wrap, word-break:break-word
-        //    - height oshmaydi, panel ichida scroll bo'ladi (#notificationList ga max-height qo'yilgan)
         notificationList.innerHTML = notifications.map(notif => {
             const date = new Date(notif.createdAt);
             const timeStr = date.toLocaleString('uz-UZ', {
@@ -312,7 +358,6 @@ function initNotifications() {
                 </div>`;
         }).join('');
 
-        // O'qildi tugmalari
         notificationList.querySelectorAll('.mark-read-btn').forEach(btn => {
             btn.addEventListener('click', async (e) => {
                 e.stopPropagation();
@@ -321,7 +366,6 @@ function initNotifications() {
         });
     }
 
-    // ── Bitta xabarni o'qilgan deb belgilash ──
     async function markAsRead(id) {
         try {
             const token = getToken();
@@ -343,7 +387,6 @@ function initNotifications() {
         }
     }
 
-    // Panel ochiq bo'lsa har 30 sekundda yangilanadi
     setInterval(() => {
         if (notificationPanel.style.display === 'flex') {
             loadNotifications();
@@ -351,7 +394,6 @@ function initNotifications() {
     }, 30000);
 }
 
-// ── Token olish yordamchi funksiyasi ──
 function getToken() {
     return localStorage.getItem('customerToken') || sessionStorage.getItem('customerToken');
 }
