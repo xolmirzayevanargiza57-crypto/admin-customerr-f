@@ -11,175 +11,14 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
     <link rel="stylesheet" href="css/style.css" />
-
-    <style>
-        /* NOTIFICATION PANEL — RESPONSIVE + SCROLL */
-        .notification-wrapper {
-            position: relative;
-            display: inline-block;
-        }
-
-        .notification-btn {
-            background: none;
-            border: none;
-            font-size: 1.2rem;
-            color: var(--text-primary);
-            position: relative;
-            padding: 8px;
-            cursor: pointer;
-        }
-
-        #notificationBadge {
-            position: absolute;
-            top: -2px;
-            right: -4px;
-            background: #ff3b30;
-            color: white;
-            font-size: 0.6rem;
-            border-radius: 50%;
-            padding: 2px 5px;
-            min-width: 18px;
-            text-align: center;
-            display: none;
-            font-weight: 600;
-            line-height: 1.4;
-        }
-
-        #notificationPanel {
-            display: none;
-            position: fixed;
-            top: 60px;
-            right: 12px;
-            left: 12px;
-            max-width: 420px;
-            margin-left: auto;
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 14px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.18);
-            z-index: 9999;
-            overflow: hidden;
-            flex-direction: column;
-        }
-
-        .notif-panel-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 14px;
-            border-bottom: 1px solid var(--border-color);
-            background: var(--bg-card);
-            flex-shrink: 0;
-        }
-
-        .notif-panel-header h4 {
-            font-size: 0.9rem;
-            font-weight: 600;
-            margin: 0;
-            color: var(--text-primary);
-        }
-
-        #markAllRead {
-            background: none;
-            border: none;
-            color: #007aff;
-            font-size: 0.72rem;
-            cursor: pointer;
-            white-space: nowrap;
-            padding: 4px 0;
-        }
-
-        #notificationList {
-            overflow-y: auto;
-            max-height: 360px;
-            padding: 6px 0;
-        }
-
-        .notification-item {
-            padding: 10px 14px;
-            border-bottom: 1px solid var(--border-color);
-            transition: background 0.2s;
-        }
-
-        .notification-item:last-child {
-            border-bottom: none;
-        }
-
-        .notification-item.unread {
-            background: var(--bg-hover);
-            border-left: 3px solid #007aff;
-        }
-
-        .notification-item-inner {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 8px;
-        }
-
-        .notification-body {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .notification-title {
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            display: block;
-            word-break: break-word;
-            margin-bottom: 4px;
-        }
-
-        .notification-message {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            margin: 0 0 4px 0;
-            word-break: break-word;
-            white-space: pre-wrap;
-            line-height: 1.45;
-        }
-
-        .notification-time {
-            font-size: 0.7rem;
-            color: var(--text-muted);
-        }
-
-        .mark-read-btn {
-            background: none;
-            border: 1px solid #007aff;
-            color: #007aff;
-            font-size: 0.68rem;
-            cursor: pointer;
-            white-space: nowrap;
-            padding: 3px 8px;
-            border-radius: 6px;
-            flex-shrink: 0;
-            align-self: flex-start;
-        }
-
-        .notif-read-label {
-            font-size: 0.68rem;
-            color: var(--text-muted);
-            white-space: nowrap;
-            padding: 3px 0;
-            flex-shrink: 0;
-            align-self: flex-start;
-        }
-
-        @media (min-width: 480px) {
-            #notificationPanel {
-                position: absolute;
-                top: 45px;
-                right: 0;
-                left: auto;
-                width: 380px;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="css/input.css" />
+    <link rel="stylesheet" href="css/modal.css" />
+    <link rel="stylesheet" href="css/responsive.css" />
+    <link rel="stylesheet" href="css/theme.css" />
 </head>
 <body>
     <div class="app-container">
+        <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-brand">
                 <div class="brand-icon"><i class="fas fa-crown"></i></div>
@@ -226,6 +65,7 @@
 
         <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
+        <!-- Main Content -->
         <main class="main-content">
             <header class="top-header">
                 <div class="header-left">
@@ -236,18 +76,22 @@
                     </div>
                 </div>
                 <div class="header-right">
-                    <div class="notification-wrapper">
-                        <button id="notificationToggle" class="notification-btn">
+                    <!-- NOTIFICATIONS ICON -->
+                    <div class="notification-wrapper" style="position: relative; display: inline-block;">
+                        <button id="notificationToggle" class="notification-btn" style="background: none; border: none; font-size: 1.2rem; color: var(--text-primary); position: relative; padding: 8px; cursor: pointer;">
                             <i class="fas fa-bell"></i>
-                            <span id="notificationBadge">0</span>
+                            <span id="notificationBadge" style="position: absolute; top: -2px; right: -4px; background: #ff3b30; color: white; font-size: 0.6rem; border-radius: 50%; padding: 2px 5px; min-width: 18px; text-align: center; display: none; font-weight: 600;">0</span>
                         </button>
-                        <div id="notificationPanel">
-                            <div class="notif-panel-header">
-                                <h4><i class="fas fa-bell" style="margin-right:6px;"></i>Bildirishnomalar</h4>
-                                <button id="markAllRead">Hammasini o'qilgan deb belgilash</button>
+                        <!-- Notification Panel -->
+                        <div id="notificationPanel" style="display: none; position: absolute; top: 45px; right: 0; width: 380px; max-height: 420px; overflow-y: auto; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); z-index: 1000; padding: 12px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 10px; border-bottom: 1px solid var(--border-color);">
+                                <h4 style="font-size: 0.9rem; font-weight: 600; margin: 0; color: var(--text-primary);">
+                                    <i class="fas fa-bell" style="margin-right: 6px;"></i> Bildirishnomalar
+                                </h4>
+                                <button id="markAllRead" style="background: none; border: none; color: var(--text-muted); font-size: 0.7rem; cursor: pointer;">Hammasini o'qilgan deb belgilash</button>
                             </div>
-                            <div id="notificationList">
-                                <p class="text-muted" style="text-align:center;padding:20px 0;font-size:0.85rem;">Hozircha xabarlar yo'q</p>
+                            <div id="notificationList" style="padding-top: 8px;">
+                                <p class="text-muted" style="text-align: center; padding: 20px 0; font-size: 0.85rem;">Hozircha xabarlar yo'q</p>
                             </div>
                         </div>
                     </div>
@@ -262,62 +106,65 @@
                 </div>
             </header>
 
+            <!-- Stats Cards -->
             <section class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-icon blue"><i class="fas fa-chalkboard-teacher"></i></div>
                     <div class="stat-info">
-                        <p class="stat-label"><i class="fas fa-users"></i> <span data-i18n="total_teachers">Jami O'qituvchilar</span></p>
+                        <p class="stat-label"><i class="fas fa-users"></i> Jami O'qituvchilar</p>
                         <p class="stat-value" id="teacherCount">0</p>
                     </div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-icon green"><i class="fas fa-graduation-cap"></i></div>
                     <div class="stat-info">
-                        <p class="stat-label"><i class="fas fa-user-graduate"></i> <span data-i18n="total_students">Jami O'quvchilar</span></p>
+                        <p class="stat-label"><i class="fas fa-user-graduate"></i> Jami O'quvchilar</p>
                         <p class="stat-value" id="studentCount">0</p>
                     </div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-icon purple"><i class="fas fa-star"></i></div>
                     <div class="stat-info">
-                        <p class="stat-label"><i class="fas fa-trophy"></i> <span data-i18n="total_xp">Jami XP</span></p>
+                        <p class="stat-label"><i class="fas fa-trophy"></i> Jami XP</p>
                         <p class="stat-value" id="totalXP">0</p>
                     </div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-icon orange"><i class="fas fa-calendar-check"></i></div>
                     <div class="stat-info">
-                        <p class="stat-label"><i class="fas fa-clock"></i> <span data-i18n="today_attendance">Bugungi davomat</span></p>
+                        <p class="stat-label"><i class="fas fa-clock"></i> Bugungi davomat</p>
                         <p class="stat-value" id="todayAttendance">0</p>
                         <span class="stat-change" id="attendancePercent">0%</span>
                     </div>
                 </div>
             </section>
 
+            <!-- Attendance Cards -->
             <section class="attendance-cards">
                 <div class="stat-card present-card">
                     <div class="stat-icon green"><i class="fas fa-check-circle"></i></div>
                     <div class="stat-info">
-                        <p class="stat-label"><i class="fas fa-user-check"></i> <span data-i18n="present">Keldi</span></p>
+                        <p class="stat-label"><i class="fas fa-user-check"></i> Keldi</p>
                         <p class="stat-value" id="presentCount" style="color: var(--color-success);">0</p>
                     </div>
                 </div>
                 <div class="stat-card" style="border-left: 4px solid var(--color-warning);">
                     <div class="stat-icon" style="background: #fff3e0; color: var(--color-warning);"><i class="fas fa-exclamation-triangle"></i></div>
                     <div class="stat-info">
-                        <p class="stat-label"><i class="fas fa-comment"></i> <span data-i18n="absent_reason">Sababli</span></p>
+                        <p class="stat-label"><i class="fas fa-comment"></i> Sababli</p>
                         <p class="stat-value" id="absentReasonCount" style="color: var(--color-warning);">0</p>
                     </div>
                 </div>
                 <div class="stat-card absent-card">
                     <div class="stat-icon" style="background: #fef2f2; color: var(--color-danger);"><i class="fas fa-times-circle"></i></div>
                     <div class="stat-info">
-                        <p class="stat-label"><i class="fas fa-user-times"></i> <span data-i18n="absent">Kelmadi</span></p>
+                        <p class="stat-label"><i class="fas fa-user-times"></i> Kelmadi</p>
                         <p class="stat-value" id="absentCount" style="color: var(--color-danger);">0</p>
                     </div>
                 </div>
             </section>
 
+            <!-- Subscription Card -->
             <section class="subscription-card">
                 <div class="sub-item">
                     <span class="label"><i class="fas fa-circle"></i> Holati</span>
@@ -339,6 +186,7 @@
         </main>
     </div>
 
+    <!-- Theme Toggle -->
     <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
         <i class="fas fa-moon moon"></i>
         <i class="fas fa-sun sun"></i>
