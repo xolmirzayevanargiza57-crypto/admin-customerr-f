@@ -1,18 +1,26 @@
 // ============================================================
-// DASHBOARD - STATISTIKALAR (Admin-Customer) - TO'LIQ
+// DASHBOARD - ADMIN CUSTOMER (TO'LIQ)
 // ============================================================
 
+let dashboardLoaded = false;
 let lastDashboardStats = null;
 let refreshInterval = null;
 let countdownInterval = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
+    // ⭐ FAQAT 1 MARTA YUKLANISHI UCHUN
+    if (dashboardLoaded) {
+        console.log('⚠️ Dashboard allaqachon yuklangan');
+        return;
+    }
+    dashboardLoaded = true;
+
     console.log('🚀 Dashboard yuklanmoqda...');
-    
+
     try {
         const token = localStorage.getItem('customerToken') || sessionStorage.getItem('customerToken');
         if (!token) {
-            window.location.href = 'index.html';
+            window.location.replace('index.html');
             return;
         }
 
@@ -21,23 +29,40 @@ document.addEventListener('DOMContentLoaded', async () => {
             const nameEl = document.getElementById('userName');
             const initialEl = document.getElementById('userInitial');
             const schoolEl = document.getElementById('schoolName');
-            
+
             if (nameEl) nameEl.textContent = Auth.getUserName();
             if (initialEl) initialEl.textContent = Auth.getUserInitial();
             if (schoolEl) schoolEl.textContent = user.schoolName || 'Nurli Ta\'lim Markazi';
         }
 
+        // ⭐ LOGOUT TUGMASI
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+            const newLogoutBtn = logoutBtn.cloneNode(true);
+            logoutBtn.parentNode.replaceChild(newLogoutBtn, logoutBtn);
+
+            newLogoutBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                if (confirm('Haqiqatan ham chiqmoqchimisiz?')) {
+                    Auth.logout();
+                }
+            });
+        }
+
         await loadDashboardStats();
-        
+
+        // ⭐ HAR 30 SONIYADA MA'LUMOTLARNI YANGILASH
         refreshInterval = setInterval(() => {
             loadDashboardStats();
         }, 30000);
-        
+
+        // ⭐ REAL-TIME COUNTDOWN - HAR SONIYADA YANGILANADI
         startCountdown();
-        
-        setupListeners();
+
+        // ⭐ NOTIFICATIONS
         initNotifications();
-        
+
         console.log('✅ Dashboard yuklandi!');
     } catch (error) {
         console.error('❌ Dashboard yuklash xatosi:', error);
@@ -50,10 +75,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 // ============================================================
 function formatEndDate(endDate) {
     if (!endDate) return 'Muddati yo\'q';
-    
+
     try {
         let date = null;
-        
+
         if (typeof endDate === 'string' && endDate.includes('M01')) {
             const parts = endDate.split(' ');
             if (parts.length === 4) {
@@ -66,11 +91,11 @@ function formatEndDate(endDate) {
         } else {
             date = new Date(endDate);
         }
-        
+
         if (!date || isNaN(date.getTime())) {
             return endDate || 'Muddati yo\'q';
         }
-        
+
         const year = date.getFullYear();
         const monthNames = ['yanvar', 'fevral', 'mart', 'aprel', 'may', 'iyun', 'iyul', 'avgust', 'sentabr', 'oktabr', 'noyabr', 'dekabr'];
         const month = monthNames[date.getMonth()];
@@ -78,7 +103,7 @@ function formatEndDate(endDate) {
         const hours = String(date.getHours()).padStart(2, '0');
         const minutes = String(date.getMinutes()).padStart(2, '0');
         const seconds = String(date.getSeconds()).padStart(2, '0');
-        
+
         return `${year}-yil ${day}-${month} ${hours}:${minutes}:${seconds}`;
     } catch (error) {
         console.error('❌ Sanani formatlash xatosi:', error);
@@ -94,7 +119,7 @@ function startCountdown() {
         clearInterval(countdownInterval);
         countdownInterval = null;
     }
-    
+
     countdownInterval = setInterval(() => {
         updateCountdown();
     }, 1000);
@@ -103,11 +128,12 @@ function startCountdown() {
 function updateCountdown() {
     const daysEl = document.getElementById('subscriptionDays');
     const endEl = document.getElementById('subscriptionEnd');
-    
+
     if (!daysEl || !lastDashboardStats || !lastDashboardStats.subscription) return;
-    
+
     const sub = lastDashboardStats.subscription;
-    
+
+    // Tugash vaqti
     if (endEl) {
         if (sub.formattedEndDate) {
             endEl.textContent = sub.formattedEndDate;
@@ -117,12 +143,13 @@ function updateCountdown() {
             endEl.textContent = 'Muddati yo\'q';
         }
     }
-    
+
+    // Qolgan kun
     if (!sub.endDate) {
         daysEl.textContent = '-';
         return;
     }
-    
+
     let endDate = null;
     if (typeof sub.endDate === 'string' && sub.endDate.includes('M01')) {
         const parts = sub.endDate.split(' ');
@@ -136,25 +163,25 @@ function updateCountdown() {
     } else {
         endDate = new Date(sub.endDate);
     }
-    
+
     if (!endDate || isNaN(endDate.getTime())) {
         daysEl.textContent = '-';
         return;
     }
-    
+
     const now = new Date();
     const diff = endDate - now;
-    
+
     if (diff <= 0) {
         daysEl.textContent = '⚠️ Vaqt tugagan!';
         return;
     }
-    
+
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
     const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
     const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
     const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-    
+
     daysEl.textContent = `${days} kun ${hours}s ${minutes}m ${seconds}s`;
 }
 
@@ -164,21 +191,24 @@ function updateCountdown() {
 async function loadDashboardStats() {
     try {
         console.log('📊 Statistika yuklanmoqda...');
-        
+
         const data = await API.getDashboardStats();
         console.log('📊 Statistika javobi:', data);
-        
+
         if (!data.success) {
-            const errorMessage = data.message || 'Noma\'lum xatolik';
-            console.error('❌ Statistika xatosi:', errorMessage);
-            showError('Ma\'lumotlarni yuklashda xatolik: ' + errorMessage);
+            if (data.status === 401 || data.status === 403) {
+                Auth.logout();
+                return;
+            }
+            console.error('❌ Statistika xatosi:', data.message);
+            showError('Ma\'lumotlarni yuklashda xatolik: ' + data.message);
             return;
         }
-        
+
         const stats = data.data;
         lastDashboardStats = stats;
         console.log('📊 Statistika ma\'lumotlari:', stats);
-        
+
         const elements = {
             teacherCount: document.getElementById('teacherCount'),
             studentCount: document.getElementById('studentCount'),
@@ -193,20 +223,20 @@ async function loadDashboardStats() {
             subscriptionEnd: document.getElementById('subscriptionEnd'),
             subscriptionDays: document.getElementById('subscriptionDays')
         };
-        
+
         if (elements.teacherCount) elements.teacherCount.textContent = stats.teacherCount || 0;
         if (elements.studentCount) elements.studentCount.textContent = stats.studentCount || 0;
         if (elements.totalXP) elements.totalXP.textContent = stats.totalXP || 0;
         if (elements.todayAttendance) elements.todayAttendance.textContent = stats.todayAttendance || 0;
-        
+
         const present = stats.attendanceStats?.present || 0;
         const absentReason = stats.attendanceStats?.absent_reason || 0;
         const absent = stats.attendanceStats?.absent || 0;
-        
+
         if (elements.presentCount) elements.presentCount.textContent = present;
         if (elements.absentReasonCount) elements.absentReasonCount.textContent = absentReason;
         if (elements.absentCount) elements.absentCount.textContent = absent;
-        
+
         const total = present + absentReason + absent;
         if (elements.attendancePercent) {
             if (total > 0) {
@@ -218,9 +248,10 @@ async function loadDashboardStats() {
             }
         }
 
+        // ⭐ SUBSCRIPTION
         if (stats.subscription) {
             const sub = stats.subscription;
-            
+
             const statusMap = {
                 'active': '✅ Faol',
                 'inactive': '⛔ Faol emas',
@@ -229,7 +260,7 @@ async function loadDashboardStats() {
             if (elements.subscriptionStatus) {
                 elements.subscriptionStatus.textContent = statusMap[sub.status] || sub.status || 'Noma\'lum';
             }
-            
+
             const typeMap = {
                 'monthly': '📅 Oylik',
                 '6months': '📅 6 oylik',
@@ -240,7 +271,7 @@ async function loadDashboardStats() {
             if (elements.subscriptionType) {
                 elements.subscriptionType.textContent = typeMap[sub.type] || sub.type || 'Noma\'lum';
             }
-            
+
             if (elements.subscriptionEnd) {
                 if (sub.formattedEndDate) {
                     elements.subscriptionEnd.textContent = sub.formattedEndDate;
@@ -250,7 +281,7 @@ async function loadDashboardStats() {
                     elements.subscriptionEnd.textContent = 'Muddati yo\'q';
                 }
             }
-            
+
             if (elements.subscriptionDays) {
                 if (!sub.endDate) {
                     elements.subscriptionDays.textContent = '-';
@@ -268,11 +299,11 @@ async function loadDashboardStats() {
                     } else {
                         endDate = new Date(sub.endDate);
                     }
-                    
+
                     if (endDate && !isNaN(endDate.getTime())) {
                         const now = new Date();
                         const diff = endDate - now;
-                        
+
                         if (diff > 0) {
                             const days = Math.floor(diff / (1000 * 60 * 60 * 24));
                             const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
@@ -287,17 +318,12 @@ async function loadDashboardStats() {
                     }
                 }
             }
-        } else {
-            if (elements.subscriptionStatus) elements.subscriptionStatus.textContent = '❌ Yo\'q';
-            if (elements.subscriptionType) elements.subscriptionType.textContent = '❌ Yo\'q';
-            if (elements.subscriptionEnd) elements.subscriptionEnd.textContent = '-';
-            if (elements.subscriptionDays) elements.subscriptionDays.textContent = '-';
         }
-        
+
         console.log('✅ Dashboard statistikasi yuklandi!');
     } catch (error) {
         console.error('❌ Statistikani yuklash xatosi:', error);
-        throw error;
+        showError('Ma\'lumotlarni yuklashda xatolik: ' + error.message);
     }
 }
 
@@ -306,36 +332,34 @@ async function loadDashboardStats() {
 // ============================================================
 function initNotifications() {
     const notificationToggle = document.getElementById('notificationToggle');
-    const notificationPanel  = document.getElementById('notificationPanel');
-    const notificationList   = document.getElementById('notificationList');
-    const notificationBadge  = document.getElementById('notificationBadge');
-    const markAllReadBtn     = document.getElementById('markAllRead');
+    const notificationPanel = document.getElementById('notificationPanel');
+    const notificationList = document.getElementById('notificationList');
+    const notificationBadge = document.getElementById('notificationBadge');
+    const markAllRead = document.getElementById('markAllRead');
 
-    if (!notificationToggle || !notificationPanel) return;
+    if (!notificationToggle) return;
 
     notificationToggle.addEventListener('click', (e) => {
         e.stopPropagation();
-        const isOpen = notificationPanel.style.display === 'flex';
-        notificationPanel.style.display = isOpen ? 'none' : 'flex';
-        if (!isOpen) loadNotifications();
+        const isOpen = notificationPanel.style.display === 'block';
+        notificationPanel.style.display = isOpen ? 'none' : 'block';
+        if (!isOpen) {
+            loadNotifications();
+        }
     });
 
     document.addEventListener('click', (e) => {
-        if (
-            notificationPanel.style.display === 'flex' &&
-            !notificationPanel.contains(e.target) &&
-            !notificationToggle.contains(e.target)
-        ) {
+        if (!notificationPanel.contains(e.target) && e.target !== notificationToggle && !notificationToggle.contains(e.target)) {
             notificationPanel.style.display = 'none';
         }
     });
 
-    if (markAllReadBtn) {
-        markAllReadBtn.addEventListener('click', async () => {
+    if (markAllRead) {
+        markAllRead.addEventListener('click', async () => {
             try {
-                const token = getToken();
+                const token = Auth.getToken();
                 if (!token) return;
-                
+
                 const response = await fetch('https://admin-customerr.onrender.com/api/notifications/mark-all-read', {
                     method: 'POST',
                     headers: {
@@ -343,7 +367,10 @@ function initNotifications() {
                         'Authorization': `Bearer ${token}`
                     }
                 });
-                if (response.ok) loadNotifications();
+
+                if (response.ok) {
+                    loadNotifications();
+                }
             } catch (error) {
                 console.error('❌ Xatolik:', error);
             }
@@ -352,35 +379,27 @@ function initNotifications() {
 
     async function loadNotifications() {
         try {
-            const token = getToken();
+            const token = Auth.getToken();
             if (!token) return;
 
-            notificationList.innerHTML = `
-                <p style="text-align:center;padding:20px 0;font-size:0.82rem;color:var(--text-muted);">
-                    <i class="fas fa-spinner fa-spin"></i> Yuklanmoqda...
-                </p>`;
-
             const response = await fetch('https://admin-customerr.onrender.com/api/notifications', {
-                headers: { 'Authorization': `Bearer ${token}` }
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
             });
 
             const data = await response.json();
             console.log('📨 Xabarlar:', data);
 
             if (response.ok && data.success) {
-                renderNotifications(data.data || []);
+                const notifications = data.data || [];
+                renderNotifications(notifications);
             } else {
-                notificationList.innerHTML = `
-                    <p style="text-align:center;padding:20px 0;font-size:0.82rem;color:var(--text-muted);">
-                        Xabarlar yuklanmadi
-                    </p>`;
+                notificationList.innerHTML = `<p class="text-muted" style="text-align: center; padding: 20px 0; font-size: 0.85rem;">Xabarlar yuklanmadi</p>`;
             }
         } catch (error) {
             console.error('❌ Xabarlarni yuklash xatosi:', error);
-            notificationList.innerHTML = `
-                <p style="text-align:center;padding:20px 0;font-size:0.82rem;color:var(--text-muted);">
-                    Xatolik yuz berdi
-                </p>`;
+            notificationList.innerHTML = `<p class="text-muted" style="text-align: center; padding: 20px 0; font-size: 0.85rem;">Xatolik yuz berdi</p>`;
         }
     }
 
@@ -388,6 +407,7 @@ function initNotifications() {
         if (!notificationList || !notificationBadge) return;
 
         const unreadCount = notifications.filter(n => !n.isRead).length;
+
         if (unreadCount > 0) {
             notificationBadge.style.display = 'block';
             notificationBadge.textContent = unreadCount > 99 ? '99+' : unreadCount;
@@ -395,109 +415,117 @@ function initNotifications() {
             notificationBadge.style.display = 'none';
         }
 
-        if (!notifications.length) {
-            notificationList.innerHTML = `
-                <p style="text-align:center;padding:24px 0;font-size:0.85rem;color:var(--text-muted);">
-                    <i class="fas fa-bell-slash" style="font-size:1.5rem;display:block;margin-bottom:8px;opacity:0.4;"></i>
-                    Hozircha xabarlar yo'q
-                </p>`;
+        if (!notifications || notifications.length === 0) {
+            notificationList.innerHTML = `<p class="text-muted" style="text-align: center; padding: 20px 0; font-size: 0.85rem;">Hozircha xabarlar yo'q</p>`;
             return;
         }
 
         notificationList.innerHTML = notifications.map(notif => {
             const date = new Date(notif.createdAt);
             const timeStr = date.toLocaleString('uz-UZ', {
-                year: 'numeric', month: 'short', day: 'numeric',
-                hour: '2-digit', minute: '2-digit'
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
             });
-            const isUnread = !notif.isRead;
 
             return `
-                <div class="notification-item ${isUnread ? 'unread' : ''}">
-                    <div class="notification-item-inner">
-                        <div class="notification-body">
-                            <strong class="notification-title">${notif.title || 'Xabar'}</strong>
-                            <p class="notification-message">${notif.message || ''}</p>
-                            <span class="notification-time">${timeStr}</span>
+                <div class="notification-item" style="padding: 10px 12px; border-bottom: 1px solid var(--border-color); ${!notif.isRead ? 'background: var(--bg-hover); border-left: 3px solid #007aff;' : ''}">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
+                        <div style="flex: 1; min-width: 0;">
+                            <strong style="font-size: 0.85rem; color: var(--text-primary); display: block; word-wrap: break-word;">${notif.title || 'Xabar'}</strong>
+                            <p style="font-size: 0.8rem; color: var(--text-secondary); margin: 4px 0; word-wrap: break-word;">${notif.message || ''}</p>
+                            <span style="font-size: 0.7rem; color: var(--text-muted);">${timeStr}</span>
                         </div>
-                        ${isUnread
-                            ? `<button class="mark-read-btn" data-id="${notif._id}">O'qildi</button>`
-                            : `<span class="notif-read-label">✓ O'qilgan</span>`
-                        }
+                        ${!notif.isRead ? `
+                            <button class="mark-read-btn" data-id="${notif._id}" style="background: none; border: none; color: #007aff; font-size: 0.7rem; cursor: pointer; white-space: nowrap; padding: 4px 8px;">
+                                O'qildi
+                            </button>
+                        ` : `
+                            <span style="font-size: 0.7rem; color: var(--text-muted); white-space: nowrap; padding: 4px 8px;">✓ O'qilgan</span>
+                        `}
                     </div>
-                </div>`;
+                </div>
+            `;
         }).join('');
 
-        notificationList.querySelectorAll('.mark-read-btn').forEach(btn => {
+        document.querySelectorAll('.mark-read-btn').forEach(btn => {
             btn.addEventListener('click', async (e) => {
                 e.stopPropagation();
-                await markAsRead(btn.dataset.id);
+                const id = btn.dataset.id;
+                await markAsRead(id);
             });
         });
     }
 
     async function markAsRead(id) {
         try {
-            const token = getToken();
+            const token = Auth.getToken();
             if (!token) return;
 
-            const response = await fetch(
-                `https://admin-customerr.onrender.com/api/notifications/${id}/read`,
-                {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    }
+            const response = await fetch(`https://admin-customerr.onrender.com/api/notifications/${id}/read`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
                 }
-            );
-            if (response.ok) loadNotifications();
+            });
+
+            if (response.ok) {
+                loadNotifications();
+            }
         } catch (error) {
             console.error('❌ Xatolik:', error);
         }
     }
 
+    // ⭐ Har 30 soniyada yangilash (agar panel ochiq bo'lsa)
     setInterval(() => {
-        if (notificationPanel.style.display === 'flex') {
+        if (notificationPanel.style.display === 'block') {
             loadNotifications();
         }
     }, 30000);
 }
 
-function getToken() {
-    return localStorage.getItem('customerToken') || sessionStorage.getItem('customerToken');
-}
-
 // ============================================================
-// EVENT LISTENERLAR
+// XATOLIKNI KO'RSATISH
 // ============================================================
-function setupListeners() {
-    const logoutBtn = document.getElementById('logoutBtn');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', () => Auth.logout());
-    }
-}
-
 function showError(msg) {
     console.error('⚠️ Xatolik:', msg);
+
     const div = document.createElement('div');
     div.style.cssText = `
-        position: fixed; top: 20px; right: 20px; z-index: 10000;
+        position: fixed; top: 20px; right: 20px; z-index: 9999;
         padding: 14px 18px; background: #fef2f2;
         border: 1px solid #fecaca; border-radius: 10px;
-        color: #dc2626; max-width: 360px;
+        color: #dc2626; max-width: 400px;
         box-shadow: 0 10px 40px rgba(0,0,0,0.1);
         display: flex; align-items: center; gap: 10px;
         font-size: 0.85rem;
+        z-index: 10000;
     `;
     div.innerHTML = `
         <i class="fas fa-exclamation-circle"></i>
         <span>${msg}</span>
-        <button onclick="this.parentElement.remove()"
-            style="margin-left:auto;background:none;border:none;color:#dc2626;cursor:pointer;font-size:1.1rem;">×</button>
+        <button onclick="this.parentElement.remove()" style="margin-left: auto; background: none; border: none; color: #dc2626; cursor: pointer; font-size: 1.1rem;">×</button>
     `;
     document.body.appendChild(div);
     setTimeout(() => div.remove(), 8000);
 }
+
+// ============================================================
+// TOZALASH (Sahifa yopilganda)
+// ============================================================
+window.addEventListener('beforeunload', function() {
+    if (refreshInterval) {
+        clearInterval(refreshInterval);
+        refreshInterval = null;
+    }
+    if (countdownInterval) {
+        clearInterval(countdownInterval);
+        countdownInterval = null;
+    }
+});
 
 console.log('✅ dashboard.js yuklandi');
