@@ -1,5 +1,5 @@
 // ============================================================
-// AUTH - ADMIN CUSTOMER (TO'LIQ)
+// AUTH - ADMIN CUSTOMER (TO'LIQ TUZATILGAN)
 // ============================================================
 
 const Auth = {
@@ -19,6 +19,29 @@ const Auth = {
                 sessionStorage.setItem('customerUser', JSON.stringify(data.user));
                 return { success: true, data };
             }
+            
+            // ⭐ BLOKLANGAN YOKI OBUNA TUGAGAN USER
+            if (data.action === 'contact_support') {
+                const phone = data.phone || '+998 94 022 44 92';
+                const message = data.message || 'Iltimos, yordam uchun raqamga qo\'ng\'iroq qiling.';
+                
+                // Telefon raqamiga qo'ng'iroq qilish uchun havola
+                const confirmCall = confirm(
+                    `${message}\n\n📞 Raqamga qo'ng'iroq qilmoqchimisiz? ${phone}`
+                );
+                
+                if (confirmCall) {
+                    window.location.href = `tel:${phone.replace(/\s/g, '')}`;
+                }
+                
+                return { 
+                    success: false, 
+                    error: message,
+                    phone: phone,
+                    action: 'contact_support'
+                };
+            }
+            
             return { success: false, error: data.message || 'Login xatosi' };
         } catch (error) {
             console.error('❌ Login xatosi:', error);
@@ -30,11 +53,15 @@ const Auth = {
     // LOGOUT
     // ============================================================
     logout() {
+        console.log('🔓 Logout bosildi');
         localStorage.removeItem('customerToken');
         localStorage.removeItem('customerUser');
         sessionStorage.removeItem('customerToken');
         sessionStorage.removeItem('customerUser');
-        window.location.href = 'index.html';
+
+        const basePath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
+        const target = `${basePath}index.html`;
+        window.location.replace(target);
     },
     
     // ============================================================
@@ -51,71 +78,22 @@ const Auth = {
         const user = localStorage.getItem('customerUser') || sessionStorage.getItem('customerUser');
         return user ? JSON.parse(user) : null;
     },
-    
+
     getUserName() {
         const user = this.getUser();
-        return user ? user.fullName || 'Admin' : 'Admin';
+        return user?.fullName || 'Admin';
     },
     
     getUserInitial() {
         const name = this.getUserName();
         if (name && name.length > 0) {
-            const parts = name.split(' ');
+            const parts = name.split(/\s+/).filter(Boolean);
             if (parts.length >= 2) {
                 return (parts[0][0] + parts[1][0]).toUpperCase();
             }
             return name[0].toUpperCase();
         }
         return 'A';
-    },
-    
-    // ============================================================
-    // AUTHENTICATION TEKSHIRISH (SERVER BILAN)
-    // ============================================================
-    async checkAuth() {
-        const token = this.getToken();
-        if (!token) return { valid: false, reason: 'no_token' };
-
-        try {
-            const data = await API.get('/api/auth/me');
-            if (!data || !data.success) {
-                return { valid: false, reason: data && (data.status === 401 || data.status === 403) ? 'unauthorized' : 'server' };
-            }
-
-            const user = data.user;
-            if (!user) return { valid: false, reason: 'no_user' };
-
-            // persist fresh user
-            if (localStorage.getItem('customerToken')) {
-                localStorage.setItem('customerUser', JSON.stringify(user));
-            } else {
-                sessionStorage.setItem('customerUser', JSON.stringify(user));
-            }
-
-            // Account active check
-            if (user.active === false || user.isActive === false || user.status === 'inactive' || user.status === 'blocked') {
-                return { valid: false, reason: 'inactive' };
-            }
-
-            // Subscription / premium check (best-effort checks against common fields)
-            if (user.isSubscribed === false || user.subscription === 'expired') {
-                return { valid: false, reason: 'expired' };
-            }
-
-            if (user.subscriptionExpiry) {
-                try {
-                    const exp = new Date(user.subscriptionExpiry);
-                    if (!isNaN(exp.getTime()) && exp < new Date()) {
-                        return { valid: false, reason: 'expired' };
-                    }
-                } catch (e) { /* ignore parse errors */ }
-            }
-
-            return { valid: true, reason: null };
-        } catch (error) {
-            console.warn('⚠️ Auth check xatosi:', error.message);
-            return { valid: false, reason: 'error' };
-        }
     },
     
     // ============================================================
@@ -132,17 +110,11 @@ const Auth = {
 document.addEventListener('DOMContentLoaded', async () => {
     const path = window.location.pathname;
     const isLoginPage = path.includes('index.html') || path === '/' || path.endsWith('/');
-    
+
     if (!isLoginPage) {
         if (!Auth.isAuthenticated()) {
-            window.location.href = 'index.html?reason=no_token';
-        } else {
-            const result = await Auth.checkAuth();
-            if (!result || result.valid !== true) {
-                const reason = result && result.reason ? result.reason : 'unauthorized';
-                // Redirect to login with reason so the login page can show explanation
-                window.location.href = `index.html?reason=${encodeURIComponent(reason)}`;
-            }
+            window.location.href = 'index.html';
+            return;
         }
     }
 });
