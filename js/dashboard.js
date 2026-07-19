@@ -54,7 +54,6 @@ function formatEndDate(endDate) {
     try {
         let date = null;
         
-        // Agar "2027 M01 12 21:13:00" formatida bo'lsa
         if (typeof endDate === 'string' && endDate.includes('M01')) {
             const parts = endDate.split(' ');
             if (parts.length === 4) {
@@ -72,7 +71,6 @@ function formatEndDate(endDate) {
             return endDate || 'Muddati yo\'q';
         }
         
-        // ⭐ 2027-yil 12-yanvar 21:13:00 formatida chiqarish
         const year = date.getFullYear();
         const monthNames = ['yanvar', 'fevral', 'mart', 'aprel', 'may', 'iyun', 'iyul', 'avgust', 'sentabr', 'oktabr', 'noyabr', 'dekabr'];
         const month = monthNames[date.getMonth()];
@@ -110,7 +108,6 @@ function updateCountdown() {
     
     const sub = lastDashboardStats.subscription;
     
-    // ⭐ TUGASH VAQTI - FORMATLANGAN
     if (endEl) {
         if (sub.formattedEndDate) {
             endEl.textContent = sub.formattedEndDate;
@@ -121,13 +118,11 @@ function updateCountdown() {
         }
     }
     
-    // ⭐ QOLGAN KUN - REAL-TIME COUNTDOWN
     if (!sub.endDate) {
         daysEl.textContent = '-';
         return;
     }
     
-    // endDate ni Date ga o'zgartirish
     let endDate = null;
     if (typeof sub.endDate === 'string' && sub.endDate.includes('M01')) {
         const parts = sub.endDate.split(' ');
@@ -223,7 +218,6 @@ async function loadDashboardStats() {
             }
         }
 
-        // ⭐ SUBSCRIPTION
         if (stats.subscription) {
             const sub = stats.subscription;
             
@@ -247,7 +241,6 @@ async function loadDashboardStats() {
                 elements.subscriptionType.textContent = typeMap[sub.type] || sub.type || 'Noma\'lum';
             }
             
-            // ⭐ TUGASH VAQTI - FORMATLANGAN
             if (elements.subscriptionEnd) {
                 if (sub.formattedEndDate) {
                     elements.subscriptionEnd.textContent = sub.formattedEndDate;
@@ -258,7 +251,6 @@ async function loadDashboardStats() {
                 }
             }
             
-            // ⭐ QOLGAN KUN
             if (elements.subscriptionDays) {
                 if (!sub.endDate) {
                     elements.subscriptionDays.textContent = '-';
