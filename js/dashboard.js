@@ -1,5 +1,5 @@
 // ============================================================
-// DASHBOARD - STATISTIKALAR (Admin-Customer)
+// DASHBOARD - STATISTIKALAR (Admin-Customer) - TO'LIQ
 // ============================================================
 
 let lastDashboardStats = null;
@@ -46,52 +46,42 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 // ============================================================
-// ⭐ TUGASH VAQTINI TO'G'RI FORMATLASH FUNKSIYASI
+// ⭐ TUGASH VAQTINI FORMATLASH - 2027-yil 12-yanvar 21:13:00
 // ============================================================
 function formatEndDate(endDate) {
     if (!endDate) return 'Muddati yo\'q';
     
     try {
-        // Agar endDate string bo'lsa va "2027 M01 12 21:13:00" formatida bo'lsa
+        let date = null;
+        
+        // Agar "2027 M01 12 21:13:00" formatida bo'lsa
         if (typeof endDate === 'string' && endDate.includes('M01')) {
-            // "2027 M01 12 21:13:00" -> "2027-01-12T21:13:00"
             const parts = endDate.split(' ');
             if (parts.length === 4) {
                 const year = parts[0];
                 const month = parts[1].replace('M', '').padStart(2, '0');
                 const day = parts[2].padStart(2, '0');
                 const time = parts[3];
-                const isoString = `${year}-${month}-${day}T${time}`;
-                const date = new Date(isoString);
-                if (!isNaN(date.getTime())) {
-                    return date.toLocaleString('uz-UZ', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        second: '2-digit',
-                        hour12: false
-                    });
-                }
+                date = new Date(`${year}-${month}-${day}T${time}`);
             }
+        } else {
+            date = new Date(endDate);
         }
         
-        // Oddiy Date formatida bo'lsa
-        const date = new Date(endDate);
-        if (!isNaN(date.getTime())) {
-            return date.toLocaleString('uz-UZ', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit',
-                hour12: false
-            });
+        if (!date || isNaN(date.getTime())) {
+            return endDate || 'Muddati yo\'q';
         }
         
-        return endDate;
+        // ⭐ 2027-yil 12-yanvar 21:13:00 formatida chiqarish
+        const year = date.getFullYear();
+        const monthNames = ['yanvar', 'fevral', 'mart', 'aprel', 'may', 'iyun', 'iyul', 'avgust', 'sentabr', 'oktabr', 'noyabr', 'dekabr'];
+        const month = monthNames[date.getMonth()];
+        const day = date.getDate();
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        const seconds = String(date.getSeconds()).padStart(2, '0');
+        
+        return `${year}-yil ${day}-${month} ${hours}:${minutes}:${seconds}`;
     } catch (error) {
         console.error('❌ Sanani formatlash xatosi:', error);
         return endDate || 'Muddati yo\'q';
@@ -273,7 +263,6 @@ async function loadDashboardStats() {
                 if (!sub.endDate) {
                     elements.subscriptionDays.textContent = '-';
                 } else {
-                    // endDate ni Date ga o'zgartirish
                     let endDate = null;
                     if (typeof sub.endDate === 'string' && sub.endDate.includes('M01')) {
                         const parts = sub.endDate.split(' ');
