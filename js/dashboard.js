@@ -63,7 +63,6 @@ async function loadDashboardStats() {
         lastDashboardStats = stats;
         console.log('📊 Statistika ma\'lumotlari:', stats);
         
-        // Stats cards
         const elements = {
             teacherCount: document.getElementById('teacherCount'),
             studentCount: document.getElementById('studentCount'),
@@ -103,10 +102,8 @@ async function loadDashboardStats() {
             }
         }
 
-        // ⭐ SUBSCRIPTION - TO'LIQ
+        // SUBSCRIPTION
         if (stats.subscription) {
-            console.log('📊 Subscription ma\'lumotlari:', stats.subscription);
-            
             const sub = stats.subscription;
             
             const statusMap = {
@@ -131,7 +128,7 @@ async function loadDashboardStats() {
             
             if (sub.endDate && elements.subscriptionEnd) {
                 const endDate = new Date(sub.endDate);
-                const formattedDate = endDate.toLocaleString('uz-UZ', {
+                elements.subscriptionEnd.textContent = endDate.toLocaleString('uz-UZ', {
                     year: 'numeric',
                     month: 'long',
                     day: 'numeric',
@@ -140,7 +137,6 @@ async function loadDashboardStats() {
                     second: '2-digit',
                     hour12: false
                 });
-                elements.subscriptionEnd.textContent = formattedDate;
             } else if (elements.subscriptionEnd) {
                 elements.subscriptionEnd.textContent = 'Muddati yo\'q';
             }
@@ -177,36 +173,43 @@ async function loadDashboardStats() {
 }
 
 // ============================================================
-// ⭐ NOTIFICATIONS - Admin Customer (dashboard.js ichida)
+// ⭐ NOTIFICATIONS — Admin Customer
+// Panel: header fikslanadi, #notificationList scroll bo'ladi
+// Height oshmaydi, uzun matn wrap bo'ladi
 // ============================================================
 function initNotifications() {
     const notificationToggle = document.getElementById('notificationToggle');
-    const notificationPanel = document.getElementById('notificationPanel');
-    const notificationList = document.getElementById('notificationList');
-    const notificationBadge = document.getElementById('notificationBadge');
-    const markAllRead = document.getElementById('markAllRead');
+    const notificationPanel  = document.getElementById('notificationPanel');
+    const notificationList   = document.getElementById('notificationList');
+    const notificationBadge  = document.getElementById('notificationBadge');
+    const markAllReadBtn     = document.getElementById('markAllRead');
 
-    if (!notificationToggle) return;
+    if (!notificationToggle || !notificationPanel) return;
 
+    // ── Panel ochish / yopish ──
     notificationToggle.addEventListener('click', (e) => {
         e.stopPropagation();
-        const isOpen = notificationPanel.style.display === 'block';
-        notificationPanel.style.display = isOpen ? 'none' : 'block';
-        if (!isOpen) {
-            loadNotifications();
-        }
+        const isOpen = notificationPanel.style.display === 'flex';
+        notificationPanel.style.display = isOpen ? 'none' : 'flex';
+        if (!isOpen) loadNotifications();
     });
 
+    // Panel tashqarisiga bosganda yopiladi
     document.addEventListener('click', (e) => {
-        if (!notificationPanel.contains(e.target) && e.target !== notificationToggle && !notificationToggle.contains(e.target)) {
+        if (
+            notificationPanel.style.display === 'flex' &&
+            !notificationPanel.contains(e.target) &&
+            !notificationToggle.contains(e.target)
+        ) {
             notificationPanel.style.display = 'none';
         }
     });
 
-    if (markAllRead) {
-        markAllRead.addEventListener('click', async () => {
+    // ── Hammasini o'qilgan deb belgilash ──
+    if (markAllReadBtn) {
+        markAllReadBtn.addEventListener('click', async () => {
             try {
-                const token = localStorage.getItem('customerToken') || sessionStorage.getItem('customerToken');
+                const token = getToken();
                 if (!token) return;
                 
                 const response = await fetch('https://admin-customerr.onrender.com/api/notifications/mark-all-read', {
@@ -216,47 +219,55 @@ function initNotifications() {
                         'Authorization': `Bearer ${token}`
                     }
                 });
-                
-                if (response.ok) {
-                    loadNotifications();
-                }
+                if (response.ok) loadNotifications();
             } catch (error) {
                 console.error('❌ Xatolik:', error);
             }
         });
     }
 
+    // ── Xabarlarni yuklash ──
     async function loadNotifications() {
         try {
-            const token = localStorage.getItem('customerToken') || sessionStorage.getItem('customerToken');
+            const token = getToken();
             if (!token) return;
 
+            // Yuklanmoqda holati
+            notificationList.innerHTML = `
+                <p style="text-align:center;padding:20px 0;font-size:0.82rem;color:var(--text-muted);">
+                    <i class="fas fa-spinner fa-spin"></i> Yuklanmoqda...
+                </p>`;
+
             const response = await fetch('https://admin-customerr.onrender.com/api/notifications', {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
+                headers: { 'Authorization': `Bearer ${token}` }
             });
 
             const data = await response.json();
             console.log('📨 Xabarlar:', data);
 
             if (response.ok && data.success) {
-                const notifications = data.data || [];
-                renderNotifications(notifications);
+                renderNotifications(data.data || []);
             } else {
-                notificationList.innerHTML = `<p class="text-muted" style="text-align: center; padding: 20px 0; font-size: 0.85rem;">Xabarlar yuklanmadi</p>`;
+                notificationList.innerHTML = `
+                    <p style="text-align:center;padding:20px 0;font-size:0.82rem;color:var(--text-muted);">
+                        Xabarlar yuklanmadi
+                    </p>`;
             }
         } catch (error) {
             console.error('❌ Xabarlarni yuklash xatosi:', error);
-            notificationList.innerHTML = `<p class="text-muted" style="text-align: center; padding: 20px 0; font-size: 0.85rem;">Xatolik yuz berdi</p>`;
+            notificationList.innerHTML = `
+                <p style="text-align:center;padding:20px 0;font-size:0.82rem;color:var(--text-muted);">
+                    Xatolik yuz berdi
+                </p>`;
         }
     }
 
+    // ── Xabarlarni chizish ──
     function renderNotifications(notifications) {
         if (!notificationList || !notificationBadge) return;
 
+        // Badge
         const unreadCount = notifications.filter(n => !n.isRead).length;
-        
         if (unreadCount > 0) {
             notificationBadge.style.display = 'block';
             notificationBadge.textContent = unreadCount > 99 ? '99+' : unreadCount;
@@ -264,78 +275,85 @@ function initNotifications() {
             notificationBadge.style.display = 'none';
         }
 
-        if (!notifications || notifications.length === 0) {
-            notificationList.innerHTML = `<p class="text-muted" style="text-align: center; padding: 20px 0; font-size: 0.85rem;">Hozircha xabarlar yo'q</p>`;
+        // Bo'sh holat
+        if (!notifications.length) {
+            notificationList.innerHTML = `
+                <p style="text-align:center;padding:24px 0;font-size:0.85rem;color:var(--text-muted);">
+                    <i class="fas fa-bell-slash" style="font-size:1.5rem;display:block;margin-bottom:8px;opacity:0.4;"></i>
+                    Hozircha xabarlar yo'q
+                </p>`;
             return;
         }
 
+        // ⭐ Har bir xabar:
+        //    - .notification-message → white-space:pre-wrap, word-break:break-word
+        //    - height oshmaydi, panel ichida scroll bo'ladi (#notificationList ga max-height qo'yilgan)
         notificationList.innerHTML = notifications.map(notif => {
             const date = new Date(notif.createdAt);
             const timeStr = date.toLocaleString('uz-UZ', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
+                year: 'numeric', month: 'short', day: 'numeric',
+                hour: '2-digit', minute: '2-digit'
             });
-
-            const isRead = notif.isRead || false;
+            const isUnread = !notif.isRead;
 
             return `
-                <div class="notification-item" style="padding: 10px 12px; border-bottom: 1px solid var(--border-color); ${!isRead ? 'background: var(--bg-hover); border-left: 3px solid #007aff;' : ''}">
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
-                        <div style="flex: 1; min-width: 0;">
-                            <strong style="font-size: 0.85rem; color: var(--text-primary); display: block; word-wrap: break-word;">${notif.title || 'Xabar'}</strong>
-                            <p style="font-size: 0.8rem; color: var(--text-secondary); margin: 4px 0; word-wrap: break-word;">${notif.message || ''}</p>
-                            <span style="font-size: 0.7rem; color: var(--text-muted);">${timeStr}</span>
+                <div class="notification-item ${isUnread ? 'unread' : ''}">
+                    <div class="notification-item-inner">
+                        <div class="notification-body">
+                            <strong class="notification-title">${notif.title || 'Xabar'}</strong>
+                            <p class="notification-message">${notif.message || ''}</p>
+                            <span class="notification-time">${timeStr}</span>
                         </div>
-                        ${!isRead ? `
-                            <button class="mark-read-btn" data-id="${notif._id}" style="background: none; border: none; color: #007aff; font-size: 0.7rem; cursor: pointer; white-space: nowrap; padding: 4px 8px;">
-                                O'qildi
-                            </button>
-                        ` : `
-                            <span style="font-size: 0.7rem; color: var(--text-muted); white-space: nowrap; padding: 4px 8px;">✓ O'qilgan</span>
-                        `}
+                        ${isUnread
+                            ? `<button class="mark-read-btn" data-id="${notif._id}">O'qildi</button>`
+                            : `<span class="notif-read-label">✓ O'qilgan</span>`
+                        }
                     </div>
-                </div>
-            `;
+                </div>`;
         }).join('');
 
-        document.querySelectorAll('.mark-read-btn').forEach(btn => {
+        // O'qildi tugmalari
+        notificationList.querySelectorAll('.mark-read-btn').forEach(btn => {
             btn.addEventListener('click', async (e) => {
                 e.stopPropagation();
-                const id = btn.dataset.id;
-                await markAsRead(id);
+                await markAsRead(btn.dataset.id);
             });
         });
     }
 
+    // ── Bitta xabarni o'qilgan deb belgilash ──
     async function markAsRead(id) {
         try {
-            const token = localStorage.getItem('customerToken') || sessionStorage.getItem('customerToken');
+            const token = getToken();
             if (!token) return;
 
-            const response = await fetch(`https://admin-customerr.onrender.com/api/notifications/${id}/read`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
+            const response = await fetch(
+                `https://admin-customerr.onrender.com/api/notifications/${id}/read`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    }
                 }
-            });
-
-            if (response.ok) {
-                loadNotifications();
-            }
+            );
+            if (response.ok) loadNotifications();
         } catch (error) {
             console.error('❌ Xatolik:', error);
         }
     }
 
+    // Panel ochiq bo'lsa har 30 sekundda yangilanadi
     setInterval(() => {
-        if (notificationPanel && notificationPanel.style.display === 'block') {
+        if (notificationPanel.style.display === 'flex') {
             loadNotifications();
         }
     }, 30000);
+}
+
+// ── Token olish yordamchi funksiyasi ──
+function getToken() {
+    return localStorage.getItem('customerToken') || sessionStorage.getItem('customerToken');
 }
 
 // ============================================================
@@ -344,30 +362,27 @@ function initNotifications() {
 function setupListeners() {
     const logoutBtn = document.getElementById('logoutBtn');
     if (logoutBtn) {
-        logoutBtn.addEventListener('click', () => {
-            Auth.logout();
-        });
+        logoutBtn.addEventListener('click', () => Auth.logout());
     }
 }
 
 function showError(msg) {
     console.error('⚠️ Xatolik:', msg);
-    
     const div = document.createElement('div');
     div.style.cssText = `
-        position: fixed; top: 20px; right: 20px; z-index: 9999;
+        position: fixed; top: 20px; right: 20px; z-index: 10000;
         padding: 14px 18px; background: #fef2f2;
         border: 1px solid #fecaca; border-radius: 10px;
-        color: #dc2626; max-width: 400px;
+        color: #dc2626; max-width: 360px;
         box-shadow: 0 10px 40px rgba(0,0,0,0.1);
         display: flex; align-items: center; gap: 10px;
         font-size: 0.85rem;
-        z-index: 10000;
     `;
     div.innerHTML = `
         <i class="fas fa-exclamation-circle"></i>
         <span>${msg}</span>
-        <button onclick="this.parentElement.remove()" style="margin-left: auto; background: none; border: none; color: #dc2626; cursor: pointer; font-size: 1.1rem;">×</button>
+        <button onclick="this.parentElement.remove()"
+            style="margin-left:auto;background:none;border:none;color:#dc2626;cursor:pointer;font-size:1.1rem;">×</button>
     `;
     document.body.appendChild(div);
     setTimeout(() => div.remove(), 8000);
