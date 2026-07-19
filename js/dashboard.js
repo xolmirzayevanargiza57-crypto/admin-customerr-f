@@ -29,12 +29,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         await loadDashboardStats();
         
-        // ⭐ HAR 30 SONIYADA MA'LUMOTLARNI YANGILASH
         refreshInterval = setInterval(() => {
             loadDashboardStats();
         }, 30000);
         
-        // ⭐ REAL-TIME COUNTDOWN - HAR SONIYADA YANGILANADI
         startCountdown();
         
         setupListeners();
@@ -48,10 +46,62 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 // ============================================================
+// ⭐ TUGASH VAQTINI TO'G'RI FORMATLASH FUNKSIYASI
+// ============================================================
+function formatEndDate(endDate) {
+    if (!endDate) return 'Muddati yo\'q';
+    
+    try {
+        // Agar endDate string bo'lsa va "2027 M01 12 21:13:00" formatida bo'lsa
+        if (typeof endDate === 'string' && endDate.includes('M01')) {
+            // "2027 M01 12 21:13:00" -> "2027-01-12T21:13:00"
+            const parts = endDate.split(' ');
+            if (parts.length === 4) {
+                const year = parts[0];
+                const month = parts[1].replace('M', '').padStart(2, '0');
+                const day = parts[2].padStart(2, '0');
+                const time = parts[3];
+                const isoString = `${year}-${month}-${day}T${time}`;
+                const date = new Date(isoString);
+                if (!isNaN(date.getTime())) {
+                    return date.toLocaleString('uz-UZ', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit',
+                        hour12: false
+                    });
+                }
+            }
+        }
+        
+        // Oddiy Date formatida bo'lsa
+        const date = new Date(endDate);
+        if (!isNaN(date.getTime())) {
+            return date.toLocaleString('uz-UZ', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            });
+        }
+        
+        return endDate;
+    } catch (error) {
+        console.error('❌ Sanani formatlash xatosi:', error);
+        return endDate || 'Muddati yo\'q';
+    }
+}
+
+// ============================================================
 // ⭐ REAL-TIME COUNTDOWN - HAR SONIYADA YANGILANADI
 // ============================================================
 function startCountdown() {
-    // Eski intervalni tozalash
     if (countdownInterval) {
         clearInterval(countdownInterval);
         countdownInterval = null;
@@ -69,12 +119,44 @@ function updateCountdown() {
     if (!daysEl || !lastDashboardStats || !lastDashboardStats.subscription) return;
     
     const sub = lastDashboardStats.subscription;
+    
+    // ⭐ TUGASH VAQTI - FORMATLANGAN
+    if (endEl) {
+        if (sub.formattedEndDate) {
+            endEl.textContent = sub.formattedEndDate;
+        } else if (sub.endDate) {
+            endEl.textContent = formatEndDate(sub.endDate);
+        } else {
+            endEl.textContent = 'Muddati yo\'q';
+        }
+    }
+    
+    // ⭐ QOLGAN KUN - REAL-TIME COUNTDOWN
     if (!sub.endDate) {
         daysEl.textContent = '-';
         return;
     }
     
-    const endDate = new Date(sub.endDate);
+    // endDate ni Date ga o'zgartirish
+    let endDate = null;
+    if (typeof sub.endDate === 'string' && sub.endDate.includes('M01')) {
+        const parts = sub.endDate.split(' ');
+        if (parts.length === 4) {
+            const year = parts[0];
+            const month = parts[1].replace('M', '').padStart(2, '0');
+            const day = parts[2].padStart(2, '0');
+            const time = parts[3];
+            endDate = new Date(`${year}-${month}-${day}T${time}`);
+        }
+    } else {
+        endDate = new Date(sub.endDate);
+    }
+    
+    if (!endDate || isNaN(endDate.getTime())) {
+        daysEl.textContent = '-';
+        return;
+    }
+    
     const now = new Date();
     const diff = endDate - now;
     
@@ -83,13 +165,11 @@ function updateCountdown() {
         return;
     }
     
-    // ⭐ KUN, SOAT, MINUT, SEKUNDNI HISOBLASH
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
     const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
     const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
     const seconds = Math.floor((diff % (1000 * 60)) / 1000);
     
-    // ⭐ TO'G'RI FORMAT: "177 kun 4s 47m 48s"
     daysEl.textContent = `${days} kun ${hours}s ${minutes}m ${seconds}s`;
 }
 
@@ -114,7 +194,6 @@ async function loadDashboardStats() {
         lastDashboardStats = stats;
         console.log('📊 Statistika ma\'lumotlari:', stats);
         
-        // Stats cards
         const elements = {
             teacherCount: document.getElementById('teacherCount'),
             studentCount: document.getElementById('studentCount'),
@@ -154,11 +233,10 @@ async function loadDashboardStats() {
             }
         }
 
-        // ⭐ SUBSCRIPTION - TO'LIQ VA TO'G'RI
+        // ⭐ SUBSCRIPTION
         if (stats.subscription) {
             const sub = stats.subscription;
             
-            // Status
             const statusMap = {
                 'active': '✅ Faol',
                 'inactive': '⛔ Faol emas',
@@ -168,7 +246,6 @@ async function loadDashboardStats() {
                 elements.subscriptionStatus.textContent = statusMap[sub.status] || sub.status || 'Noma\'lum';
             }
             
-            // Turi
             const typeMap = {
                 'monthly': '📅 Oylik',
                 '6months': '📅 6 oylik',
@@ -180,42 +257,54 @@ async function loadDashboardStats() {
                 elements.subscriptionType.textContent = typeMap[sub.type] || sub.type || 'Noma\'lum';
             }
             
-            // ⭐ TUGASH VAQTI - TO'G'RI FORMAT
-            if (sub.endDate && elements.subscriptionEnd) {
-                const endDate = new Date(sub.endDate);
-                // ⭐ TO'G'RI FORMAT: 2027-yil 12-yanvar 21:13:00
-                const formattedDate = endDate.toLocaleString('uz-UZ', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    second: '2-digit',
-                    hour12: false
-                });
-                elements.subscriptionEnd.textContent = formattedDate;
-            } else if (elements.subscriptionEnd) {
-                elements.subscriptionEnd.textContent = 'Muddati yo\'q';
+            // ⭐ TUGASH VAQTI - FORMATLANGAN
+            if (elements.subscriptionEnd) {
+                if (sub.formattedEndDate) {
+                    elements.subscriptionEnd.textContent = sub.formattedEndDate;
+                } else if (sub.endDate) {
+                    elements.subscriptionEnd.textContent = formatEndDate(sub.endDate);
+                } else {
+                    elements.subscriptionEnd.textContent = 'Muddati yo\'q';
+                }
             }
             
-            // ⭐ QOLGAN KUN - REAL-TIME COUNTDOWN
-            if (sub.endDate && elements.subscriptionDays) {
-                const endDate = new Date(sub.endDate);
-                const now = new Date();
-                const diff = endDate - now;
-                
-                if (diff > 0) {
-                    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-                    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-                    // ⭐ TO'G'RI FORMAT: "177 kun 4s 47m 48s"
-                    elements.subscriptionDays.textContent = `${days} kun ${hours}s ${minutes}m ${seconds}s`;
+            // ⭐ QOLGAN KUN
+            if (elements.subscriptionDays) {
+                if (!sub.endDate) {
+                    elements.subscriptionDays.textContent = '-';
                 } else {
-                    elements.subscriptionDays.textContent = '⚠️ Vaqt tugagan!';
+                    // endDate ni Date ga o'zgartirish
+                    let endDate = null;
+                    if (typeof sub.endDate === 'string' && sub.endDate.includes('M01')) {
+                        const parts = sub.endDate.split(' ');
+                        if (parts.length === 4) {
+                            const year = parts[0];
+                            const month = parts[1].replace('M', '').padStart(2, '0');
+                            const day = parts[2].padStart(2, '0');
+                            const time = parts[3];
+                            endDate = new Date(`${year}-${month}-${day}T${time}`);
+                        }
+                    } else {
+                        endDate = new Date(sub.endDate);
+                    }
+                    
+                    if (endDate && !isNaN(endDate.getTime())) {
+                        const now = new Date();
+                        const diff = endDate - now;
+                        
+                        if (diff > 0) {
+                            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+                            elements.subscriptionDays.textContent = `${days} kun ${hours}s ${minutes}m ${seconds}s`;
+                        } else {
+                            elements.subscriptionDays.textContent = '⚠️ Vaqt tugagan!';
+                        }
+                    } else {
+                        elements.subscriptionDays.textContent = sub.endDate || '-';
+                    }
                 }
-            } else if (elements.subscriptionDays) {
-                elements.subscriptionDays.textContent = '-';
             }
         } else {
             if (elements.subscriptionStatus) elements.subscriptionStatus.textContent = '❌ Yo\'q';
@@ -232,7 +321,7 @@ async function loadDashboardStats() {
 }
 
 // ============================================================
-// ⭐ NOTIFICATIONS — Admin Customer
+// ⭐ NOTIFICATIONS
 // ============================================================
 function initNotifications() {
     const notificationToggle = document.getElementById('notificationToggle');
