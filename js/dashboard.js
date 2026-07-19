@@ -1,8 +1,9 @@
 // ============================================================
-// DASHBOARD - STATISTIKALAR (CHARTLAR O'CHIRILGAN)
+// DASHBOARD - STATISTIKALAR (TO'LIQ TUZATILGAN)
 // ============================================================
 
 let lastDashboardStats = null;
+let refreshInterval = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('🚀 Dashboard yuklanmoqda...');
@@ -25,7 +26,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (schoolEl) schoolEl.textContent = user.schoolName || 'Nurli Ta\'lim Markazi';
         }
 
+        // ⭐ Ma'lumotlarni yuklash
         await loadDashboardStats();
+        
+        // ⭐ Har 30 soniyada yangilash
+        refreshInterval = setInterval(() => {
+            loadDashboardStats();
+        }, 30000);
+        
         setupListeners();
         
         console.log('✅ Dashboard yuklandi!');
@@ -36,10 +44,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 // ============================================================
-// ⭐ STATISTIKALARNI YUKLASH (CHARTLAR YO'Q)
+// ⭐ STATISTIKALARNI YUKLASH - TO'LIQ TUZATILGAN
 // ============================================================
 async function loadDashboardStats() {
     try {
+        console.log('📊 Statistika yuklanmoqda...');
+        
         const data = await API.getDashboardStats();
         console.log('📊 Statistika javobi:', data);
         
@@ -70,11 +80,13 @@ async function loadDashboardStats() {
             subscriptionDays: document.getElementById('subscriptionDays')
         };
         
+        // ⭐ Asosiy statistikalar
         if (elements.teacherCount) elements.teacherCount.textContent = stats.teacherCount || 0;
         if (elements.studentCount) elements.studentCount.textContent = stats.studentCount || 0;
         if (elements.totalXP) elements.totalXP.textContent = stats.totalXP || 0;
         if (elements.todayAttendance) elements.todayAttendance.textContent = stats.todayAttendance || 0;
         
+        // ⭐ Davomat statistikasi
         const present = stats.attendanceStats?.present || 0;
         const absentReason = stats.attendanceStats?.absent_reason || 0;
         const absent = stats.attendanceStats?.absent || 0;
@@ -94,33 +106,75 @@ async function loadDashboardStats() {
             }
         }
 
-        // Subscription
+        // ⭐ SUBSCRIPTION - TO'LIQ TUZATILGAN
         if (stats.subscription) {
+            console.log('📊 Subscription ma\'lumotlari:', stats.subscription);
+            
+            const sub = stats.subscription;
+            
+            // Status
             const statusMap = {
-                active: 'Faol',
-                inactive: 'Faol emas',
-                expired: 'Muddati tugagan'
-            };
-            const typeMap = {
-                monthly: 'Oylik',
-                sixmonths: '6 oylik',
-                yearly: 'Yillik',
-                none: 'Yo\'q'
+                'active': '✅ Faol',
+                'inactive': '⛔ Faol emas',
+                'expired': '⚠️ Muddati tugagan'
             };
             if (elements.subscriptionStatus) {
-                elements.subscriptionStatus.textContent = statusMap[stats.subscription.status] || 'Noma\'lum';
+                elements.subscriptionStatus.textContent = statusMap[sub.status] || sub.status || 'Noma\'lum';
             }
+            
+            // Turi
+            const typeMap = {
+                'monthly': '📅 Oylik',
+                '6months': '📅 6 oylik',
+                'yearly': '📅 Yillik',
+                'custom': '⚙️ Custom',
+                'none': '❌ Yo\'q'
+            };
             if (elements.subscriptionType) {
-                elements.subscriptionType.textContent = typeMap[stats.subscription.type] || 'Noma\'lum';
+                elements.subscriptionType.textContent = typeMap[sub.type] || sub.type || 'Noma\'lum';
             }
-            if (stats.subscription.endDate && elements.subscriptionEnd) {
-                const end = new Date(stats.subscription.endDate);
-                elements.subscriptionEnd.textContent = end.toLocaleDateString('uz-UZ');
-                const days = Math.ceil((end - new Date()) / (1000 * 60 * 60 * 24));
-                if (elements.subscriptionDays) {
-                    elements.subscriptionDays.textContent = days > 0 ? `${days} kun` : 'Muddati tugagan';
+            
+            // Tugash vaqti
+            if (sub.endDate && elements.subscriptionEnd) {
+                const endDate = new Date(sub.endDate);
+                const formattedDate = endDate.toLocaleString('uz-UZ', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: false
+                });
+                elements.subscriptionEnd.textContent = formattedDate;
+            } else if (elements.subscriptionEnd) {
+                elements.subscriptionEnd.textContent = 'Muddati yo\'q';
+            }
+            
+            // Qolgan kun
+            if (sub.endDate && elements.subscriptionDays) {
+                const endDate = new Date(sub.endDate);
+                const now = new Date();
+                const diff = endDate - now;
+                
+                if (diff > 0) {
+                    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+                    elements.subscriptionDays.textContent = `${days} kun ${hours}s ${minutes}m ${seconds}s`;
+                } else {
+                    elements.subscriptionDays.textContent = '⚠️ Vaqt tugagan!';
                 }
+            } else if (elements.subscriptionDays) {
+                elements.subscriptionDays.textContent = '-';
             }
+        } else {
+            // Subscription ma'lumoti bo'lmasa
+            if (elements.subscriptionStatus) elements.subscriptionStatus.textContent = '❌ Yo\'q';
+            if (elements.subscriptionType) elements.subscriptionType.textContent = '❌ Yo\'q';
+            if (elements.subscriptionEnd) elements.subscriptionEnd.textContent = '-';
+            if (elements.subscriptionDays) elements.subscriptionDays.textContent = '-';
         }
         
         console.log('✅ Dashboard statistikasi yuklandi!');
