@@ -1,5 +1,5 @@
 // ============================================================
-// API - BACKEND BILAN BOG'LANISH (TO'LIQ)
+// API - BACKEND BILAN BOG'LANISH (Admin-Customer)
 // ============================================================
 
 function getApiBaseURL() {
@@ -10,6 +10,14 @@ function getApiBaseURL() {
     const override = window.__API_BASE_URL__ || window.API_BASE_URL || window.__ENV__?.API_BASE_URL || document.querySelector('meta[name="api-base-url"]')?.getAttribute('content');
     if (override && typeof override === 'string' && override.trim()) {
         return override.trim().replace(/\/$/, '');
+    }
+
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        return 'http://127.0.0.1:5001';
+    }
+
+    if (window.location.protocol === 'http:' || window.location.protocol === 'https:') {
+        return window.location.origin.replace(/\/$/, '');
     }
 
     return 'https://admin-customerr.onrender.com';
@@ -64,12 +72,23 @@ const API = {
             
             if (!response.ok) {
                 console.error(`❌ ${response.status} ${url}`, data);
+                return {
+                    ...data,
+                    success: false,
+                    status: response.status,
+                    message: data?.message || data?.error || `Request failed with status ${response.status}`
+                };
             }
             
             return data;
         } catch (error) {
             console.error('❌ API xatosi:', error);
-            return { success: false, message: error.message };
+            return {
+                success: false,
+                message: error?.message || 'Network request failed',
+                status: 0,
+                error
+            };
         }
     },
     
@@ -99,43 +118,12 @@ const API = {
         });
     },
     
-    // ============================================================
-    // AUTH
-    // ============================================================
-    async login(email, password) {
-        return this.post('/api/auth/login', { email, password });
-    },
-    
-    async getProfile() {
-        return this.get('/api/auth/me');
-    },
-    
-    async updateProfile(data) {
-        return this.put('/api/auth/profile', data);
-    },
-    
-    async changePassword(data) {
-        return this.post('/api/auth/change-password', data);
-    },
-    
-    async updateTheme(theme) {
-        return this.put('/api/auth/theme', { theme });
-    },
-    
-    async updateLanguage(language) {
-        return this.put('/api/auth/language', { language });
-    },
-    
-    // ============================================================
-    // DASHBOARD
-    // ============================================================
+    // ⭐ DASHBOARD STATS
     async getDashboardStats() {
         return this.get('/api/dashboard/stats');
     },
     
-    // ============================================================
     // TEACHERS
-    // ============================================================
     async getTeachers(params = {}) {
         return this.get('/api/teachers', params);
     },
@@ -156,28 +144,7 @@ const API = {
         return this.delete(`/api/teachers/${id}`);
     },
     
-    // ============================================================
-    // TEACHER LESSONS - O'QITUVCHI DARSLARI
-    // ============================================================
-    async getTeacherLessons(params = {}) {
-        return this.get('/api/teacherlessons', params);
-    },
-    
-    async createTeacherLesson(data) {
-        return this.post('/api/teacherlessons', data);
-    },
-    
-    async updateTeacherLesson(id, data) {
-        return this.put(`/api/teacherlessons/${id}`, data);
-    },
-    
-    async deleteTeacherLesson(id) {
-        return this.delete(`/api/teacherlessons/${id}`);
-    },
-    
-    // ============================================================
     // STUDENTS
-    // ============================================================
     async getStudents(params = {}) {
         return this.get('/api/students', params);
     },
@@ -198,24 +165,7 @@ const API = {
         return this.delete(`/api/students/${id}`);
     },
     
-    // ============================================================
-    // STUDENT SUBJECTS - O'QUVCHI FANLARI
-    // ============================================================
-    async getStudentSubjects(params = {}) {
-        return this.get('/api/studentsubjects', params);
-    },
-    
-    async createStudentSubject(data) {
-        return this.post('/api/studentsubjects', data);
-    },
-    
-    async deleteStudentSubject(id) {
-        return this.delete(`/api/studentsubjects/${id}`);
-    },
-    
-    // ============================================================
     // SUBJECTS
-    // ============================================================
     async getSubjects() {
         return this.get('/api/subjects');
     },
@@ -232,9 +182,7 @@ const API = {
         return this.delete(`/api/subjects/${id}`);
     },
     
-    // ============================================================
     // ATTENDANCES
-    // ============================================================
     async getAttendances(params = {}) {
         return this.get('/api/attendances', params);
     },
@@ -243,9 +191,7 @@ const API = {
         return this.post('/api/attendances', data);
     },
     
-    // ============================================================
     // PAYMENTS
-    // ============================================================
     async getPayments(params = {}) {
         return this.get('/api/payments', params);
     },
@@ -260,6 +206,15 @@ const API = {
     
     async deletePayment(id) {
         return this.delete(`/api/payments/${id}`);
+    },
+
+    // NOTIFICATIONS
+    async createNotification(data = {}) {
+        return this.post('/api/notifications', data);
+    },
+
+    async getNotifications(params = {}) {
+        return this.get('/api/notifications', params);
     }
 };
 
