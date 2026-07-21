@@ -25,11 +25,11 @@ function getApiBaseURL() {
 
 const API = {
     baseURL: getApiBaseURL(),
-
+    
     getToken() {
         return localStorage.getItem('customerToken') || sessionStorage.getItem('customerToken');
     },
-
+    
     getHeaders() {
         const token = this.getToken();
         return {
@@ -37,12 +37,12 @@ const API = {
             'Authorization': token ? `Bearer ${token}` : ''
         };
     },
-
+    
     async request(endpoint, options = {}) {
         try {
             const url = endpoint.startsWith('http') ? endpoint : `${this.baseURL}${endpoint}`;
             console.log(`📡 ${options.method || 'GET'} ${url}`);
-
+            
             const response = await fetch(url, {
                 ...options,
                 headers: {
@@ -69,7 +69,7 @@ const API = {
                     };
                 }
             }
-
+            
             if (!response.ok) {
                 console.error(`❌ ${response.status} ${url}`, data);
                 return {
@@ -79,7 +79,7 @@ const API = {
                     message: data?.message || data?.error || `Request failed with status ${response.status}`
                 };
             }
-
+            
             return data;
         } catch (error) {
             console.error('❌ API xatosi:', error);
@@ -91,134 +91,119 @@ const API = {
             };
         }
     },
-
+    
     async get(endpoint, params = {}) {
         const query = new URLSearchParams(params).toString();
         const url = query ? `${endpoint}?${query}` : endpoint;
         return this.request(url, { method: 'GET' });
     },
-
+    
     async post(endpoint, data = {}) {
         return this.request(endpoint, {
             method: 'POST',
             body: JSON.stringify(data)
         });
     },
-
+    
     async put(endpoint, data = {}) {
         return this.request(endpoint, {
             method: 'PUT',
             body: JSON.stringify(data)
         });
     },
-
+    
     async delete(endpoint) {
         return this.request(endpoint, {
             method: 'DELETE'
         });
     },
-
-    // ⭐ PROFILE - theme.js va i18n.js uchun (MUHIM - BU YO'Q EDI)
-    async getProfile() {
-        return this.get('/api/auth/me');
-    },
-
-    // ⭐ THEME - serverga saqlash (MUHIM - BU YO'Q EDI)
-    async updateTheme(theme) {
-        return this.put('/api/auth/theme', { theme });
-    },
-
-    // ⭐ LANGUAGE - serverga saqlash (MUHIM - BU YO'Q EDI)
-    async updateLanguage(language) {
-        return this.put('/api/auth/language', { language });
-    },
-
+    
     // ⭐ DASHBOARD STATS
     async getDashboardStats() {
         return this.get('/api/dashboard/stats');
     },
-
+    
     // TEACHERS
     async getTeachers(params = {}) {
         return this.get('/api/teachers', params);
     },
-
+    
     async getTeacher(id) {
         return this.get(`/api/teachers/${id}`);
     },
-
+    
     async createTeacher(data) {
         return this.post('/api/teachers', data);
     },
-
+    
     async updateTeacher(id, data) {
         return this.put(`/api/teachers/${id}`, data);
     },
-
+    
     async deleteTeacher(id) {
         return this.delete(`/api/teachers/${id}`);
     },
-
+    
     // STUDENTS
     async getStudents(params = {}) {
         return this.get('/api/students', params);
     },
-
+    
     async getStudent(id) {
         return this.get(`/api/students/${id}`);
     },
-
+    
     async createStudent(data) {
         return this.post('/api/students', data);
     },
-
+    
     async updateStudent(id, data) {
         return this.put(`/api/students/${id}`, data);
     },
-
+    
     async deleteStudent(id) {
         return this.delete(`/api/students/${id}`);
     },
-
+    
     // SUBJECTS
     async getSubjects() {
         return this.get('/api/subjects');
     },
-
+    
     async createSubject(data) {
         return this.post('/api/subjects', data);
     },
-
+    
     async updateSubject(id, data) {
         return this.put(`/api/subjects/${id}`, data);
     },
-
+    
     async deleteSubject(id) {
         return this.delete(`/api/subjects/${id}`);
     },
-
+    
     // ATTENDANCES
     async getAttendances(params = {}) {
         return this.get('/api/attendances', params);
     },
-
+    
     async createAttendance(data) {
         return this.post('/api/attendances', data);
     },
-
+    
     // PAYMENTS
     async getPayments(params = {}) {
         return this.get('/api/payments', params);
     },
-
+    
     async createPayment(data) {
         return this.post('/api/payments', data);
     },
-
+    
     async updatePayment(id, data) {
         return this.put(`/api/payments/${id}`, data);
     },
-
+    
     async deletePayment(id) {
         return this.delete(`/api/payments/${id}`);
     },
@@ -230,11 +215,6 @@ const API = {
 
     async getNotifications(params = {}) {
         return this.get('/api/notifications', params);
-    },
-
-    // ⭐ NOTIFICATION O'CHIRISH (MUHIM - BU YO'Q EDI)
-    async deleteNotification(id) {
-        return this.delete(`/api/notifications/${id}`);
     }
 };
 
