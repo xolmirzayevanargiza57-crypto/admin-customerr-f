@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         await loadNotifications();
 
-        // ⭐ HAR 30 SONIYADA YANGILASH
+        // HAR 30 SONIYADA YANGILASH
         refreshInterval = setInterval(() => {
             loadNotifications();
         }, 30000);
@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 // ============================================================
-// ⭐ FORMAT DATE
+// FORMAT DATE
 // ============================================================
 function formatDate(date) {
     if (!date) return 'Noma\'lum vaqt';
@@ -95,7 +95,7 @@ function renderNotifications(notifications) {
     const container = document.getElementById('notificationsList');
     if (!container) return;
 
-    // ⭐ FILTER
+    // FILTER
     let filtered = notifications;
     if (currentFilter === 'unread') {
         filtered = notifications.filter(n => !n.isRead);
@@ -114,7 +114,7 @@ function renderNotifications(notifications) {
         return;
     }
 
-    // ⭐ SANALAR BO'YICHA GURUHLASH
+    // SANALAR BO'YICHA GURUHLASH
     const grouped = {};
     filtered.forEach(notif => {
         const date = new Date(notif.createdAt);
@@ -177,7 +177,7 @@ function renderNotifications(notifications) {
 
     container.innerHTML = html;
 
-    // ⭐ O'qilgan deb belgilash
+    // O'qilgan deb belgilash
     document.querySelectorAll('.mark-read-btn').forEach(btn => {
         btn.addEventListener('click', async function(e) {
             e.stopPropagation();
@@ -243,7 +243,7 @@ async function markAllAsRead() {
 // SETUP LISTENERS
 // ============================================================
 function setupListeners() {
-    // ⭐ LOGOUT
+    // LOGOUT
     const logoutBtn = document.getElementById('logoutBtn');
     if (logoutBtn) {
         const newLogoutBtn = logoutBtn.cloneNode(true);
@@ -257,7 +257,7 @@ function setupListeners() {
         });
     }
 
-    // ⭐ FILTER - Barchasi
+    // FILTER - Barchasi
     const filterAll = document.getElementById('filterAll');
     if (filterAll) {
         filterAll.addEventListener('click', function() {
@@ -267,7 +267,7 @@ function setupListeners() {
         });
     }
 
-    // ⭐ FILTER - O'qilmagan
+    // FILTER - O'qilmagan
     const filterUnread = document.getElementById('filterUnread');
     if (filterUnread) {
         filterUnread.addEventListener('click', function() {
@@ -277,7 +277,7 @@ function setupListeners() {
         });
     }
 
-    // ⭐ FILTER - O'qilgan
+    // FILTER - O'qilgan
     const filterRead = document.getElementById('filterRead');
     if (filterRead) {
         filterRead.addEventListener('click', function() {
@@ -287,13 +287,13 @@ function setupListeners() {
         });
     }
 
-    // ⭐ MARK ALL READ
+    // MARK ALL READ
     const markAllRead = document.getElementById('markAllRead');
     if (markAllRead) {
         markAllRead.addEventListener('click', markAllAsRead);
     }
 
-    // ⭐ REFRESH
+    // REFRESH
     const refreshBtn = document.getElementById('refreshNotifications');
     if (refreshBtn) {
         refreshBtn.addEventListener('click', function() {
@@ -302,7 +302,7 @@ function setupListeners() {
         });
     }
 
-    // ⭐ SIDEBAR TOGGLE
+    // SIDEBAR TOGGLE
     const menuToggle = document.getElementById('menuToggle');
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('sidebarOverlay');
