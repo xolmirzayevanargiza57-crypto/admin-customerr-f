@@ -1,26 +1,41 @@
-<!-- ==================== SIDEBAR - TO'G'RI ==================== -->
+<!-- ==================== SIDEBAR - ADMIN MAIN (TO'LIQ) ==================== -->
 <aside class="sidebar" id="sidebar">
     <div class="sidebar-brand">
-        <div class="brand-icon"><i class="fas fa-crown"></i></div>
-        <div class="brand-text">
-            <span class="brand-name">Admin Customer</span>
-            <span class="brand-version">v1.0</span>
+        <div class="brand-icon">
+            <i class="fas fa-crown"></i>
         </div>
+        <span>Admin Main</span>
+        <span class="brand-version">v1.0</span>
     </div>
+
     <nav class="sidebar-nav">
-        <a href="dashboard.html" class="nav-link"><i class="fas fa-chart-pie"></i> <span data-i18n="dashboard">Dashboard</span></a>
-        <a href="teachers.html" class="nav-link"><i class="fas fa-chalkboard-teacher"></i> <span data-i18n="teachers">O'qituvchilar</span></a>
-        <a href="students.html" class="nav-link"><i class="fas fa-graduation-cap"></i> <span data-i18n="students">O'quvchilar</span></a>
-        <a href="payments.html" class="nav-link"><i class="fas fa-money-bill"></i> <span data-i18n="payments">To'lovlar</span></a>
-        <a href="attendance.html" class="nav-link"><i class="fas fa-calendar-check"></i> <span data-i18n="attendance">Davomat</span></a>
-        <a href="reports.html" class="nav-link"><i class="fas fa-file-alt"></i> <span data-i18n="reports">Hisobotlar</span></a>
-        <a href="subjects.html" class="nav-link"><i class="fas fa-book"></i> <span data-i18n="subjects">Fanlar</span></a>
-        <a href="all.html" class="nav-link"><i class="fas fa-th-list"></i> <span data-i18n="all">Barchasi</span></a>
-        <a href="settings.html" class="nav-link"><i class="fas fa-cog"></i> <span data-i18n="settings">Sozlamalar</span></a>
+        <a href="dashboard.html" class="nav-link active" data-nav-label="navDashboard">
+            <i class="fas fa-chart-pie"></i>
+            <span>Dashboard</span>
+        </a>
+        <a href="admins.html" class="nav-link" data-nav-label="navAdmins">
+            <i class="fas fa-users"></i>
+            <span>Admin Customerlar</span>
+        </a>
+        <a href="admin-add.html" class="nav-link" data-nav-label="navAdd">
+            <i class="fas fa-user-plus"></i>
+            <span>Yangi Admin</span>
+        </a>
+        <a href="notifications.html" class="nav-link" data-nav-label="navNotifications">
+            <i class="fas fa-bell"></i>
+            <span>Bildirishnomalar</span>
+            <span id="sidebarBadge" style="margin-left: auto; background: #ff3b30; color: white; font-size: 0.55rem; padding: 2px 8px; border-radius: 10px; display: none;">0</span>
+        </a>
+        <a href="settings.html" class="nav-link" data-nav-label="navSettings">
+            <i class="fas fa-cog"></i>
+            <span>Sozlamalar</span>
+        </a>
     </nav>
+
     <div class="sidebar-footer">
         <button id="logoutBtn" class="btn-logout">
-            <i class="fas fa-sign-out-alt"></i> <span data-i18n="logout">Chiqish</span>
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Chiqish</span>
         </button>
     </div>
 </aside>
