@@ -1,5 +1,5 @@
 // ============================================================
-// NOTIFICATIONS - ADMIN CUSTOMER (TO'LIQ)
+// NOTIFICATIONS - Admin Customer (TO'LIQ)
 // ============================================================
 
 let allNotifications = [];
@@ -26,7 +26,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         await loadNotifications();
 
-        // HAR 30 SONIYADA YANGILASH
         refreshInterval = setInterval(() => {
             loadNotifications();
         }, 30000);
@@ -41,84 +40,132 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 // ============================================================
-// FORMAT DATE
+// ⭐ TOSHKENT VAQTI BILAN SANANI FORMATLASH (sekundigacha)
 // ============================================================
-function formatDate(date) {
+function formatDateTimeTashkent(date) {
     if (!date) return 'Noma\'lum vaqt';
     try {
         const d = new Date(date);
         if (isNaN(d.getTime())) return 'Noma\'lum vaqt';
-        const year = d.getFullYear();
+        
+        const options = {
+            timeZone: 'Asia/Tashkent',
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false
+        };
+        
+        const formatter = new Intl.DateTimeFormat('uz-UZ', options);
+        const parts = formatter.formatToParts(d);
+        
+        const dateObj = {};
+        parts.forEach(part => {
+            dateObj[part.type] = part.value;
+        });
+        
         const monthNames = ['yanvar', 'fevral', 'mart', 'aprel', 'may', 'iyun', 'iyul', 'avgust', 'sentabr', 'oktabr', 'noyabr', 'dekabr'];
-        const month = monthNames[d.getMonth()];
-        const day = d.getDate();
-        const hours = String(d.getHours()).padStart(2, '0');
-        const minutes = String(d.getMinutes()).padStart(2, '0');
-        const seconds = String(d.getSeconds()).padStart(2, '0');
-        return `${year}-yil ${day}-${month} ${hours}:${minutes}:${seconds}`;
+        const monthNum = parseInt(dateObj.month);
+        const monthName = monthNames[monthNum - 1] || monthNum;
+        
+        return `${dateObj.day} ${monthName} ${dateObj.year}, ${dateObj.hour}:${dateObj.minute}:${dateObj.second}`;
     } catch (error) {
         return 'Noma\'lum vaqt';
     }
 }
 
 // ============================================================
-// LOAD NOTIFICATIONS
+// ⭐ KUN BO'YICHA FILTRLASH
+// ============================================================
+function filterByDate(notifications, filter) {
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const weekAgo = new Date(now);
+    weekAgo.setDate(weekAgo.getDate() - 7);
+    const monthAgo = new Date(now);
+    monthAgo.setMonth(monthAgo.getMonth() - 1);
+
+    return notifications.filter(notif => {
+        const notifDate = new Date(notif.createdAt);
+        
+        switch (filter) {
+            case 'today':
+                return notifDate >= today;
+            case 'week':
+                return notifDate >= weekAgo;
+            case 'month':
+                return notifDate >= monthAgo;
+            case 'unread':
+                return !notif.isRead;
+            case 'read':
+                return notif.isRead;
+            case 'all':
+            default:
+                return true;
+        }
+    });
+}
+
+// ============================================================
+// ⭐ XABARLARNI YUKLASH
 // ============================================================
 async function loadNotifications() {
     try {
         const token = Auth.getToken();
         if (!token) return;
 
-        const response = await fetch('https://admin-customerr.onrender.com/api/notifications', {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
+        const response = await API.get('/notifications');
+        console.log('📨 Xabarlar javobi:', response);
 
-        const data = await response.json();
-        console.log('📨 Xabarlar:', data);
-
-        if (response.ok && data.success) {
-            allNotifications = data.data || [];
+        if (response.success) {
+            allNotifications = response.data || [];
             renderNotifications(allNotifications);
         } else {
-            showError('Xabarlar yuklanmadi');
+            showError('Xabarlar yuklanmadi: ' + (response.message || 'Noma\'lum xatolik'));
         }
     } catch (error) {
         console.error('❌ Xabarlarni yuklash xatosi:', error);
-        showError('Xatolik yuz berdi');
+        showError('Xatolik yuz berdi: ' + error.message);
     }
 }
 
 // ============================================================
-// RENDER NOTIFICATIONS
+// ⭐ XABARLARNI KO'RSATISH
 // ============================================================
 function renderNotifications(notifications) {
     const container = document.getElementById('notificationsList');
     if (!container) return;
 
-    // FILTER
-    let filtered = notifications;
-    if (currentFilter === 'unread') {
-        filtered = notifications.filter(n => !n.isRead);
-    } else if (currentFilter === 'read') {
-        filtered = notifications.filter(n => n.isRead);
-    }
+    const filtered = filterByDate(notifications, currentFilter);
 
     if (!filtered || filtered.length === 0) {
+        const filterLabels = {
+            'all': 'Hozircha xabarlar yo\'q',
+            'today': 'Bugun xabarlar yo\'q',
+            'week': 'Shu hafta xabarlar yo\'q',
+            'month': 'Shu oy xabarlar yo\'q',
+            'unread': 'O\'qilmagan xabarlar yo\'q',
+            'read': 'O\'qilgan xabarlar yo\'q'
+        };
         container.innerHTML = `
-            <div class="notif-empty" style="text-align: center; padding: 60px 0;">
-                <i class="fas fa-bell-slash" style="font-size: 3rem; opacity: 0.3; display: block; margin-bottom: 16px;"></i>
-                <p style="color: var(--text-muted); font-size: 1rem;">Hozircha xabarlar yo'q</p>
-                <p style="color: var(--text-muted); font-size: 0.85rem;">Sizga yuborilgan xabarlar shu yerda ko'rinadi</p>
+            <div class="notif-empty">
+                <i class="fas fa-bell-slash"></i>
+                <p>${filterLabels[currentFilter] || 'Xabarlar yo\'q'}</p>
+                <p class="sub-text">Sizga yuborilgan xabarlar shu yerda ko\'rinadi</p>
             </div>
         `;
         return;
     }
 
-    // SANALAR BO'YICHA GURUHLASH
+    // ⭐ Xabarlarni sana bo'yicha guruhlash
     const grouped = {};
     filtered.forEach(notif => {
         const date = new Date(notif.createdAt);
         const dateKey = date.toLocaleDateString('uz-UZ', {
+            timeZone: 'Asia/Tashkent',
             year: 'numeric',
             month: 'long',
             day: 'numeric'
@@ -130,42 +177,38 @@ function renderNotifications(notifications) {
     let html = '';
     Object.keys(grouped).forEach(dateKey => {
         html += `
-            <div class="notification-date-group" style="margin-bottom: 12px;">
-                <div style="padding: 6px 0; font-size: 0.75rem; color: var(--text-muted); font-weight: 600; border-bottom: 1px solid var(--border-color); margin-bottom: 8px;">
+            <div class="notification-date-group">
+                <div class="date-header">
                     <i class="fas fa-calendar"></i> ${dateKey}
+                    <span style="font-size: 0.65rem; font-weight: 400; color: var(--text-muted); margin-left: 8px;">
+                        ${grouped[dateKey].length} ta xabar
+                    </span>
                 </div>
         `;
 
         grouped[dateKey].forEach(notif => {
-            const time = new Date(notif.createdAt).toLocaleTimeString('uz-UZ', {
-                hour: '2-digit',
-                minute: '2-digit'
-            });
             const isUnread = !notif.isRead;
-            const formattedDate = formatDate(notif.createdAt);
-            const sender = notif.sentByName || 'Admin';
+            const sentByName = notif.sentByName || 'Admin';
+            const formattedDate = formatDateTimeTashkent(notif.createdAt);
 
             html += `
-                <div class="notification-item ${isUnread ? 'unread' : ''}" style="padding: 12px 16px; border-bottom: 1px solid var(--border-color); ${isUnread ? 'background: var(--bg-hover); border-left: 3px solid #007aff;' : ''}">
-                    <div class="notification-item-inner" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
-                        <div class="notification-body" style="flex: 1; min-width: 0;">
-                            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                                <strong class="notification-title" style="font-size: 0.9rem; font-weight: 600; color: var(--text-primary);">${notif.title || 'Xabar'}</strong>
-                                <span style="font-size: 0.65rem; color: var(--text-muted); background: var(--bg-hover); padding: 2px 8px; border-radius: 10px;">${sender}</span>
-                            </div>
-                            <p class="notification-message" style="font-size: 0.85rem; color: var(--text-secondary); margin: 6px 0; word-break: break-word; white-space: pre-wrap; line-height: 1.5;">${notif.message || ''}</p>
-                            <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-                                <span class="notification-time" style="font-size: 0.7rem; color: var(--text-muted);"><i class="fas fa-clock"></i> ${time}</span>
-                                <span class="notification-time" style="font-size: 0.7rem; color: var(--text-muted);"><i class="fas fa-calendar"></i> ${formattedDate}</span>
-                                ${notif.recipientName ? `<span style="font-size: 0.65rem; color: var(--text-muted);"><i class="fas fa-user"></i> ${notif.recipientName}</span>` : ''}
-                            </div>
+                <div class="notification-item ${isUnread ? 'unread' : ''}">
+                    <div class="notification-body">
+                        <span class="notification-title">${notif.title || 'Xabar'}</span>
+                        <p class="notification-message">${notif.message || ''}</p>
+                        <div class="notification-meta">
+                            <span><i class="fas fa-user"></i> ✉️ Yuborgan: ${sentByName}</span>
+                            <span><i class="fas fa-clock"></i> ${formattedDate}</span>
+                            <span><i class="fas fa-circle" style="color: ${isUnread ? '#007aff' : '#34c759'}; font-size: 0.5rem;"></i> ${isUnread ? 'O\'qilmagan' : 'O\'qilgan'}</span>
                         </div>
+                    </div>
+                    <div class="notification-actions">
                         ${isUnread ? `
-                            <button class="mark-read-btn" data-id="${notif._id}" style="background: none; border: 1px solid #007aff; color: #007aff; font-size: 0.7rem; cursor: pointer; padding: 4px 12px; border-radius: 6px; flex-shrink: 0; transition: all 0.3s ease;">
-                                O'qildi
+                            <button class="btn-read" data-id="${notif._id}">
+                                <i class="fas fa-check"></i> O'qildi
                             </button>
                         ` : `
-                            <span class="notif-read-label" style="font-size: 0.7rem; color: var(--text-muted); flex-shrink: 0; padding: 4px 0;">✓ O'qilgan</span>
+                            <span class="read-label">✓ O'qilgan</span>
                         `}
                     </div>
                 </div>
@@ -177,8 +220,8 @@ function renderNotifications(notifications) {
 
     container.innerHTML = html;
 
-    // O'qilgan deb belgilash
-    document.querySelectorAll('.mark-read-btn').forEach(btn => {
+    // ⭐ O'qilgan deb belgilash
+    document.querySelectorAll('.btn-read').forEach(btn => {
         btn.addEventListener('click', async function(e) {
             e.stopPropagation();
             const id = this.dataset.id;
@@ -188,33 +231,25 @@ function renderNotifications(notifications) {
 }
 
 // ============================================================
-// MARK AS READ
+// ⭐ XABARNI O'QILGAN DEB BELGILASH
 // ============================================================
 async function markAsRead(id) {
     try {
-        const token = Auth.getToken();
-        if (!token) return;
-
-        const response = await fetch(`https://admin-customerr.onrender.com/api/notifications/${id}/read`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            }
-        });
-
-        if (response.ok) {
+        const response = await API.post(`/notifications/${id}/read`);
+        if (response.success) {
+            showSuccess('Xabar o\'qilgan deb belgilandi!');
             await loadNotifications();
-            showSuccess('Xabar o\'qilgan deb belgilandi');
+        } else {
+            showError(response.message || 'Xatolik yuz berdi!');
         }
     } catch (error) {
         console.error('❌ Xatolik:', error);
-        showError('Xatolik yuz berdi');
+        showError('Xabarni o\'qilgan deb belgilashda xatolik!');
     }
 }
 
 // ============================================================
-// MARK ALL AS READ
+// ⭐ BARCHA XABARLARNI O'QILGAN DEB BELGILASH
 // ============================================================
 async function markAllAsRead() {
     try {
@@ -229,21 +264,37 @@ async function markAllAsRead() {
             }
         });
 
-        if (response.ok) {
+        const data = await response.json();
+        if (response.ok && data.success) {
+            showSuccess('Barcha xabarlar o\'qilgan deb belgilandi!');
             await loadNotifications();
-            showSuccess('Barcha xabarlar o\'qilgan deb belgilandi');
+        } else {
+            showError(data.message || 'Xatolik yuz berdi!');
         }
     } catch (error) {
         console.error('❌ Xatolik:', error);
-        showError('Xatolik yuz berdi');
+        showError('Xatolik yuz berdi: ' + error.message);
     }
 }
 
 // ============================================================
-// SETUP LISTENERS
+// ⭐ FILTER TUGMALARI
+// ============================================================
+function updateFilterButtons() {
+    document.querySelectorAll('.filter-pill').forEach(btn => {
+        btn.classList.remove('active');
+        const filter = btn.dataset.filter;
+        if (filter === currentFilter) {
+            btn.classList.add('active');
+        }
+    });
+}
+
+// ============================================================
+// ⭐ EVENT LISTENERLAR
 // ============================================================
 function setupListeners() {
-    // LOGOUT
+    // Logout
     const logoutBtn = document.getElementById('logoutBtn');
     if (logoutBtn) {
         const newLogoutBtn = logoutBtn.cloneNode(true);
@@ -257,7 +308,7 @@ function setupListeners() {
         });
     }
 
-    // FILTER - Barchasi
+    // Filter - Barchasi
     const filterAll = document.getElementById('filterAll');
     if (filterAll) {
         filterAll.addEventListener('click', function() {
@@ -267,7 +318,37 @@ function setupListeners() {
         });
     }
 
-    // FILTER - O'qilmagan
+    // Filter - Bugun
+    const filterToday = document.getElementById('filterToday');
+    if (filterToday) {
+        filterToday.addEventListener('click', function() {
+            currentFilter = 'today';
+            updateFilterButtons();
+            renderNotifications(allNotifications);
+        });
+    }
+
+    // Filter - Shu hafta
+    const filterWeek = document.getElementById('filterWeek');
+    if (filterWeek) {
+        filterWeek.addEventListener('click', function() {
+            currentFilter = 'week';
+            updateFilterButtons();
+            renderNotifications(allNotifications);
+        });
+    }
+
+    // Filter - Shu oy
+    const filterMonth = document.getElementById('filterMonth');
+    if (filterMonth) {
+        filterMonth.addEventListener('click', function() {
+            currentFilter = 'month';
+            updateFilterButtons();
+            renderNotifications(allNotifications);
+        });
+    }
+
+    // Filter - O'qilmagan
     const filterUnread = document.getElementById('filterUnread');
     if (filterUnread) {
         filterUnread.addEventListener('click', function() {
@@ -277,7 +358,7 @@ function setupListeners() {
         });
     }
 
-    // FILTER - O'qilgan
+    // Filter - O'qilgan
     const filterRead = document.getElementById('filterRead');
     if (filterRead) {
         filterRead.addEventListener('click', function() {
@@ -287,52 +368,46 @@ function setupListeners() {
         });
     }
 
-    // MARK ALL READ
+    // Mark all as read
     const markAllRead = document.getElementById('markAllRead');
     if (markAllRead) {
         markAllRead.addEventListener('click', markAllAsRead);
     }
 
-    // REFRESH
+    // Refresh
     const refreshBtn = document.getElementById('refreshNotifications');
     if (refreshBtn) {
         refreshBtn.addEventListener('click', function() {
             loadNotifications();
-            showSuccess('Yangilandi');
+            showSuccess('Yangilandi!');
         });
     }
 
-    // SIDEBAR TOGGLE
+    // Sidebar toggle
     const menuToggle = document.getElementById('menuToggle');
     const sidebar = document.getElementById('sidebar');
-    const overlay = document.getElementById('sidebarOverlay');
-    if (menuToggle && sidebar && overlay) {
+    if (menuToggle && sidebar) {
         menuToggle.addEventListener('click', () => {
             sidebar.classList.toggle('open');
-            overlay.classList.toggle('show');
         });
-        overlay.addEventListener('click', () => {
-            sidebar.classList.remove('open');
-            overlay.classList.remove('show');
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 768) {
+                const isSidebar = sidebar.contains(e.target);
+                const isToggle = menuToggle.contains(e.target);
+                if (!isSidebar && !isToggle) {
+                    sidebar.classList.remove('open');
+                }
+            }
         });
     }
-}
-
-function updateFilterButtons() {
-    document.querySelectorAll('.filter-pill').forEach(btn => {
-        btn.classList.remove('active');
-        const filter = btn.dataset.filter;
-        if (filter === currentFilter) {
-            btn.classList.add('active');
-        }
-    });
 }
 
 // ============================================================
-// SHOW MESSAGES
+// ⭐ XATOLIK VA MUVAFFAQIYAT XABARLARI
 // ============================================================
 function showError(msg) {
     console.error('⚠️ Xatolik:', msg);
+    
     const div = document.createElement('div');
     div.style.cssText = `
         position: fixed; top: 20px; right: 20px; z-index: 9999;
@@ -354,6 +429,8 @@ function showError(msg) {
 }
 
 function showSuccess(msg) {
+    console.log('✅ Muvaffaqiyat:', msg);
+    
     const div = document.createElement('div');
     div.style.cssText = `
         position: fixed; top: 20px; right: 20px; z-index: 9999;
@@ -375,10 +452,13 @@ function showSuccess(msg) {
 }
 
 // ============================================================
-// CLEANUP
+// ⭐ CLEANUP
 // ============================================================
 window.addEventListener('beforeunload', function() {
-    if (refreshInterval) { clearInterval(refreshInterval); refreshInterval = null; }
+    if (refreshInterval) {
+        clearInterval(refreshInterval);
+        refreshInterval = null;
+    }
 });
 
 console.log('✅ notifications.js yuklandi');
