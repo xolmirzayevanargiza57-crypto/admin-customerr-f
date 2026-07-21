@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (schoolEl) schoolEl.textContent = user.schoolName || 'Nurli Ta\'lim Markazi';
         }
 
-        // ⭐ LOGOUT TUGMASI
+        // LOGOUT TUGMASI
         const logoutBtn = document.getElementById('logoutBtn');
         if (logoutBtn) {
             const newLogoutBtn = logoutBtn.cloneNode(true);
@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         startCountdown();
 
-        // ⭐ NOTIFICATIONS
+        // NOTIFICATIONS
         initNotifications();
 
         console.log('✅ Dashboard yuklandi!');
@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 // ============================================================
-// ⭐ FORMAT DATE FUNCTION
+// FORMAT DATE FUNCTION
 // ============================================================
 function formatDate(date) {
     if (!date) return 'Noma\'lum vaqt';
@@ -87,7 +87,7 @@ function formatDate(date) {
 }
 
 // ============================================================
-// ⭐ COUNTDOWN - REAL TIME
+// COUNTDOWN - REAL TIME
 // ============================================================
 function startCountdown() {
     if (countdownInterval) {
@@ -281,7 +281,7 @@ async function loadDashboardStats() {
 }
 
 // ============================================================
-// ⭐ NOTIFICATIONS (Admin-Customer)
+// NOTIFICATIONS (Admin-Customer)
 // ============================================================
 function initNotifications() {
     const notificationToggle = document.getElementById('notificationToggle');
@@ -367,7 +367,7 @@ function initNotifications() {
             return;
         }
 
-        // ⭐ SANALAR BO'YICHA GURUHLASH
+        // SANALAR BO'YICHA GURUHLASH
         const grouped = {};
         notifications.forEach(notif => {
             const date = new Date(notif.createdAt);
