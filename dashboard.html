@@ -77,21 +77,21 @@
                 </div>
                 <div class="header-right">
                     <!-- NOTIFICATIONS ICON -->
-                    <div class="notification-wrapper">
-                        <button id="notificationToggle" class="notification-btn">
+                    <div class="notification-wrapper" style="position: relative; display: inline-block;">
+                        <button id="notificationToggle" class="notification-btn" style="background: none; border: none; font-size: 1.2rem; color: var(--text-primary); position: relative; padding: 8px; cursor: pointer;">
                             <i class="fas fa-bell"></i>
-                            <span id="notificationBadge">0</span>
+                            <span id="notificationBadge" style="position: absolute; top: -2px; right: -4px; background: #ff3b30; color: white; font-size: 0.6rem; border-radius: 50%; padding: 2px 5px; min-width: 18px; text-align: center; display: none; font-weight: 600;">0</span>
                         </button>
-                        <div id="notificationPanel">
-                            <div class="notif-panel-header">
-                                <h4><i class="fas fa-bell"></i> Bildirishnomalar</h4>
-                                <button id="markAllRead">Hammasini o'qilgan deb belgilash</button>
+                        <!-- Notification Panel -->
+                        <div id="notificationPanel" style="display: none; position: absolute; top: 45px; right: 0; width: 380px; max-height: 420px; overflow-y: auto; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); z-index: 1000; padding: 12px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 10px; border-bottom: 1px solid var(--border-color);">
+                                <h4 style="font-size: 0.9rem; font-weight: 600; margin: 0; color: var(--text-primary);">
+                                    <i class="fas fa-bell" style="margin-right: 6px;"></i> Bildirishnomalar
+                                </h4>
+                                <button id="markAllRead" style="background: none; border: none; color: var(--text-muted); font-size: 0.7rem; cursor: pointer;">Hammasini o'qilgan deb belgilash</button>
                             </div>
-                            <div id="notificationList">
-                                <div class="notif-empty">
-                                    <i class="fas fa-bell-slash"></i>
-                                    <p>Hozircha xabarlar yo'q</p>
-                                </div>
+                            <div id="notificationList" style="padding-top: 8px;">
+                                <p class="text-muted" style="text-align: center; padding: 20px 0; font-size: 0.85rem;">Hozircha xabarlar yo'q</p>
                             </div>
                         </div>
                     </div>
