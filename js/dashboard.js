@@ -1,34 +1,67 @@
 // ============================================================
-// DASHBOARD - ADMIN MAIN (TO'LIQ)
+// DASHBOARD - ADMIN CUSTOMER (TO'LIQ)
 // ============================================================
 
 let dashboardLoaded = false;
-let statsData = null;
+let lastDashboardStats = null;
 let refreshInterval = null;
+let countdownInterval = null;
 
-document.addEventListener('DOMContentLoaded', function() {
-    // ⭐ FAQAT 1 MARTA YUKLANISHI UCHUN
+document.addEventListener('DOMContentLoaded', async () => {
     if (dashboardLoaded) {
         console.log('⚠️ Dashboard allaqachon yuklangan');
         return;
     }
     dashboardLoaded = true;
 
-    // Token tekshirish
-    if (!Auth.isAuthenticated()) {
-        window.location.href = 'index.html';
-        return;
-    }
-
     console.log('🚀 Dashboard yuklanmoqda...');
-    loadStatistics();
-    updateNotificationBadge();
-    
-    // ⭐ Har 30 soniyada yangilash
-    refreshInterval = setInterval(() => {
-        loadStatistics();
-        updateNotificationBadge();
-    }, 30000);
+
+    try {
+        const token = localStorage.getItem('customerToken') || sessionStorage.getItem('customerToken');
+        if (!token) {
+            window.location.replace('index.html');
+            return;
+        }
+
+        const user = Auth.getUser();
+        if (user) {
+            const nameEl = document.getElementById('userName');
+            const initialEl = document.getElementById('userInitial');
+            const schoolEl = document.getElementById('schoolName');
+            if (nameEl) nameEl.textContent = Auth.getUserName();
+            if (initialEl) initialEl.textContent = Auth.getUserInitial();
+            if (schoolEl) schoolEl.textContent = user.schoolName || 'Nurli Ta\'lim Markazi';
+        }
+
+        // LOGOUT TUGMASI
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+            const newLogoutBtn = logoutBtn.cloneNode(true);
+            logoutBtn.parentNode.replaceChild(newLogoutBtn, logoutBtn);
+            newLogoutBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                if (confirm('Haqiqatan ham chiqmoqchimisiz?')) {
+                    Auth.logout();
+                }
+            });
+        }
+
+        await loadDashboardStats();
+        await updateNotificationBadge();
+
+        refreshInterval = setInterval(() => {
+            loadDashboardStats();
+            updateNotificationBadge();
+        }, 30000);
+
+        startCountdown();
+
+        console.log('✅ Dashboard yuklandi!');
+    } catch (error) {
+        console.error('❌ Dashboard yuklash xatosi:', error);
+        showError('Dashboard yuklashda xatolik: ' + error.message);
+    }
 });
 
 // ============================================================
@@ -71,263 +104,251 @@ async function updateNotificationBadge() {
 }
 
 // ============================================================
-// STATISTIKA YUKLASH
+// FORMAT DATE FUNCTION
 // ============================================================
-async function loadStatistics() {
+function formatDate(date) {
+    if (!date) return 'Noma\'lum vaqt';
     try {
-        console.log('📊 Statistika yuklanmoqda...');
-        
-        const data = await API.get('/statistics');
-        console.log('📊 Statistika javobi:', data);
-        
-        if (data.success) {
-            statsData = data.data;
-            renderStatistics(statsData);
-        } else if (data.status === 401 || data.status === 403) {
-            console.warn('⚠️ Auth xatosi, logout...');
-            Auth.logout();
-        } else {
-            console.error('❌ Statistika xatosi:', data.message);
-            showError('Ma\'lumotlarni yuklashda xatolik: ' + data.message);
-        }
+        const d = new Date(date);
+        if (isNaN(d.getTime())) return 'Noma\'lum vaqt';
+        const year = d.getFullYear();
+        const monthNames = ['yanvar', 'fevral', 'mart', 'aprel', 'may', 'iyun', 'iyul', 'avgust', 'sentabr', 'oktabr', 'noyabr', 'dekabr'];
+        const month = monthNames[d.getMonth()];
+        const day = d.getDate();
+        const hours = String(d.getHours()).padStart(2, '0');
+        const minutes = String(d.getMinutes()).padStart(2, '0');
+        const seconds = String(d.getSeconds()).padStart(2, '0');
+        return `${year}-yil ${day}-${month} ${hours}:${minutes}:${seconds}`;
     } catch (error) {
-        console.error('❌ Statistika yuklash xatosi:', error);
-        showError('Tarmoq xatosi! Qayta urinib ko\'ring.');
+        return 'Noma\'lum vaqt';
     }
 }
 
 // ============================================================
-// STATISTIKANI RENDER QILISH
+// COUNTDOWN - REAL TIME
 // ============================================================
-function renderStatistics(data) {
-    console.log('📊 Statistika render qilinmoqda:', data);
-    
-    const counts = data.counts || {};
-    
-    // ⭐ Stats cards
-    const elements = {
-        total: document.getElementById('totalCount'),
-        monthly: document.getElementById('monthlyCount'),
-        yearly: document.getElementById('yearlyCount'),
-        inactive: document.getElementById('inactiveCount'),
-        newThisWeek: document.getElementById('newThisWeek'),
-    };
-    
-    // Jami adminlar
-    if (elements.total) {
-        elements.total.textContent = counts.total || 0;
+function startCountdown() {
+    if (countdownInterval) {
+        clearInterval(countdownInterval);
+        countdownInterval = null;
     }
-    
-    // Oylik obuna
-    if (elements.monthly) {
-        elements.monthly.textContent = counts.monthly || 0;
-    }
-    
-    // Yillik obuna
-    if (elements.yearly) {
-        elements.yearly.textContent = counts.yearly || 0;
-    }
-    
-    // Obunasi yo'q
-    if (elements.inactive) {
-        elements.inactive.textContent = counts.noSubscription || 0;
-    }
-    
-    // Bu hafta yangi
-    if (elements.newThisWeek) {
-        const newCount = counts.newThisWeek || 0;
-        if (newCount > 0) {
-            elements.newThisWeek.textContent = `+${newCount} bu hafta`;
-            elements.newThisWeek.className = 'stat-change positive';
+    countdownInterval = setInterval(() => {
+        updateCountdown();
+    }, 1000);
+}
+
+function updateCountdown() {
+    const daysEl = document.getElementById('subscriptionDays');
+    const endEl = document.getElementById('subscriptionEnd');
+    if (!daysEl || !lastDashboardStats || !lastDashboardStats.subscription) return;
+    const sub = lastDashboardStats.subscription;
+
+    if (endEl) {
+        if (sub.formattedEndDate) {
+            endEl.textContent = sub.formattedEndDate;
+        } else if (sub.endDate) {
+            endEl.textContent = formatDate(sub.endDate);
         } else {
-            elements.newThisWeek.textContent = '0 bu hafta';
-            elements.newThisWeek.className = 'stat-change';
+            endEl.textContent = 'Muddati yo\'q';
         }
     }
-    
-    // ⭐ Chart yaratish
-    createSubscriptionChart(data.chart);
-    
-    // ⭐ Oxirgi adminlar
-    loadRecentAdmins();
-}
 
-// ============================================================
-// SUBSCRIPTION CHART
-// ============================================================
-let subscriptionChart = null;
-
-function createSubscriptionChart(chartData) {
-    const ctx = document.getElementById('subscriptionChart');
-    if (!ctx) {
-        console.warn('⚠️ Chart canvas topilmadi');
+    if (!sub.endDate) {
+        daysEl.textContent = '-';
         return;
     }
-    
-    if (subscriptionChart) {
-        subscriptionChart.destroy();
-        subscriptionChart = null;
-    }
-    
-    const labels = chartData?.labels || ['Oylik', '6 oylik', 'Yillik', 'Custom', 'Faol', 'Faol emas', 'Obunasi yo\'q'];
-    const data = chartData?.data || [0, 0, 0, 0, 0, 0, 0];
-    
-    subscriptionChart = new Chart(ctx, {
-        type: 'pie',
-        data: {
-            labels: labels,
-            datasets: [{
-                data: data,
-                backgroundColor: [
-                    'rgba(52, 199, 89, 0.8)',
-                    'rgba(255, 149, 0, 0.8)',
-                    'rgba(0, 122, 255, 0.8)',
-                    'rgba(124, 58, 237, 0.8)',
-                    'rgba(31, 120, 180, 0.8)',
-                    'rgba(255, 59, 48, 0.8)',
-                    'rgba(142, 142, 147, 0.8)'
-                ],
-                borderColor: [
-                    'rgba(52, 199, 89, 1)',
-                    'rgba(255, 149, 0, 1)',
-                    'rgba(0, 122, 255, 1)',
-                    'rgba(124, 58, 237, 1)',
-                    'rgba(31, 120, 180, 1)',
-                    'rgba(255, 59, 48, 1)',
-                    'rgba(108, 117, 125, 1)'
-                ],
-                borderWidth: 2
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: {
-                        usePointStyle: true,
-                        padding: 16,
-                        font: { size: 12, weight: '500' }
-                    }
-                }
-            }
+
+    let endDate = null;
+    if (typeof sub.endDate === 'string' && sub.endDate.includes('M01')) {
+        const parts = sub.endDate.split(' ');
+        if (parts.length === 4) {
+            const year = parts[0];
+            const month = parts[1].replace('M', '').padStart(2, '0');
+            const day = parts[2].padStart(2, '0');
+            const time = parts[3];
+            endDate = new Date(`${year}-${month}-${day}T${time}`);
         }
-    });
+    } else {
+        endDate = new Date(sub.endDate);
+    }
+
+    if (!endDate || isNaN(endDate.getTime())) {
+        daysEl.textContent = '-';
+        return;
+    }
+
+    const now = new Date();
+    const diff = endDate - now;
+
+    if (diff <= 0) {
+        daysEl.textContent = '⚠️ Vaqt tugagan!';
+        return;
+    }
+
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+    daysEl.textContent = `${days} kun ${hours}s ${minutes}m ${seconds}s`;
 }
 
 // ============================================================
-// OXIRGI ADMINLAR
+// LOAD DASHBOARD STATS
 // ============================================================
-async function loadRecentAdmins() {
+async function loadDashboardStats() {
     try {
-        const container = document.getElementById('recentAdminsList');
-        if (!container) return;
-        
-        const data = await API.get('/admins?limit=10');
-        
-        if (data.success && data.data) {
-            const admins = data.data || [];
-            
-            if (admins.length === 0) {
-                container.innerHTML = '<p class="text-muted">Hali adminlar yo\'q</p>';
+        console.log('📊 Statistika yuklanmoqda...');
+        const data = await API.getDashboardStats();
+        console.log('📊 Statistika javobi:', data);
+
+        if (!data.success) {
+            if (data.status === 401 || data.status === 403) {
+                Auth.logout();
                 return;
             }
-            
-            container.innerHTML = admins.map(admin => {
-                const subType = admin.subscription?.type || 'none';
-                const subStatus = admin.subscription?.status || 'inactive';
-                
-                let subLabel = 'Obunasi yo\'q';
-                let subClass = 'inactive';
-                
-                if (subType === 'none') {
-                    subLabel = 'Obunasi yo\'q';
-                    subClass = 'inactive';
-                } else if (subStatus === 'active') {
-                    if (subType === 'monthly') { 
-                        subLabel = 'Oylik'; 
-                        subClass = 'active'; 
-                    } else if (subType === '6months') { 
-                        subLabel = '6 oylik'; 
-                        subClass = 'active'; 
-                    } else if (subType === 'yearly') { 
-                        subLabel = 'Yillik'; 
-                        subClass = 'active'; 
-                    } else if (subType === 'custom') { 
-                        subLabel = 'Custom'; 
-                        subClass = 'active'; 
-                    } else { 
-                        subLabel = 'Faol'; 
-                        subClass = 'active'; 
-                    }
+            console.error('❌ Statistika xatosi:', data.message);
+            showError('Ma\'lumotlarni yuklashda xatolik: ' + data.message);
+            return;
+        }
+
+        const stats = data.data;
+        lastDashboardStats = stats;
+        console.log('📊 Statistika ma\'lumotlari:', stats);
+
+        const elements = {
+            teacherCount: document.getElementById('teacherCount'),
+            studentCount: document.getElementById('studentCount'),
+            totalXP: document.getElementById('totalXP'),
+            todayAttendance: document.getElementById('todayAttendance'),
+            presentCount: document.getElementById('presentCount'),
+            absentReasonCount: document.getElementById('absentReasonCount'),
+            absentCount: document.getElementById('absentCount'),
+            attendancePercent: document.getElementById('attendancePercent'),
+            subscriptionStatus: document.getElementById('subscriptionStatus'),
+            subscriptionType: document.getElementById('subscriptionType'),
+            subscriptionEnd: document.getElementById('subscriptionEnd'),
+            subscriptionDays: document.getElementById('subscriptionDays')
+        };
+
+        if (elements.teacherCount) elements.teacherCount.textContent = stats.teacherCount || 0;
+        if (elements.studentCount) elements.studentCount.textContent = stats.studentCount || 0;
+        if (elements.totalXP) elements.totalXP.textContent = stats.totalXP || 0;
+        if (elements.todayAttendance) elements.todayAttendance.textContent = stats.todayAttendance || 0;
+
+        const present = stats.attendanceStats?.present || 0;
+        const absentReason = stats.attendanceStats?.absent_reason || 0;
+        const absent = stats.attendanceStats?.absent || 0;
+
+        if (elements.presentCount) elements.presentCount.textContent = present;
+        if (elements.absentReasonCount) elements.absentReasonCount.textContent = absentReason;
+        if (elements.absentCount) elements.absentCount.textContent = absent;
+
+        const total = present + absentReason + absent;
+        if (elements.attendancePercent) {
+            if (total > 0) {
+                const percent = Math.round((present / total) * 100);
+                elements.attendancePercent.textContent = `${percent}%`;
+                elements.attendancePercent.className = `stat-change ${percent >= 70 ? 'positive' : 'negative'}`;
+            } else {
+                elements.attendancePercent.textContent = '0%';
+            }
+        }
+
+        // SUBSCRIPTION
+        if (stats.subscription) {
+            const sub = stats.subscription;
+            const statusMap = { 'active': '✅ Faol', 'inactive': '⛔ Faol emas', 'expired': '⚠️ Muddati tugagan' };
+            if (elements.subscriptionStatus) {
+                elements.subscriptionStatus.textContent = statusMap[sub.status] || sub.status || 'Noma\'lum';
+            }
+            const typeMap = { 'monthly': '📅 Oylik', '6months': '📅 6 oylik', 'yearly': '📅 Yillik', 'custom': '⚙️ Custom', 'none': '❌ Yo\'q' };
+            if (elements.subscriptionType) {
+                elements.subscriptionType.textContent = typeMap[sub.type] || sub.type || 'Noma\'lum';
+            }
+            if (elements.subscriptionEnd) {
+                if (sub.formattedEndDate) {
+                    elements.subscriptionEnd.textContent = sub.formattedEndDate;
+                } else if (sub.endDate) {
+                    elements.subscriptionEnd.textContent = formatDate(sub.endDate);
                 } else {
-                    subLabel = 'Faol emas';
-                    subClass = 'inactive';
+                    elements.subscriptionEnd.textContent = 'Muddati yo\'q';
                 }
-                
-                return `
-                    <div class="recent-admin-item">
-                        <div class="recent-admin-avatar">
-                            ${(admin.fullName || 'A').charAt(0).toUpperCase()}
-                        </div>
-                        <div class="recent-admin-info">
-                            <p class="recent-admin-name">${admin.fullName || '-'}</p>
-                            <p class="recent-admin-email">${admin.email || '-'}</p>
-                        </div>
-                        <span class="status-badge ${subClass}">${subLabel}</span>
-                    </div>
-                `;
-            }).join('');
-            
-            container.classList.add('scrollable');
+            }
+            if (elements.subscriptionDays) {
+                if (!sub.endDate) {
+                    elements.subscriptionDays.textContent = '-';
+                } else {
+                    let endDate = null;
+                    if (typeof sub.endDate === 'string' && sub.endDate.includes('M01')) {
+                        const parts = sub.endDate.split(' ');
+                        if (parts.length === 4) {
+                            const year = parts[0];
+                            const month = parts[1].replace('M', '').padStart(2, '0');
+                            const day = parts[2].padStart(2, '0');
+                            const time = parts[3];
+                            endDate = new Date(`${year}-${month}-${day}T${time}`);
+                        }
+                    } else {
+                        endDate = new Date(sub.endDate);
+                    }
+                    if (endDate && !isNaN(endDate.getTime())) {
+                        const now = new Date();
+                        const diff = endDate - now;
+                        if (diff > 0) {
+                            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+                            elements.subscriptionDays.textContent = `${days} kun ${hours}s ${minutes}m ${seconds}s`;
+                        } else {
+                            elements.subscriptionDays.textContent = '⚠️ Vaqt tugagan!';
+                        }
+                    } else {
+                        elements.subscriptionDays.textContent = sub.endDate || '-';
+                    }
+                }
+            }
         }
+
+        console.log('✅ Dashboard statistikasi yuklandi!');
     } catch (error) {
-        console.error('❌ Oxirgi adminlar yuklash xatosi:', error);
-        const container = document.getElementById('recentAdminsList');
-        if (container) {
-            container.innerHTML = '<p class="text-muted">Adminlar yuklanmadi</p>';
-        }
+        console.error('❌ Statistikani yuklash xatosi:', error);
+        showError('Ma\'lumotlarni yuklashda xatolik: ' + error.message);
     }
 }
 
 // ============================================================
-// XATOLIK KO'RSATISH
+// SHOW ERROR
 // ============================================================
-function showError(message) {
-    console.error('⚠️ Xatolik:', message);
-    
-    // ⭐ Ekranda xatolikni ko'rsatish
-    const container = document.querySelector('.stats-grid');
-    if (container) {
-        const errorDiv = document.createElement('div');
-        errorDiv.className = 'stat-card';
-        errorDiv.style.cssText = 'grid-column: 1 / -1; text-align: center; padding: 20px; border-color: var(--color-danger);';
-        errorDiv.innerHTML = `
-            <p style="color: var(--color-danger);">
-                <i class="fas fa-exclamation-circle"></i> 
-                ${message}
-            </p>
-            <button onclick="location.reload()" class="btn-secondary" style="margin-top: 8px; width: auto; padding: 8px 16px;">
-                <i class="fas fa-sync-alt"></i> Qayta yuklash
-            </button>
-        `;
-        container.prepend(errorDiv);
-    }
+function showError(msg) {
+    console.error('⚠️ Xatolik:', msg);
+    const div = document.createElement('div');
+    div.style.cssText = `
+        position: fixed; top: 20px; right: 20px; z-index: 9999;
+        padding: 14px 18px; background: #fef2f2;
+        border: 1px solid #fecaca; border-radius: 10px;
+        color: #dc2626; max-width: 400px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        display: flex; align-items: center; gap: 10px;
+        font-size: 0.85rem;
+        z-index: 10000;
+    `;
+    div.innerHTML = `
+        <i class="fas fa-exclamation-circle"></i>
+        <span>${msg}</span>
+        <button onclick="this.parentElement.remove()" style="margin-left: auto; background: none; border: none; color: #dc2626; cursor: pointer; font-size: 1.1rem;">×</button>
+    `;
+    document.body.appendChild(div);
+    setTimeout(() => div.remove(), 8000);
 }
 
 // ============================================================
-// TOZALASH (Sahifa yopilganda)
+// CLEANUP
 // ============================================================
 window.addEventListener('beforeunload', function() {
-    if (refreshInterval) {
-        clearInterval(refreshInterval);
-        refreshInterval = null;
-    }
-    if (subscriptionChart) {
-        subscriptionChart.destroy();
-        subscriptionChart = null;
-    }
+    if (refreshInterval) { clearInterval(refreshInterval); refreshInterval = null; }
+    if (countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; }
 });
 
 console.log('✅ dashboard.js yuklandi');
