@@ -1,5 +1,5 @@
 // ============================================================
-// NOTIFICATIONS - Admin Customer (TO'LIQ)
+// NOTIFICATIONS - ADMIN CUSTOMER (TO'LIQ)
 // ============================================================
 
 let allNotifications = [];
@@ -7,7 +7,7 @@ let currentFilter = 'all';
 let refreshInterval = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
-    console.log('🚀 Notifications sahifasi yuklanmoqda...');
+    console.log('🚀 Notifications sahifasi yuklanmoqda... (Admin Customer)');
 
     try {
         const token = localStorage.getItem('customerToken') || sessionStorage.getItem('customerToken');
@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         setupListeners();
 
-        console.log('✅ Notifications sahifasi yuklandi!');
+        console.log('✅ Notifications sahifasi yuklandi! (Admin Customer)');
     } catch (error) {
         console.error('❌ Notifications yuklash xatosi:', error);
         showError('Notifications yuklashda xatolik: ' + error.message);
@@ -117,7 +117,7 @@ async function loadNotifications() {
         const token = Auth.getToken();
         if (!token) return;
 
-        const response = await API.get('/notifications');
+        const response = await API.getNotifications();
         console.log('📨 Xabarlar javobi:', response);
 
         if (response.success) {
@@ -220,7 +220,7 @@ function renderNotifications(notifications) {
 
     container.innerHTML = html;
 
-    // ⭐ O'qilgan deb belgilash
+    // ⭐ O'qilgan deb belgilash (faqat Admin Customer)
     document.querySelectorAll('.btn-read').forEach(btn => {
         btn.addEventListener('click', async function(e) {
             e.stopPropagation();
@@ -231,11 +231,11 @@ function renderNotifications(notifications) {
 }
 
 // ============================================================
-// ⭐ XABARNI O'QILGAN DEB BELGILASH
+// ⭐ XABARNI O'QILGAN DEB BELGILASH (Admin Customer)
 // ============================================================
 async function markAsRead(id) {
     try {
-        const response = await API.post(`/notifications/${id}/read`);
+        const response = await API.markNotificationRead(id);
         if (response.success) {
             showSuccess('Xabar o\'qilgan deb belgilandi!');
             await loadNotifications();
@@ -249,27 +249,16 @@ async function markAsRead(id) {
 }
 
 // ============================================================
-// ⭐ BARCHA XABARLARNI O'QILGAN DEB BELGILASH
+// ⭐ BARCHA XABARLARNI O'QILGAN DEB BELGILASH (Admin Customer)
 // ============================================================
 async function markAllAsRead() {
     try {
-        const token = Auth.getToken();
-        if (!token) return;
-
-        const response = await fetch('https://admin-customerr.onrender.com/api/notifications/mark-all-read', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            }
-        });
-
-        const data = await response.json();
-        if (response.ok && data.success) {
+        const response = await API.markAllNotificationsRead();
+        if (response.success) {
             showSuccess('Barcha xabarlar o\'qilgan deb belgilandi!');
             await loadNotifications();
         } else {
-            showError(data.message || 'Xatolik yuz berdi!');
+            showError(response.message || 'Xatolik yuz berdi!');
         }
     } catch (error) {
         console.error('❌ Xatolik:', error);
@@ -461,4 +450,4 @@ window.addEventListener('beforeunload', function() {
     }
 });
 
-console.log('✅ notifications.js yuklandi');
+console.log('✅ notifications.js yuklandi (Admin Customer)');
