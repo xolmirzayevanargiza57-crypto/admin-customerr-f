@@ -1,5 +1,5 @@
 // ============================================================
-// NOTIFICATIONS - ADMIN CUSTOMER (TO'LIQ TUZATILGAN)
+// NOTIFICATIONS - ADMIN CUSTOMER (TO'LIQ)
 // ============================================================
 
 let allNotifications = [];
@@ -69,7 +69,7 @@ async function loadNotifications() {
         const token = Auth.getToken();
         if (!token) return;
 
-        const response = await fetch(`${API.baseURL}/api/notifications`, {
+        const response = await fetch('https://admin-customerr.onrender.com/api/notifications', {
             headers: { 'Authorization': `Bearer ${token}` }
         });
 
@@ -77,9 +77,7 @@ async function loadNotifications() {
         console.log('📨 Xabarlar:', data);
 
         if (response.ok && data.success) {
-            // ⭐ Localda yashirilgan xabarlarni filter qilish
-            const hidden = JSON.parse(localStorage.getItem('hiddenNotifs') || '[]');
-            allNotifications = (data.data || []).filter(n => !hidden.includes(n._id?.toString()));
+            allNotifications = data.data || [];
             renderNotifications(allNotifications);
         } else {
             showError('Xabarlar yuklanmadi');
@@ -107,10 +105,10 @@ function renderNotifications(notifications) {
 
     if (!filtered || filtered.length === 0) {
         container.innerHTML = `
-            <div style="text-align:center;padding:60px 0;">
-                <i class="fas fa-bell-slash" style="font-size:3rem;opacity:0.3;display:block;margin-bottom:16px;"></i>
-                <p style="color:var(--text-muted);font-size:1rem;">Hozircha xabarlar yo'q</p>
-                <p style="color:var(--text-muted);font-size:0.85rem;">Sizga yuborilgan xabarlar shu yerda ko'rinadi</p>
+            <div class="notif-empty" style="text-align: center; padding: 60px 0;">
+                <i class="fas fa-bell-slash" style="font-size: 3rem; opacity: 0.3; display: block; margin-bottom: 16px;"></i>
+                <p style="color: var(--text-muted); font-size: 1rem;">Hozircha xabarlar yo'q</p>
+                <p style="color: var(--text-muted); font-size: 0.85rem;">Sizga yuborilgan xabarlar shu yerda ko'rinadi</p>
             </div>
         `;
         return;
@@ -121,7 +119,9 @@ function renderNotifications(notifications) {
     filtered.forEach(notif => {
         const date = new Date(notif.createdAt);
         const dateKey = date.toLocaleDateString('uz-UZ', {
-            year: 'numeric', month: 'long', day: 'numeric'
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
         });
         if (!grouped[dateKey]) grouped[dateKey] = [];
         grouped[dateKey].push(notif);
@@ -130,55 +130,43 @@ function renderNotifications(notifications) {
     let html = '';
     Object.keys(grouped).forEach(dateKey => {
         html += `
-            <div style="margin-bottom:12px;">
-                <div style="padding:6px 0;font-size:0.75rem;color:var(--text-muted);font-weight:600;border-bottom:1px solid var(--border-color);margin-bottom:8px;">
+            <div class="notification-date-group" style="margin-bottom: 12px;">
+                <div style="padding: 6px 0; font-size: 0.75rem; color: var(--text-muted); font-weight: 600; border-bottom: 1px solid var(--border-color); margin-bottom: 8px;">
                     <i class="fas fa-calendar"></i> ${dateKey}
                 </div>
         `;
 
         grouped[dateKey].forEach(notif => {
             const time = new Date(notif.createdAt).toLocaleTimeString('uz-UZ', {
-                hour: '2-digit', minute: '2-digit'
+                hour: '2-digit',
+                minute: '2-digit'
             });
             const isUnread = !notif.isRead;
             const formattedDate = formatDate(notif.createdAt);
             const sender = notif.sentByName || 'Admin';
 
             html += `
-                <div class="notification-item ${isUnread ? 'unread' : ''}"
-                    style="padding:12px 16px;border-bottom:1px solid var(--border-color);
-                    ${isUnread ? 'background:var(--bg-hover);border-left:3px solid #007aff;' : ''}">
-                    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;">
-                        <div style="flex:1;min-width:0;">
-                            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-                                <strong style="font-size:0.9rem;font-weight:600;color:var(--text-primary);">${notif.title || 'Xabar'}</strong>
-                                <span style="font-size:0.65rem;color:var(--text-muted);background:var(--bg-hover);padding:2px 8px;border-radius:10px;">${sender}</span>
+                <div class="notification-item ${isUnread ? 'unread' : ''}" style="padding: 12px 16px; border-bottom: 1px solid var(--border-color); ${isUnread ? 'background: var(--bg-hover); border-left: 3px solid #007aff;' : ''}">
+                    <div class="notification-item-inner" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
+                        <div class="notification-body" style="flex: 1; min-width: 0;">
+                            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                                <strong class="notification-title" style="font-size: 0.9rem; font-weight: 600; color: var(--text-primary);">${notif.title || 'Xabar'}</strong>
+                                <span style="font-size: 0.65rem; color: var(--text-muted); background: var(--bg-hover); padding: 2px 8px; border-radius: 10px;">${sender}</span>
                             </div>
-                            <p style="font-size:0.85rem;color:var(--text-secondary);margin:6px 0;word-break:break-word;white-space:pre-wrap;line-height:1.5;">${notif.message || ''}</p>
-                            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-                                <span style="font-size:0.7rem;color:var(--text-muted);"><i class="fas fa-clock"></i> ${time}</span>
-                                <span style="font-size:0.7rem;color:var(--text-muted);"><i class="fas fa-calendar"></i> ${formattedDate}</span>
+                            <p class="notification-message" style="font-size: 0.85rem; color: var(--text-secondary); margin: 6px 0; word-break: break-word; white-space: pre-wrap; line-height: 1.5;">${notif.message || ''}</p>
+                            <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                                <span class="notification-time" style="font-size: 0.7rem; color: var(--text-muted);"><i class="fas fa-clock"></i> ${time}</span>
+                                <span class="notification-time" style="font-size: 0.7rem; color: var(--text-muted);"><i class="fas fa-calendar"></i> ${formattedDate}</span>
+                                ${notif.recipientName ? `<span style="font-size: 0.65rem; color: var(--text-muted);"><i class="fas fa-user"></i> ${notif.recipientName}</span>` : ''}
                             </div>
                         </div>
-
-                        <!-- ⭐ TUGMALAR -->
-                        <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;">
-                            ${isUnread ? `
-                                <button class="mark-read-btn" data-id="${notif._id}"
-                                    style="background:none;border:1px solid #007aff;color:#007aff;font-size:0.7rem;cursor:pointer;padding:4px 10px;border-radius:6px;transition:all 0.2s;">
-                                    O'qildi
-                                </button>
-                            ` : `
-                                <span style="font-size:0.7rem;color:var(--text-muted);padding:4px 0;">✓ O'qilgan</span>
-                            `}
-
-                            <!-- ⭐ DELETE TUGMASI -->
-                            <button class="delete-notif-btn" data-id="${notif._id}"
-                                style="background:none;border:1px solid #ff3b30;color:#ff3b30;font-size:0.7rem;cursor:pointer;padding:4px 10px;border-radius:6px;transition:all 0.2s;display:flex;align-items:center;gap:4px;"
-                                title="Xabarni o'chirish">
-                                <i class="fas fa-trash"></i> O'chirish
+                        ${isUnread ? `
+                            <button class="mark-read-btn" data-id="${notif._id}" style="background: none; border: 1px solid #007aff; color: #007aff; font-size: 0.7rem; cursor: pointer; padding: 4px 12px; border-radius: 6px; flex-shrink: 0; transition: all 0.3s ease;">
+                                O'qildi
                             </button>
-                        </div>
+                        ` : `
+                            <span class="notif-read-label" style="font-size: 0.7rem; color: var(--text-muted); flex-shrink: 0; padding: 4px 0;">✓ O'qilgan</span>
+                        `}
                     </div>
                 </div>
             `;
@@ -189,19 +177,12 @@ function renderNotifications(notifications) {
 
     container.innerHTML = html;
 
-    // O'qildi tugmalari
+    // O'qilgan deb belgilash
     document.querySelectorAll('.mark-read-btn').forEach(btn => {
-        btn.addEventListener('click', async function (e) {
+        btn.addEventListener('click', async function(e) {
             e.stopPropagation();
-            await markAsRead(this.dataset.id);
-        });
-    });
-
-    // ⭐ DELETE tugmalari
-    document.querySelectorAll('.delete-notif-btn').forEach(btn => {
-        btn.addEventListener('click', async function (e) {
-            e.stopPropagation();
-            await deleteNotification(this.dataset.id);
+            const id = this.dataset.id;
+            await markAsRead(id);
         });
     });
 }
@@ -214,9 +195,12 @@ async function markAsRead(id) {
         const token = Auth.getToken();
         if (!token) return;
 
-        const response = await fetch(`${API.baseURL}/api/notifications/${id}/read`, {
+        const response = await fetch(`https://admin-customerr.onrender.com/api/notifications/${id}/read`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
         });
 
         if (response.ok) {
@@ -237,9 +221,12 @@ async function markAllAsRead() {
         const token = Auth.getToken();
         if (!token) return;
 
-        const response = await fetch(`${API.baseURL}/api/notifications/mark-all-read`, {
+        const response = await fetch('https://admin-customerr.onrender.com/api/notifications/mark-all-read', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
         });
 
         if (response.ok) {
@@ -253,46 +240,6 @@ async function markAllAsRead() {
 }
 
 // ============================================================
-// ⭐ DELETE NOTIFICATION
-// ============================================================
-async function deleteNotification(id) {
-    if (!confirm('Bu xabarni o\'chirishni xohlaysizmi?')) return;
-
-    try {
-        const token = Auth.getToken();
-        if (!token) return;
-
-        // Serverdan o'chirishga urinish
-        const response = await fetch(`${API.baseURL}/api/notifications/${id}`, {
-            method: 'DELETE',
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-
-        if (response.ok) {
-            console.log('✅ Xabar serverdan o\'chirildi');
-            showSuccess('Xabar o\'chirildi');
-        } else {
-            // Admin Customer server tomonida o'chira olmasa - localda yashiramiz
-            console.log('ℹ️ Serverdan o\'chirilmadi, localda yashirildi');
-            const hidden = JSON.parse(localStorage.getItem('hiddenNotifs') || '[]');
-            if (!hidden.includes(id)) hidden.push(id);
-            localStorage.setItem('hiddenNotifs', JSON.stringify(hidden));
-            showSuccess('Xabar o\'chirildi');
-        }
-
-        await loadNotifications();
-    } catch (error) {
-        console.error('❌ Delete xatosi:', error);
-        // Xato bo'lsa ham localda yashirish
-        const hidden = JSON.parse(localStorage.getItem('hiddenNotifs') || '[]');
-        if (!hidden.includes(id)) hidden.push(id);
-        localStorage.setItem('hiddenNotifs', JSON.stringify(hidden));
-        showSuccess('Xabar o\'chirildi');
-        await loadNotifications();
-    }
-}
-
-// ============================================================
 // SETUP LISTENERS
 // ============================================================
 function setupListeners() {
@@ -301,7 +248,7 @@ function setupListeners() {
     if (logoutBtn) {
         const newLogoutBtn = logoutBtn.cloneNode(true);
         logoutBtn.parentNode.replaceChild(newLogoutBtn, logoutBtn);
-        newLogoutBtn.addEventListener('click', function (e) {
+        newLogoutBtn.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
             if (confirm('Haqiqatan ham chiqmoqchimisiz?')) {
@@ -313,7 +260,7 @@ function setupListeners() {
     // FILTER - Barchasi
     const filterAll = document.getElementById('filterAll');
     if (filterAll) {
-        filterAll.addEventListener('click', function () {
+        filterAll.addEventListener('click', function() {
             currentFilter = 'all';
             updateFilterButtons();
             renderNotifications(allNotifications);
@@ -323,7 +270,7 @@ function setupListeners() {
     // FILTER - O'qilmagan
     const filterUnread = document.getElementById('filterUnread');
     if (filterUnread) {
-        filterUnread.addEventListener('click', function () {
+        filterUnread.addEventListener('click', function() {
             currentFilter = 'unread';
             updateFilterButtons();
             renderNotifications(allNotifications);
@@ -333,7 +280,7 @@ function setupListeners() {
     // FILTER - O'qilgan
     const filterRead = document.getElementById('filterRead');
     if (filterRead) {
-        filterRead.addEventListener('click', function () {
+        filterRead.addEventListener('click', function() {
             currentFilter = 'read';
             updateFilterButtons();
             renderNotifications(allNotifications);
@@ -349,7 +296,7 @@ function setupListeners() {
     // REFRESH
     const refreshBtn = document.getElementById('refreshNotifications');
     if (refreshBtn) {
-        refreshBtn.addEventListener('click', function () {
+        refreshBtn.addEventListener('click', function() {
             loadNotifications();
             showSuccess('Yangilandi');
         });
@@ -374,7 +321,8 @@ function setupListeners() {
 function updateFilterButtons() {
     document.querySelectorAll('.filter-pill').forEach(btn => {
         btn.classList.remove('active');
-        if (btn.dataset.filter === currentFilter) {
+        const filter = btn.dataset.filter;
+        if (filter === currentFilter) {
             btn.classList.add('active');
         }
     });
@@ -384,17 +332,44 @@ function updateFilterButtons() {
 // SHOW MESSAGES
 // ============================================================
 function showError(msg) {
+    console.error('⚠️ Xatolik:', msg);
     const div = document.createElement('div');
-    div.style.cssText = `position:fixed;top:20px;right:20px;z-index:10000;padding:14px 18px;background:#fef2f2;border:1px solid #fecaca;border-radius:10px;color:#dc2626;max-width:400px;box-shadow:0 10px 40px rgba(0,0,0,0.1);display:flex;align-items:center;gap:10px;font-size:0.85rem;`;
-    div.innerHTML = `<i class="fas fa-exclamation-circle"></i><span>${msg}</span><button onclick="this.parentElement.remove()" style="margin-left:auto;background:none;border:none;color:#dc2626;cursor:pointer;font-size:1.1rem;">×</button>`;
+    div.style.cssText = `
+        position: fixed; top: 20px; right: 20px; z-index: 9999;
+        padding: 14px 18px; background: #fef2f2;
+        border: 1px solid #fecaca; border-radius: 10px;
+        color: #dc2626; max-width: 400px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        display: flex; align-items: center; gap: 10px;
+        font-size: 0.85rem;
+        z-index: 10000;
+    `;
+    div.innerHTML = `
+        <i class="fas fa-exclamation-circle"></i>
+        <span>${msg}</span>
+        <button onclick="this.parentElement.remove()" style="margin-left: auto; background: none; border: none; color: #dc2626; cursor: pointer; font-size: 1.1rem;">×</button>
+    `;
     document.body.appendChild(div);
     setTimeout(() => div.remove(), 6000);
 }
 
 function showSuccess(msg) {
     const div = document.createElement('div');
-    div.style.cssText = `position:fixed;top:20px;right:20px;z-index:10000;padding:14px 18px;background:#ecfdf5;border:1px solid #a7f3d0;border-radius:10px;color:#065f46;max-width:400px;box-shadow:0 10px 40px rgba(0,0,0,0.1);display:flex;align-items:center;gap:10px;font-size:0.85rem;`;
-    div.innerHTML = `<i class="fas fa-check-circle"></i><span>${msg}</span><button onclick="this.parentElement.remove()" style="margin-left:auto;background:none;border:none;color:#065f46;cursor:pointer;font-size:1.1rem;">×</button>`;
+    div.style.cssText = `
+        position: fixed; top: 20px; right: 20px; z-index: 9999;
+        padding: 14px 18px; background: #ecfdf5;
+        border: 1px solid #a7f3d0; border-radius: 10px;
+        color: #065f46; max-width: 400px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        display: flex; align-items: center; gap: 10px;
+        font-size: 0.85rem;
+        z-index: 10000;
+    `;
+    div.innerHTML = `
+        <i class="fas fa-check-circle"></i>
+        <span>${msg}</span>
+        <button onclick="this.parentElement.remove()" style="margin-left: auto; background: none; border: none; color: #065f46; cursor: pointer; font-size: 1.1rem;">×</button>
+    `;
     document.body.appendChild(div);
     setTimeout(() => div.remove(), 3000);
 }
@@ -402,7 +377,7 @@ function showSuccess(msg) {
 // ============================================================
 // CLEANUP
 // ============================================================
-window.addEventListener('beforeunload', function () {
+window.addEventListener('beforeunload', function() {
     if (refreshInterval) { clearInterval(refreshInterval); refreshInterval = null; }
 });
 
