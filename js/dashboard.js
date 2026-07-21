@@ -1,5 +1,5 @@
 // ============================================================
-// DASHBOARD - ADMIN CUSTOMER (TO'LIQ)
+// DASHBOARD - ADMIN CUSTOMER (TO'LIQ TUZATILGAN)
 // ============================================================
 
 let dashboardLoaded = false;
@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (logoutBtn) {
             const newLogoutBtn = logoutBtn.cloneNode(true);
             logoutBtn.parentNode.replaceChild(newLogoutBtn, logoutBtn);
-            newLogoutBtn.addEventListener('click', function(e) {
+            newLogoutBtn.addEventListener('click', function (e) {
                 e.preventDefault();
                 e.stopPropagation();
                 if (confirm('Haqiqatan ham chiqmoqchimisiz?')) {
@@ -55,6 +55,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         startCountdown();
 
+        // ⭐ BROWSER NOTIFICATION RUXSAT SO'RASH
+        await requestNotificationPermission();
+
         // NOTIFICATIONS
         initNotifications();
 
@@ -64,6 +67,119 @@ document.addEventListener('DOMContentLoaded', async () => {
         showError('Dashboard yuklashda xatolik: ' + error.message);
     }
 });
+
+// ============================================================
+// ⭐ BROWSER NOTIFICATION RUXSAT SO'RASH
+// ============================================================
+async function requestNotificationPermission() {
+    // Browser notification qo'llab-quvvatlanishini tekshirish
+    if (!('Notification' in window)) {
+        console.log('⚠️ Bu brauzer bildirishnomalarni qo\'llab-quvvatlamaydi');
+        return false;
+    }
+
+    if (Notification.permission === 'granted') {
+        console.log('✅ Bildirishnoma ruxsati allaqachon berilgan');
+        // Service Worker ro'yxatdan o'tkazish (telefon o'chiq paytda ham ishlash uchun)
+        await registerServiceWorker();
+        return true;
+    }
+
+    if (Notification.permission === 'denied') {
+        console.log('❌ Bildirishnoma ruxsati rad etilgan');
+        return false;
+    }
+
+    // Ruxsat so'rash - foydalanuvchiga tushuntirish
+    const userWants = confirm(
+        '🔔 Bildirishnomalar\n\n' +
+        'Yangi xabarlar va muhim bildirishnomalar olish uchun ruxsat bering.\n\n' +
+        '"OK" tugmasini bosing va keyin "Allow/Ruxsat berish" ni tanlang.'
+    );
+
+    if (!userWants) {
+        console.log('ℹ️ Foydalanuvchi bildirishnomadan voz kechdi');
+        return false;
+    }
+
+    try {
+        const permission = await Notification.requestPermission();
+        console.log('📢 Notification permission:', permission);
+
+        if (permission === 'granted') {
+            console.log('✅ Bildirishnoma ruxsati berildi!');
+            // Test notification yuborish
+            showBrowserNotification('✅ Muvaffaqiyatli!', 'Bildirishnomalar yoqildi. Endi yangi xabarlarni olasiz.');
+            // Service Worker ro'yxatdan o'tkazish
+            await registerServiceWorker();
+            return true;
+        } else {
+            console.log('❌ Bildirishnoma ruxsati berilmadi');
+            return false;
+        }
+    } catch (error) {
+        console.error('❌ Notification permission xatosi:', error);
+        return false;
+    }
+}
+
+// ============================================================
+// ⭐ SERVICE WORKER - TELEFON O'CHIQ PAYTDA HAM ISHLASH UCHUN
+// ============================================================
+async function registerServiceWorker() {
+    if (!('serviceWorker' in navigator)) {
+        console.log('⚠️ Service Worker qo\'llab-quvvatlanmaydi');
+        return;
+    }
+
+    try {
+        // sw.js faylini tekshirish
+        const reg = await navigator.serviceWorker.register('/sw.js');
+        console.log('✅ Service Worker ro\'yxatdan o\'tdi:', reg.scope);
+
+        // Push subscription
+        if ('PushManager' in window) {
+            try {
+                const subscription = await reg.pushManager.getSubscription();
+                if (!subscription) {
+                    console.log('ℹ️ Push subscription yo\'q, hozircha polling ishlatiladi');
+                }
+            } catch (pushError) {
+                console.log('ℹ️ Push Manager:', pushError.message);
+            }
+        }
+    } catch (error) {
+        console.log('ℹ️ Service Worker:', error.message, '(sw.js fayli bo\'lmasa normal)');
+    }
+}
+
+// ============================================================
+// ⭐ BROWSER NOTIFICATION KO'RSATISH
+// ============================================================
+function showBrowserNotification(title, body, icon = '/favicon.ico') {
+    if (!('Notification' in window) || Notification.permission !== 'granted') return;
+
+    try {
+        const notification = new Notification(title, {
+            body: body,
+            icon: icon,
+            badge: icon,
+            tag: 'admin-customer-notif',
+            renotify: true,
+            requireInteraction: false,
+            silent: false
+        });
+
+        notification.onclick = function () {
+            window.focus();
+            notification.close();
+        };
+
+        setTimeout(() => notification.close(), 8000);
+    } catch (error) {
+        console.error('❌ Browser notification xatosi:', error);
+    }
+}
 
 // ============================================================
 // FORMAT DATE FUNCTION
@@ -120,21 +236,8 @@ function updateCountdown() {
         return;
     }
 
-    let endDate = null;
-    if (typeof sub.endDate === 'string' && sub.endDate.includes('M01')) {
-        const parts = sub.endDate.split(' ');
-        if (parts.length === 4) {
-            const year = parts[0];
-            const month = parts[1].replace('M', '').padStart(2, '0');
-            const day = parts[2].padStart(2, '0');
-            const time = parts[3];
-            endDate = new Date(`${year}-${month}-${day}T${time}`);
-        }
-    } else {
-        endDate = new Date(sub.endDate);
-    }
-
-    if (!endDate || isNaN(endDate.getTime())) {
+    const endDate = new Date(sub.endDate);
+    if (isNaN(endDate.getTime())) {
         daysEl.textContent = '-';
         return;
     }
@@ -176,7 +279,6 @@ async function loadDashboardStats() {
 
         const stats = data.data;
         lastDashboardStats = stats;
-        console.log('📊 Statistika ma\'lumotlari:', stats);
 
         const elements = {
             teacherCount: document.getElementById('teacherCount'),
@@ -220,11 +322,21 @@ async function loadDashboardStats() {
         // SUBSCRIPTION
         if (stats.subscription) {
             const sub = stats.subscription;
-            const statusMap = { 'active': '✅ Faol', 'inactive': '⛔ Faol emas', 'expired': '⚠️ Muddati tugagan' };
+            const statusMap = {
+                'active': '✅ Faol',
+                'inactive': '⛔ Faol emas',
+                'expired': '⚠️ Muddati tugagan'
+            };
             if (elements.subscriptionStatus) {
                 elements.subscriptionStatus.textContent = statusMap[sub.status] || sub.status || 'Noma\'lum';
             }
-            const typeMap = { 'monthly': '📅 Oylik', '6months': '📅 6 oylik', 'yearly': '📅 Yillik', 'custom': '⚙️ Custom', 'none': '❌ Yo\'q' };
+            const typeMap = {
+                'monthly': '📅 Oylik',
+                '6months': '📅 6 oylik',
+                'yearly': '📅 Yillik',
+                'custom': '⚙️ Custom',
+                'none': '❌ Yo\'q'
+            };
             if (elements.subscriptionType) {
                 elements.subscriptionType.textContent = typeMap[sub.type] || sub.type || 'Noma\'lum';
             }
@@ -237,40 +349,6 @@ async function loadDashboardStats() {
                     elements.subscriptionEnd.textContent = 'Muddati yo\'q';
                 }
             }
-            if (elements.subscriptionDays) {
-                if (!sub.endDate) {
-                    elements.subscriptionDays.textContent = '-';
-                } else {
-                    let endDate = null;
-                    if (typeof sub.endDate === 'string' && sub.endDate.includes('M01')) {
-                        const parts = sub.endDate.split(' ');
-                        if (parts.length === 4) {
-                            const year = parts[0];
-                            const month = parts[1].replace('M', '').padStart(2, '0');
-                            const day = parts[2].padStart(2, '0');
-                            const time = parts[3];
-                            endDate = new Date(`${year}-${month}-${day}T${time}`);
-                        }
-                    } else {
-                        endDate = new Date(sub.endDate);
-                    }
-                    if (endDate && !isNaN(endDate.getTime())) {
-                        const now = new Date();
-                        const diff = endDate - now;
-                        if (diff > 0) {
-                            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-                            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-                            elements.subscriptionDays.textContent = `${days} kun ${hours}s ${minutes}m ${seconds}s`;
-                        } else {
-                            elements.subscriptionDays.textContent = '⚠️ Vaqt tugagan!';
-                        }
-                    } else {
-                        elements.subscriptionDays.textContent = sub.endDate || '-';
-                    }
-                }
-            }
         }
 
         console.log('✅ Dashboard statistikasi yuklandi!');
@@ -281,7 +359,7 @@ async function loadDashboardStats() {
 }
 
 // ============================================================
-// NOTIFICATIONS (Admin-Customer)
+// ⭐ NOTIFICATIONS - TO'LIQ TUZATILGAN
 // ============================================================
 function initNotifications() {
     const notificationToggle = document.getElementById('notificationToggle');
@@ -290,45 +368,104 @@ function initNotifications() {
     const notificationBadge = document.getElementById('notificationBadge');
     const markAllRead = document.getElementById('markAllRead');
 
-    if (!notificationToggle) return;
+    if (!notificationToggle || !notificationPanel) {
+        console.log('⚠️ Notification elementlari topilmadi');
+        return;
+    }
 
-    notificationToggle.addEventListener('click', (e) => {
+    let panelOpen = false;
+
+    // ⭐ TOGGLE - style.display o'rniga classList ishlatamiz
+    notificationToggle.addEventListener('click', function (e) {
+        e.preventDefault();
         e.stopPropagation();
-        const isOpen = notificationPanel.style.display === 'block';
-        notificationPanel.style.display = isOpen ? 'none' : 'block';
-        if (!isOpen) {
+        panelOpen = !panelOpen;
+        if (panelOpen) {
+            notificationPanel.style.display = 'block';
+            notificationPanel.style.opacity = '1';
             loadNotifications();
-        }
-    });
-
-    document.addEventListener('click', (e) => {
-        if (!notificationPanel.contains(e.target) && e.target !== notificationToggle && !notificationToggle.contains(e.target)) {
+        } else {
             notificationPanel.style.display = 'none';
         }
     });
 
+    // ⭐ TASHQARIDA BOSISHDA YOPISH
+    document.addEventListener('click', function (e) {
+        if (!notificationPanel.contains(e.target) && e.target !== notificationToggle && !notificationToggle.contains(e.target)) {
+            panelOpen = false;
+            notificationPanel.style.display = 'none';
+        }
+    });
+
+    // HAMMASINI O'QILGAN DEB BELGILASH
     if (markAllRead) {
-        markAllRead.addEventListener('click', async () => {
+        markAllRead.addEventListener('click', async function (e) {
+            e.stopPropagation();
             try {
                 const token = Auth.getToken();
                 if (!token) return;
-                const response = await fetch('https://admin-customerr.onrender.com/api/notifications/mark-all-read', {
+                const response = await fetch(`${API.baseURL}/api/notifications/mark-all-read`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }
                 });
-                if (response.ok) loadNotifications();
+                if (response.ok) await loadNotifications();
             } catch (error) {
                 console.error('❌ Xatolik:', error);
             }
         });
     }
 
+    // ⭐ HAR 30 SONIYADA YANGILASH VA BROWSER NOTIFICATION
+    let lastNotifCount = 0;
+    setInterval(async () => {
+        const token = Auth.getToken();
+        if (!token) return;
+        try {
+            const response = await fetch(`${API.baseURL}/api/notifications`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await response.json();
+            if (response.ok && data.success) {
+                const unread = (data.data || []).filter(n => !n.isRead).length;
+                // ⭐ Yangi xabar kelganida browser notification
+                if (unread > lastNotifCount && lastNotifCount !== 0) {
+                    showBrowserNotification(
+                        '🔔 Yangi xabar!',
+                        `${unread - lastNotifCount} ta yangi bildirishnoma bor`
+                    );
+                }
+                lastNotifCount = unread;
+                // Badge yangilash
+                if (notificationBadge) {
+                    if (unread > 0) {
+                        notificationBadge.style.display = 'block';
+                        notificationBadge.textContent = unread > 99 ? '99+' : unread;
+                    } else {
+                        notificationBadge.style.display = 'none';
+                    }
+                }
+                // Panel ochiq bo'lsa ro'yxatni yangilash
+                if (panelOpen) {
+                    renderNotifications(data.data || []);
+                }
+            }
+        } catch (error) {
+            console.error('❌ Notification check xatosi:', error);
+        }
+    }, 30000);
+
+    // Birinchi yuklash
+    loadNotifications();
+
+    // ============================================================
+    // LOAD NOTIFICATIONS
+    // ============================================================
     async function loadNotifications() {
         try {
             const token = Auth.getToken();
             if (!token) return;
 
-            const response = await fetch('https://admin-customerr.onrender.com/api/notifications', {
+            const response = await fetch(`${API.baseURL}/api/notifications`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
 
@@ -338,14 +475,21 @@ function initNotifications() {
             if (response.ok && data.success) {
                 renderNotifications(data.data || []);
             } else {
-                notificationList.innerHTML = `<p class="text-muted" style="text-align: center; padding: 20px 0; font-size: 0.85rem;">Xabarlar yuklanmadi</p>`;
+                if (notificationList) {
+                    notificationList.innerHTML = `<p class="text-muted" style="text-align:center;padding:20px 0;font-size:0.85rem;">Xabarlar yuklanmadi</p>`;
+                }
             }
         } catch (error) {
             console.error('❌ Xabarlarni yuklash xatosi:', error);
-            notificationList.innerHTML = `<p class="text-muted" style="text-align: center; padding: 20px 0; font-size: 0.85rem;">Xatolik yuz berdi</p>`;
+            if (notificationList) {
+                notificationList.innerHTML = `<p class="text-muted" style="text-align:center;padding:20px 0;font-size:0.85rem;">Xatolik yuz berdi</p>`;
+            }
         }
     }
 
+    // ============================================================
+    // RENDER NOTIFICATIONS
+    // ============================================================
     function renderNotifications(notifications) {
         if (!notificationList || !notificationBadge) return;
 
@@ -359,9 +503,9 @@ function initNotifications() {
 
         if (!notifications || notifications.length === 0) {
             notificationList.innerHTML = `
-                <div class="notif-empty">
-                    <i class="fas fa-bell-slash"></i>
-                    <p>Hozircha xabarlar yo'q</p>
+                <div class="notif-empty" style="text-align:center;padding:30px 0;">
+                    <i class="fas fa-bell-slash" style="font-size:2rem;opacity:0.3;display:block;margin-bottom:10px;"></i>
+                    <p style="color:var(--text-muted);font-size:0.85rem;">Hozircha xabarlar yo'q</p>
                 </div>
             `;
             return;
@@ -372,9 +516,7 @@ function initNotifications() {
         notifications.forEach(notif => {
             const date = new Date(notif.createdAt);
             const dateKey = date.toLocaleDateString('uz-UZ', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
+                year: 'numeric', month: 'long', day: 'numeric'
             });
             if (!grouped[dateKey]) grouped[dateKey] = [];
             grouped[dateKey].push(notif);
@@ -383,27 +525,33 @@ function initNotifications() {
         let html = '';
         Object.keys(grouped).forEach(dateKey => {
             const items = grouped[dateKey];
-            html += `<div style="padding: 4px 0; font-size: 0.7rem; color: var(--text-muted); font-weight: 600;">${dateKey}</div>`;
+            html += `<div style="padding:4px 0;font-size:0.7rem;color:var(--text-muted);font-weight:600;">${dateKey}</div>`;
             items.forEach(notif => {
                 const time = new Date(notif.createdAt).toLocaleTimeString('uz-UZ', {
-                    hour: '2-digit',
-                    minute: '2-digit'
+                    hour: '2-digit', minute: '2-digit'
                 });
                 const isUnread = !notif.isRead;
-                const formattedDate = formatDate(notif.createdAt);
                 html += `
-                    <div class="notification-item ${isUnread ? 'unread' : ''}">
-                        <div class="notification-item-inner">
-                            <div class="notification-body">
-                                <strong class="notification-title">${notif.title || 'Xabar'}</strong>
-                                <p class="notification-message">${notif.message || ''}</p>
-                                <span class="notification-time"><i class="fas fa-clock"></i> ${time} • ${formattedDate}</span>
+                    <div class="notification-item ${isUnread ? 'unread' : ''}" style="padding:10px 0;border-bottom:1px solid var(--border-color);${isUnread ? 'border-left:3px solid #007aff;padding-left:8px;' : ''}">
+                        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
+                            <div style="flex:1;min-width:0;">
+                                <strong style="font-size:0.85rem;color:var(--text-primary);display:block;">${notif.title || 'Xabar'}</strong>
+                                <p style="font-size:0.8rem;color:var(--text-secondary);margin:4px 0;white-space:pre-wrap;word-break:break-word;">${notif.message || ''}</p>
+                                <span style="font-size:0.7rem;color:var(--text-muted);"><i class="fas fa-clock"></i> ${time}</span>
                             </div>
-                            ${isUnread ? `
-                                <button class="mark-read-btn" data-id="${notif._id}">O'qildi</button>
-                            ` : `
-                                <span class="notif-read-label">✓ O'qilgan</span>
-                            `}
+                            <div style="display:flex;flex-direction:column;gap:4px;flex-shrink:0;">
+                                ${isUnread ? `
+                                    <button class="mark-read-btn" data-id="${notif._id}"
+                                        style="background:none;border:1px solid #007aff;color:#007aff;font-size:0.65rem;cursor:pointer;padding:3px 8px;border-radius:5px;">
+                                        O'qildi
+                                    </button>
+                                ` : `<span style="font-size:0.65rem;color:var(--text-muted);">✓</span>`}
+                                <button class="delete-notif-btn" data-id="${notif._id}"
+                                    style="background:none;border:1px solid #ff3b30;color:#ff3b30;font-size:0.65rem;cursor:pointer;padding:3px 8px;border-radius:5px;"
+                                    title="O'chirish">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 `;
@@ -412,34 +560,75 @@ function initNotifications() {
 
         notificationList.innerHTML = html;
 
+        // O'qildi tugmalari
         document.querySelectorAll('.mark-read-btn').forEach(btn => {
-            btn.addEventListener('click', async (e) => {
+            btn.addEventListener('click', async function (e) {
                 e.stopPropagation();
-                const id = btn.dataset.id;
-                await markAsRead(id);
+                await markAsRead(this.dataset.id);
+            });
+        });
+
+        // ⭐ DELETE tugmalari
+        document.querySelectorAll('.delete-notif-btn').forEach(btn => {
+            btn.addEventListener('click', async function (e) {
+                e.stopPropagation();
+                await deleteNotification(this.dataset.id);
             });
         });
     }
 
+    // ============================================================
+    // MARK AS READ
+    // ============================================================
     async function markAsRead(id) {
         try {
             const token = Auth.getToken();
             if (!token) return;
-            const response = await fetch(`https://admin-customerr.onrender.com/api/notifications/${id}/read`, {
+            const response = await fetch(`${API.baseURL}/api/notifications/${id}/read`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }
             });
-            if (response.ok) loadNotifications();
+            if (response.ok) await loadNotifications();
         } catch (error) {
             console.error('❌ Xatolik:', error);
         }
     }
 
-    setInterval(() => {
-        if (notificationPanel.style.display === 'block') {
-            loadNotifications();
+    // ============================================================
+    // ⭐ DELETE NOTIFICATION - Admin Customer
+    // ============================================================
+    async function deleteNotification(id) {
+        // Admin Customer o'z xabarini o'chira olmaydi serverda
+        // Shuning uchun localda yashiramiz
+        try {
+            const token = Auth.getToken();
+            if (!token) return;
+
+            // Avval serverda o'chirishga urinish
+            const response = await fetch(`${API.baseURL}/api/notifications/${id}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            if (response.ok) {
+                console.log('✅ Xabar o\'chirildi (server)');
+            } else {
+                // Server o'chirmasа - local yashirish
+                console.log('ℹ️ Serverdan o\'chirilmadi, localda yashirildi');
+                const hidden = JSON.parse(localStorage.getItem('hiddenNotifs') || '[]');
+                if (!hidden.includes(id)) hidden.push(id);
+                localStorage.setItem('hiddenNotifs', JSON.stringify(hidden));
+            }
+            await loadNotifications();
+        } catch (error) {
+            console.error('❌ Delete xatosi:', error);
+            // Xato bo'lsa ham localda yashirish
+            const hidden = JSON.parse(localStorage.getItem('hiddenNotifs') || '[]');
+            if (!hidden.includes(id)) hidden.push(id);
+            localStorage.setItem('hiddenNotifs', JSON.stringify(hidden));
+            await loadNotifications();
         }
-    }, 30000);
+    }
 }
 
 // ============================================================
@@ -449,19 +638,17 @@ function showError(msg) {
     console.error('⚠️ Xatolik:', msg);
     const div = document.createElement('div');
     div.style.cssText = `
-        position: fixed; top: 20px; right: 20px; z-index: 9999;
-        padding: 14px 18px; background: #fef2f2;
-        border: 1px solid #fecaca; border-radius: 10px;
-        color: #dc2626; max-width: 400px;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-        display: flex; align-items: center; gap: 10px;
-        font-size: 0.85rem;
-        z-index: 10000;
+        position:fixed;top:20px;right:20px;z-index:10000;
+        padding:14px 18px;background:#fef2f2;
+        border:1px solid #fecaca;border-radius:10px;
+        color:#dc2626;max-width:400px;
+        box-shadow:0 10px 40px rgba(0,0,0,0.1);
+        display:flex;align-items:center;gap:10px;font-size:0.85rem;
     `;
     div.innerHTML = `
         <i class="fas fa-exclamation-circle"></i>
         <span>${msg}</span>
-        <button onclick="this.parentElement.remove()" style="margin-left: auto; background: none; border: none; color: #dc2626; cursor: pointer; font-size: 1.1rem;">×</button>
+        <button onclick="this.parentElement.remove()" style="margin-left:auto;background:none;border:none;color:#dc2626;cursor:pointer;font-size:1.1rem;">×</button>
     `;
     document.body.appendChild(div);
     setTimeout(() => div.remove(), 8000);
@@ -470,7 +657,7 @@ function showError(msg) {
 // ============================================================
 // CLEANUP
 // ============================================================
-window.addEventListener('beforeunload', function() {
+window.addEventListener('beforeunload', function () {
     if (refreshInterval) { clearInterval(refreshInterval); refreshInterval = null; }
     if (countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; }
 });
