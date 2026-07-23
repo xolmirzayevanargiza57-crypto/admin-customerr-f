@@ -1,6 +1,12 @@
-/* ============================================
+/* ============================================================
+   STYLE.CSS - ADMIN-CUSTOMER (CLEAN VERSION)
+   Loyiha: Admin-Customer Frontend
+   Fayl: css/style.css
+   ============================================================ */
+
+/* ============================================================
    THEME - LIGHT / DARK / AUTO
-   ============================================ */
+   ============================================================ */
 
 :root {
     --bg-primary: #f5f5f7;
@@ -45,74 +51,63 @@
     --shadow-focus: 0 0 0 4px rgba(255, 255, 255, 0.05);
 }
 
+/* Dark theme qo'shimcha class'lar */
 [data-theme="dark"] .stat-icon.blue {
     background: #1a2a4a;
     color: #4a9aff;
 }
-
 [data-theme="dark"] .stat-icon.green {
     background: #1a3a2a;
     color: #4ac759;
 }
-
 [data-theme="dark"] .stat-icon.purple {
     background: #2a1a4a;
     color: #9a6aff;
 }
-
 [data-theme="dark"] .stat-icon.orange {
     background: #3a2a1a;
     color: #ff9a4a;
 }
-
 [data-theme="dark"] .status-badge.active {
     background: #1a3a2a;
     color: #4ac759;
 }
-
 [data-theme="dark"] .status-badge.blocked {
     background: #3a1a1a;
     color: #ff3b30;
 }
-
 [data-theme="dark"] .status-badge.inactive {
     background: var(--bg-hover);
     color: var(--text-muted);
 }
-
 [data-theme="dark"] .status-badge.present {
     background: #1a3a2a;
     color: #4ac759;
 }
-
 [data-theme="dark"] .status-badge.absent {
     background: #3a1a1a;
     color: #ff3b30;
 }
-
 [data-theme="dark"] .status-badge.absent-reason {
     background: #3a2a1a;
     color: #ff9a4a;
 }
-
 [data-theme="dark"] .payment-status.paid {
     background: #1a3a2a;
     color: #4ac759;
 }
-
 [data-theme="dark"] .payment-status.pending {
     background: #3a2a1a;
     color: #ff9a4a;
 }
-
 [data-theme="dark"] .payment-status.unpaid {
     background: #3a1a1a;
     color: #ff3b30;
 }
 
-/* ============================================
+/* ============================================================
    BASE
-   ============================================ */
+   ============================================================ */
 * {
     margin: 0;
     padding: 0;
@@ -132,31 +127,28 @@ body {
     transition: var(--transition);
 }
 
-/* ============================================
+/* ============================================================
    SCROLLBAR
-   ============================================ */
+   ============================================================ */
 ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
 }
-
 ::-webkit-scrollbar-track {
     background: var(--bg-hover);
     border-radius: 10px;
 }
-
 ::-webkit-scrollbar-thumb {
     background: var(--border-color);
     border-radius: 10px;
 }
-
 ::-webkit-scrollbar-thumb:hover {
     background: var(--text-muted);
 }
 
-/* ============================================
+/* ============================================================
    LOGIN PAGE
-   ============================================ */
+   ============================================================ */
 .login-page {
     display: flex;
     align-items: center;
@@ -223,9 +215,9 @@ body {
     margin: 0 8px;
 }
 
-/* ============================================
+/* ============================================================
    FORM
-   ============================================ */
+   ============================================================ */
 .form-group {
     margin-bottom: 18px;
 }
@@ -300,7 +292,6 @@ body {
 .input-wrapper .input-icon.success {
     color: var(--color-success);
 }
-
 .input-wrapper .input-icon.error {
     color: var(--color-danger);
 }
@@ -308,7 +299,6 @@ body {
 .input-wrapper input.success+.input-icon.success {
     opacity: 1;
 }
-
 .input-wrapper input.error+.input-icon.error {
     opacity: 1;
 }
@@ -317,7 +307,6 @@ body {
     border-color: var(--color-success);
     padding-right: 40px;
 }
-
 .input-wrapper input.error {
     border-color: var(--color-danger);
     padding-right: 40px;
@@ -349,18 +338,16 @@ body {
     background: var(--bg-hover);
     color: var(--text-primary);
 }
-
 .password-toggle:focus {
     outline: none;
 }
-
 .password-toggle i {
     pointer-events: none;
 }
 
-/* ============================================
+/* ============================================================
    BUTTONS
-   ============================================ */
+   ============================================================ */
 .btn-primary {
     display: inline-flex;
     align-items: center;
@@ -383,13 +370,11 @@ body {
     transform: scale(0.98);
     opacity: 0.85;
 }
-
 .btn-primary:disabled {
     opacity: 0.5;
     cursor: not-allowed;
     transform: none;
 }
-
 .btn-primary i {
     color: var(--bg-primary);
 }
@@ -483,9 +468,9 @@ body {
     width: 100%;
 }
 
-/* ============================================
-   ACTIONS CONTAINER - FLEX FORMAT
-   ============================================ */
+/* ============================================================
+   ACTIONS CONTAINER
+   ============================================================ */
 .actions-container {
     display: flex;
     gap: 6px;
@@ -514,7 +499,6 @@ body {
     background: var(--color-purple);
     color: #fff;
 }
-
 .actions-container .btn-view:hover {
     opacity: 0.85;
     transform: scale(0.95);
@@ -525,7 +509,6 @@ body {
     color: var(--text-primary);
     border: 1px solid var(--border-color);
 }
-
 .actions-container .btn-secondary:hover {
     background: var(--bg-active);
 }
@@ -534,15 +517,14 @@ body {
     background: var(--color-danger);
     color: #fff;
 }
-
 .actions-container .btn-danger:hover {
     opacity: 0.8;
     transform: scale(0.95);
 }
 
-/* ============================================
+/* ============================================================
    ERROR MESSAGE
-   ============================================ */
+   ============================================================ */
 .error-message {
     display: none;
     align-items: center;
@@ -566,9 +548,9 @@ body {
     border-color: var(--color-danger);
 }
 
-/* ============================================
+/* ============================================================
    THEME TOGGLE
-   ============================================ */
+   ============================================================ */
 .theme-toggle {
     position: fixed;
     bottom: 24px;
@@ -597,7 +579,6 @@ body {
 .theme-toggle .sun {
     display: none;
 }
-
 .theme-toggle .moon {
     display: block;
 }
@@ -605,14 +586,13 @@ body {
 [data-theme="dark"] .theme-toggle .sun {
     display: block;
 }
-
 [data-theme="dark"] .theme-toggle .moon {
     display: none;
 }
 
-/* ============================================
-   SIDEBAR
-   ============================================ */
+/* ============================================================
+   SIDEBAR - ASOSIY
+   ============================================================ */
 .app-container {
     display: flex;
     min-height: 100vh;
@@ -628,8 +608,10 @@ body {
     border-right: 1px solid var(--border-color);
     display: flex;
     flex-direction: column;
-    position: sticky;
+    position: fixed;
     top: 0;
+    left: 0;
+    bottom: 0;
     height: 100vh;
     z-index: 100;
     overflow-y: auto;
@@ -714,7 +696,6 @@ body {
     background: var(--bg-hover);
     color: var(--text-primary);
 }
-
 .nav-link:hover i {
     color: var(--text-primary);
 }
@@ -724,9 +705,18 @@ body {
     color: var(--text-primary);
     font-weight: 600;
 }
-
 .nav-link.active i {
     color: var(--text-primary);
+}
+
+.nav-link .sidebar-badge {
+    margin-left: auto;
+    background: #ff3b30;
+    color: white;
+    font-size: 0.55rem;
+    padding: 2px 8px;
+    border-radius: 10px;
+    display: none;
 }
 
 .sidebar-footer {
@@ -755,7 +745,6 @@ body {
     background: #fef2f2;
     color: var(--color-danger);
 }
-
 .btn-logout i {
     width: 18px;
     text-align: center;
@@ -767,6 +756,9 @@ body {
     color: var(--color-danger);
 }
 
+/* ============================================================
+   SIDEBAR OVERLAY (HAMBURGER UCHUN)
+   ============================================================ */
 .sidebar-overlay {
     display: none;
     position: fixed;
@@ -782,13 +774,14 @@ body {
     display: block;
 }
 
-/* ============================================
+/* ============================================================
    MAIN CONTENT
-   ============================================ */
+   ============================================================ */
 .main-content {
     flex: 1;
     min-width: 0;
     min-height: 100vh;
+    margin-left: var(--sidebar-width);
     width: calc(100% - var(--sidebar-width));
     max-width: calc(100% - var(--sidebar-width));
 }
@@ -819,6 +812,11 @@ body {
     color: var(--text-primary);
     cursor: pointer;
     padding: 4px;
+    transition: var(--transition);
+}
+
+.menu-toggle:hover {
+    color: var(--text-muted);
 }
 
 .header-left h2 {
@@ -841,10 +839,6 @@ body {
     display: flex;
     align-items: center;
     gap: 12px;
-}
-
-.header-right .theme-toggle-small {
-    display: none !important;
 }
 
 .user-profile {
@@ -878,9 +872,9 @@ body {
     color: var(--text-muted);
 }
 
-/* ============================================
+/* ============================================================
    STATS CARDS
-   ============================================ */
+   ============================================================ */
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -918,17 +912,14 @@ body {
     background: #e8f0fe;
     color: #007aff;
 }
-
 .stat-icon.green {
     background: #e8f5e9;
     color: #34c759;
 }
-
 .stat-icon.purple {
     background: #f3e8ff;
     color: #7c3aed;
 }
-
 .stat-icon.orange {
     background: #fff3e0;
     color: #ff9500;
@@ -958,14 +949,13 @@ body {
 .stat-change.positive {
     color: var(--color-success);
 }
-
 .stat-change.negative {
     color: var(--color-danger);
 }
 
-/* ============================================
+/* ============================================================
    ATTENDANCE CARDS
-   ============================================ */
+   ============================================================ */
 .attendance-cards {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -976,88 +966,91 @@ body {
 .attendance-cards .stat-card.present-card {
     border-left: 4px solid var(--color-success);
 }
-
 .attendance-cards .stat-card.absent-card {
     border-left: 4px solid var(--color-danger);
 }
 
-/* ============================================
-   CHARTS
-   ============================================ */
-.charts-grid {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 14px;
-    padding: 0 24px 14px;
-}
-
-.chart-card {
-    background: var(--bg-card);
-    border-radius: var(--radius);
-    padding: 16px 20px;
-    border: 1px solid var(--border-color);
-}
-
-.chart-header {
-    display: flex;
-    justify-content: space-between;
+/* ============================================================
+   BADGES
+   ============================================================ */
+.status-badge {
+    display: inline-flex;
     align-items: center;
-    margin-bottom: 12px;
-}
-
-.chart-header h3 {
-    font-size: 0.85rem;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
     font-weight: 600;
-    color: var(--text-primary);
+    white-space: nowrap;
 }
 
-.chart-header h3 i {
-    margin-right: 6px;
+.status-badge.active {
+    background: #e8f5e9;
+    color: #34c759;
+}
+.status-badge.blocked {
+    background: #fef2f2;
+    color: #ff3b30;
+}
+.status-badge.inactive {
+    background: var(--bg-hover);
     color: var(--text-muted);
 }
-
-.chart-card canvas {
-    max-height: 220px;
-    width: 100% !important;
+.status-badge.present {
+    background: #e8f5e9;
+    color: #34c759;
+}
+.status-badge.absent {
+    background: #fef2f2;
+    color: #ff3b30;
+}
+.status-badge.absent-reason {
+    background: #fff3e0;
+    color: #ff9500;
 }
 
-/* ============================================
-   SUBSCRIPTION
-   ============================================ */
-.subscription-card {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 14px;
-    padding: 14px 24px;
-}
-
-.subscription-card .sub-item {
-    background: var(--bg-card);
-    border-radius: 12px;
-    padding: 12px 16px;
-    border: 1px solid var(--border-color);
-}
-
-.subscription-card .sub-item .label {
+.payment-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border-radius: 20px;
     font-size: 0.7rem;
+    font-weight: 500;
+}
+
+.payment-status.paid {
+    background: #e8f5e9;
+    color: #34c759;
+}
+.payment-status.pending {
+    background: #fff3e0;
+    color: #ff9500;
+}
+.payment-status.unpaid {
+    background: #fef2f2;
+    color: #ff3b30;
+}
+
+.age-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.65rem;
+    font-weight: 500;
+    background: var(--bg-hover);
     color: var(--text-muted);
-    display: block;
-    margin-bottom: 4px;
 }
 
-.subscription-card .sub-item .label i {
-    margin-right: 4px;
+.age-badge i {
+    font-size: 0.55rem;
 }
 
-.subscription-card .sub-item .value {
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--text-primary);
-}
-
-/* ============================================
+/* ============================================================
    TABLE
-   ============================================ */
+   ============================================================ */
 .table-container {
     padding: 0 24px 24px;
     overflow-x: auto;
@@ -1098,101 +1091,9 @@ body {
     background: var(--bg-hover);
 }
 
-.data-table td .actions-container {
-    justify-content: center;
-}
-
-/* ============================================
-   BADGES
-   ============================================ */
-.status-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    white-space: nowrap;
-}
-
-.status-badge.active {
-    background: #e8f5e9;
-    color: #34c759;
-}
-
-.status-badge.blocked {
-    background: #fef2f2;
-    color: #ff3b30;
-}
-
-.status-badge.inactive {
-    background: var(--bg-hover);
-    color: var(--text-muted);
-}
-
-.status-badge.present {
-    background: #e8f5e9;
-    color: #34c759;
-}
-
-.status-badge.absent {
-    background: #fef2f2;
-    color: #ff3b30;
-}
-
-.status-badge.absent-reason {
-    background: #fff3e0;
-    color: #ff9500;
-}
-
-.payment-status {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 3px 10px;
-    border-radius: 20px;
-    font-size: 0.7rem;
-    font-weight: 500;
-}
-
-.payment-status.paid {
-    background: #e8f5e9;
-    color: #34c759;
-}
-
-.payment-status.pending {
-    background: #fff3e0;
-    color: #ff9500;
-}
-
-.payment-status.unpaid {
-    background: #fef2f2;
-    color: #ff3b30;
-}
-
-/* ============================================
-   AGE BADGE
-   ============================================ */
-.age-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 2px 8px;
-    border-radius: 12px;
-    font-size: 0.65rem;
-    font-weight: 500;
-    background: var(--bg-hover);
-    color: var(--text-muted);
-}
-
-.age-badge i {
-    font-size: 0.55rem;
-}
-
-/* ============================================
+/* ============================================================
    TOOLBAR
-   ============================================ */
+   ============================================================ */
 .toolbar {
     display: flex;
     align-items: center;
@@ -1261,9 +1162,13 @@ body {
     box-shadow: var(--shadow-focus);
 }
 
-/* ============================================
+[data-theme="dark"] .filter-box select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23636366' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+}
+
+/* ============================================================
    SETTINGS
-   ============================================ */
+   ============================================================ */
 .settings-container {
     padding: 20px 24px;
     max-width: 700px;
@@ -1294,28 +1199,15 @@ body {
 .settings-card.danger {
     border-color: var(--color-danger);
 }
-
 .settings-card.danger h3 {
     color: var(--color-danger);
 }
-
 .settings-card.danger p {
     font-size: 0.8rem;
     color: var(--text-muted);
     margin-bottom: 14px;
 }
 
-.settings-card .form-group {
-    margin-bottom: 14px;
-}
-
-.settings-card .form-group:last-of-type {
-    margin-bottom: 18px;
-}
-
-/* ============================================
-   THEME OPTIONS
-   ============================================ */
 .theme-options {
     display: flex;
     gap: 10px;
@@ -1352,15 +1244,11 @@ body {
 .theme-option i {
     font-size: 1.2rem;
 }
-
 .theme-option span {
     font-size: 0.7rem;
     font-weight: 500;
 }
 
-/* ============================================
-   LANGUAGE SELECTOR
-   ============================================ */
 .language-selector {
     display: flex;
     gap: 6px;
@@ -1395,9 +1283,83 @@ body {
     transform: translateY(-1px);
 }
 
-/* ============================================
-   SUBJECTS GRID
-   ============================================ */
+/* ============================================================
+   CHARTS
+   ============================================================ */
+.charts-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 14px;
+    padding: 0 24px 14px;
+}
+
+.chart-card {
+    background: var(--bg-card);
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    border: 1px solid var(--border-color);
+}
+
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.chart-header h3 {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.chart-header h3 i {
+    margin-right: 6px;
+    color: var(--text-muted);
+}
+
+.chart-card canvas {
+    max-height: 220px;
+    width: 100% !important;
+}
+
+/* ============================================================
+   SUBSCRIPTION
+   ============================================================ */
+.subscription-card {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    padding: 14px 24px;
+}
+
+.subscription-card .sub-item {
+    background: var(--bg-card);
+    border-radius: 12px;
+    padding: 12px 16px;
+    border: 1px solid var(--border-color);
+}
+
+.subscription-card .sub-item .label {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    display: block;
+    margin-bottom: 4px;
+}
+
+.subscription-card .sub-item .label i {
+    margin-right: 4px;
+}
+
+.subscription-card .sub-item .value {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* ============================================================
+   SUBJECTS
+   ============================================================ */
 .subjects-grid {
     padding: 0 24px 24px;
     display: grid;
@@ -1422,73 +1384,9 @@ body {
     border-color: var(--text-muted);
 }
 
-[data-theme="dark"] .subject-card:hover {
-    box-shadow: 0 8px 30px rgba(255, 255, 255, 0.05);
-}
-
-/* ============================================
-   PROFILE SECTION
-   ============================================ */
-.profile-section {
-    padding: 20px 24px;
-    display: grid;
-    grid-template-columns: 1fr 2fr;
-    gap: 20px;
-}
-
-.profile-card {
-    background: var(--bg-card);
-    border-radius: var(--radius);
-    padding: 24px;
-    border: 1px solid var(--border-color);
-    text-align: center;
-}
-
-.profile-avatar {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    background: var(--text-primary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 14px;
-    font-size: 2.5rem;
-    color: var(--bg-primary);
-    font-weight: 700;
-}
-
-.profile-details {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-}
-
-.profile-info-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 8px 14px;
-    background: var(--bg-hover);
-    border-radius: var(--radius-sm);
-    font-size: 0.8rem;
-    color: var(--text-secondary);
-}
-
-.profile-info-item i {
-    width: 18px;
-    color: var(--text-muted);
-    text-align: center;
-}
-
-.profile-info-item strong {
-    color: var(--text-primary);
-    font-weight: 600;
-}
-
-/* ============================================
-   ATTENDANCE PAGE - DAVOMAT PANELI
-   ============================================ */
+/* ============================================================
+   ATTENDANCE PAGE
+   ============================================================ */
 .attendance-page-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -1560,15 +1458,9 @@ body {
     margin-top: 4px;
 }
 
-.attendance-page-card .salary {
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: var(--text-primary);
-}
-
-/* ============================================
-   ATTENDANCE BUTTONS - REAL TIME UPDATE
-   ============================================ */
+/* ============================================================
+   ATTENDANCE BUTTONS
+   ============================================================ */
 .attendance-btn-group {
     display: flex;
     gap: 4px;
@@ -1625,42 +1517,20 @@ body {
     border-color: #4ac759;
     color: #4ac759;
 }
-
 [data-theme="dark"] .attendance-btn-group .btn-attendance.active-absent {
     background: #3a1a1a;
     border-color: #ff3b30;
     color: #ff3b30;
 }
-
 [data-theme="dark"] .attendance-btn-group .btn-attendance.active-absent-reason {
     background: #3a2a1a;
     border-color: #ff9a4a;
     color: #ff9a4a;
 }
 
-/* Status badge update animation */
-.status-badge {
-    transition: all 0.3s ease;
-}
-
-.status-badge.present {
-    background: #e8f5e9;
-    color: #34c759;
-}
-
-.status-badge.absent {
-    background: #fef2f2;
-    color: #ff3b30;
-}
-
-.status-badge.absent-reason {
-    background: #fff3e0;
-    color: #ff9500;
-}
-
-/* ============================================
-   ALL.HTML - BARCHA MA'LUMOTLAR
-   ============================================ */
+/* ============================================================
+   ALL.HTML
+   ============================================================ */
 .all-stats-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -1687,12 +1557,10 @@ body {
     font-weight: 700;
     color: var(--text-primary);
 }
-
 .all-stat-card .stat-label {
     font-size: 0.875rem;
     color: var(--text-muted);
 }
-
 .all-stat-card .stat-icon-big {
     font-size: 2.5rem;
     opacity: 0.2;
@@ -1722,171 +1590,49 @@ body {
     font-size: 0.9rem;
     color: var(--text-primary);
 }
-
 .all-attendance-card .info .role {
     font-size: 0.75rem;
     color: var(--text-muted);
 }
-
 .all-attendance-card .status-badge {
     font-size: 0.7rem;
 }
 
-/* ============================================
-   TEACHER PROFILE VIEW
-   ============================================ */
-.teacher-profile-view {
+/* ============================================================
+   PROFILE
+   ============================================================ */
+.profile-section {
+    padding: 20px 24px;
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 20px;
+}
+
+.profile-card {
     background: var(--bg-card);
     border-radius: var(--radius);
-    padding: 20px;
+    padding: 24px;
     border: 1px solid var(--border-color);
+    text-align: center;
 }
 
-.teacher-profile-view .profile-header {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    margin-bottom: 16px;
-}
-
-.teacher-profile-view .profile-header .avatar {
-    width: 64px;
-    height: 64px;
+.profile-avatar {
+    width: 100px;
+    height: 100px;
     border-radius: 50%;
     background: var(--text-primary);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.6rem;
+    margin: 0 auto 14px;
+    font-size: 2.5rem;
     color: var(--bg-primary);
-}
-
-.teacher-profile-view .profile-header .info h3 {
-    font-size: 1.1rem;
     font-weight: 700;
-    color: var(--text-primary);
 }
 
-.teacher-profile-view .profile-header .info p {
-    font-size: 0.8rem;
-    color: var(--text-muted);
-}
-
-.teacher-profile-view .profile-stats {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    margin: 14px 0;
-}
-
-.teacher-profile-view .profile-stats .stat-item {
-    text-align: center;
-    padding: 10px;
-    background: var(--bg-hover);
-    border-radius: var(--radius-sm);
-}
-
-.teacher-profile-view .profile-stats .stat-item .number {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: var(--text-primary);
-}
-
-.teacher-profile-view .profile-stats .stat-item .label {
-    font-size: 0.7rem;
-    color: var(--text-muted);
-}
-
-.teacher-profile-view .profile-students {
-    margin-top: 14px;
-}
-
-.teacher-profile-view .profile-students h4 {
-    font-size: 0.8rem;
-    font-weight: 600;
-    margin-bottom: 6px;
-}
-
-.teacher-profile-view .profile-students .student-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 6px 10px;
-    border-bottom: 1px solid var(--border-color);
-}
-
-.teacher-profile-view .profile-students .student-item:last-child {
-    border-bottom: none;
-}
-
-/* ============================================
-   STUDENT PROFILE VIEW
-   ============================================ */
-.student-profile-view {
-    background: var(--bg-card);
-    border-radius: var(--radius);
-    padding: 20px;
-    border: 1px solid var(--border-color);
-}
-
-.student-profile-view .profile-header {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    margin-bottom: 16px;
-}
-
-.student-profile-view .profile-header .avatar {
-    width: 64px;
-    height: 64px;
-    border-radius: 50%;
-    background: var(--text-primary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.6rem;
-    color: var(--bg-primary);
-}
-
-.student-profile-view .profile-header .info h3 {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: var(--text-primary);
-}
-
-.student-profile-view .profile-header .info p {
-    font-size: 0.8rem;
-    color: var(--text-muted);
-}
-
-.student-profile-view .profile-stats {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    margin: 14px 0;
-}
-
-.student-profile-view .profile-stats .stat-item {
-    text-align: center;
-    padding: 10px;
-    background: var(--bg-hover);
-    border-radius: var(--radius-sm);
-}
-
-.student-profile-view .profile-stats .stat-item .number {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: var(--text-primary);
-}
-
-.student-profile-view .profile-stats .stat-item .label {
-    font-size: 0.7rem;
-    color: var(--text-muted);
-}
-
-/* ============================================
-   REPORTS PAGE
-   ============================================ */
+/* ============================================================
+   REPORTS
+   ============================================================ */
 .reports-grid {
     padding: 20px 24px;
     display: grid;
@@ -1899,8 +1645,8 @@ body {
     border-radius: var(--radius);
     padding: 20px 24px;
     border: 1px solid var(--border-color);
+    display: flex;
     flex-direction: column;
-    align-items: flex-start;
     gap: 10px;
 }
 
@@ -1926,17 +1672,14 @@ body {
     background: #e8f0fe;
     color: #007aff;
 }
-
 .report-card .report-header .icon.green {
     background: #e8f5e9;
     color: #34c759;
 }
-
 .report-card .report-header .icon.purple {
     background: #f3e8ff;
     color: #7c3aed;
 }
-
 .report-card .report-header .icon.orange {
     background: #fff3e0;
     color: #ff9500;
@@ -1953,15 +1696,16 @@ body {
     gap: 16px;
     font-size: 0.8rem;
     color: var(--text-secondary);
+    flex-wrap: wrap;
 }
 
 .report-card .report-stats strong {
     color: var(--text-primary);
 }
 
-/* ============================================
-   MODAL - TUZATILGAN (PASTDA OCHILMAYDI)
-   ============================================ */
+/* ============================================================
+   MODAL
+   ============================================================ */
 .modal {
     position: fixed;
     top: 0;
@@ -2032,94 +1776,154 @@ body {
 }
 
 @keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-
-    to {
-        opacity: 1;
-    }
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
 @keyframes slideUp {
-    from {
-        transform: translateY(30px);
-        opacity: 0;
-    }
-
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
+    from { transform: translateY(30px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
 }
 
-/* ============================================
-   RESPONSIVE
-   ============================================ */
-@media (max-width: 1024px) {
-    .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    .charts-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .subscription-card {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    .subjects-grid {
-        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    }
-
-    .profile-section {
-        grid-template-columns: 1fr;
-    }
-
-    .all-stats-grid {
-        grid-template-columns: 1fr 1fr;
-    }
-
-    .all-attendance-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .attendance-page-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .reports-grid {
-        grid-template-columns: 1fr 1fr;
-    }
+/* ============================================================
+   NOTIFICATIONS
+   ============================================================ */
+.notification-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border-color);
+    border-left: 3px solid transparent;
+    transition: background 0.2s ease;
+    border-radius: 0;
 }
 
+.notification-item:hover {
+    background: var(--bg-hover);
+}
+
+.notification-item.unread {
+    background: var(--bg-hover);
+    border-left-color: #007aff;
+}
+
+.notification-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.notification-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    display: block;
+    margin-bottom: 5px;
+}
+
+.notification-message {
+    font-size: 0.83rem;
+    color: var(--text-secondary);
+    margin: 0;
+    word-break: break-word;
+    white-space: pre-wrap;
+    line-height: 1.5;
+}
+
+.notification-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    margin-top: 6px;
+}
+
+.notification-actions {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+    align-items: flex-start;
+}
+
+.btn-read {
+    background: none;
+    border: 1px solid #007aff;
+    color: #007aff;
+    font-size: 0.7rem;
+    cursor: pointer;
+    padding: 4px 12px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    font-family: var(--font-family);
+}
+
+.btn-read:hover {
+    background: #007aff;
+    color: #fff;
+}
+
+.read-label {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    padding: 4px 0;
+}
+
+/* ============================================================
+   RESPONSIVE - HAMBURGER MENU (ASOSIY)
+   ============================================================ */
 @media (max-width: 768px) {
+    /* ⭐ SIDEBAR - HAMBURGER UCHUN */
     .sidebar {
-        position: fixed;
+        position: fixed !important;
         top: 0;
         left: 0;
         bottom: 0;
-        transform: translateX(-100%);
-        width: 260px;
-        min-width: 260px;
-        max-width: 260px;
-        flex: 0 0 260px;
+        transform: translateX(-100%) !important;
+        width: 280px !important;
+        min-width: 280px !important;
+        max-width: 280px !important;
         height: 100vh;
-        z-index: 200;
+        z-index: 200 !important;
+        box-shadow: none !important;
+        transition: transform 0.3s ease !important;
     }
 
     .sidebar.open {
-        transform: translateX(0);
+        transform: translateX(0) !important;
+        box-shadow: 4px 0 30px rgba(0, 0, 0, 0.15) !important;
     }
 
     .main-content {
-        width: 100%;
-        max-width: 100%;
-        min-width: 0;
+        margin-left: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
     }
 
     .menu-toggle {
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        transition: background 0.2s;
+        font-size: 1.1rem;
+        color: var(--text-primary);
+        cursor: pointer;
+        padding: 4px;
+        background: none;
+        border: none;
+    }
+
+    .menu-toggle:hover {
+        background: var(--bg-hover);
+        color: var(--text-muted);
+    }
+
+    .sidebar-overlay.show {
         display: block !important;
     }
 
@@ -2240,6 +2044,7 @@ body {
 
     .profile-section {
         padding: 12px 16px;
+        grid-template-columns: 1fr;
     }
 
     .profile-card {
@@ -2261,17 +2066,6 @@ body {
         padding: 0 16px 16px;
     }
 
-    .teacher-profile-view .profile-stats,
-    .student-profile-view .profile-stats {
-        grid-template-columns: 1fr 1fr;
-    }
-
-    .teacher-profile-view .profile-header,
-    .student-profile-view .profile-header {
-        flex-direction: column;
-        text-align: center;
-    }
-
     .attendance-page-grid {
         padding: 12px 16px;
         grid-template-columns: 1fr;
@@ -2282,16 +2076,15 @@ body {
         grid-template-columns: 1fr;
     }
 
-    .sidebar-overlay.show {
-        display: block;
-    }
-
     .modal-content {
         padding: 20px;
         max-width: 95%;
     }
 }
 
+/* ============================================================
+   RESPONSIVE - MOBILE (480px)
+   ============================================================ */
 @media (max-width: 480px) {
     .login-card {
         padding: 20px 14px;
@@ -2372,11 +2165,6 @@ body {
         font-size: 0.65rem;
     }
 
-    .teacher-profile-view .profile-stats,
-    .student-profile-view .profile-stats {
-        grid-template-columns: 1fr;
-    }
-
     .all-attendance-card {
         flex-direction: column;
         align-items: stretch;
@@ -2404,1059 +2192,92 @@ body {
         padding: 6px 14px;
         font-size: 0.75rem;
     }
+
+    .teacher-profile-view .profile-stats,
+    .student-profile-view .profile-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .teacher-profile-view .profile-header,
+    .student-profile-view .profile-header {
+        flex-direction: column;
+        text-align: center;
+    }
 }
 
-
-/* ============================================
-   THEME - LIGHT / DARK / AUTO
-   ============================================ */
-
-:root {
-    --bg-primary: #f5f5f7;
-    --bg-secondary: #ffffff;
-    --bg-card: #ffffff;
-    --bg-sidebar: #ffffff;
-    --bg-header: #ffffff;
-    --bg-input: #ffffff;
-    --bg-hover: #f1f1f3;
-    --bg-active: #e8e8ed;
-    --text-primary: #1c1c1e;
-    --text-secondary: #48484a;
-    --text-muted: #8e8e93;
-    --border-color: #d1d1d6;
-    --border-focus: #1c1c1e;
-    --shadow-focus: 0 0 0 4px rgba(0, 0, 0, 0.05);
-    --color-success: #34c759;
-    --color-danger: #ff3b30;
-    --color-warning: #ff9500;
-    --color-purple: #7c3aed;
-    --radius: 16px;
-    --radius-sm: 10px;
-    --transition: all 0.3s ease;
-    --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    --sidebar-width: 220px;
+/* ============================================================
+   TEAM / WORK HOURS
+   ============================================================ */
+.attendance-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 12px;
+    padding: 0 24px 24px;
 }
 
-[data-theme="dark"] {
-    --bg-primary: #0a0a0a;
-    --bg-secondary: #1c1c1e;
-    --bg-card: #1c1c1e;
-    --bg-sidebar: #1c1c1e;
-    --bg-header: #1c1c1e;
-    --bg-input: #2c2c2e;
-    --bg-hover: #2c2c2e;
-    --bg-active: #3a3a3c;
-    --text-primary: #ffffff;
-    --text-secondary: #aeaeb2;
-    --text-muted: #636366;
-    --border-color: #3a3a3c;
-    --border-focus: #ffffff;
-    --shadow-focus: 0 0 0 4px rgba(255, 255, 255, 0.05);
-}
-
-[data-theme="dark"] .stat-icon.blue {
-    background: #1a2a4a;
-    color: #4a9aff;
-}
-
-[data-theme="dark"] .stat-icon.green {
-    background: #1a3a2a;
-    color: #4ac759;
-}
-
-[data-theme="dark"] .stat-icon.purple {
-    background: #2a1a4a;
-    color: #9a6aff;
-}
-
-[data-theme="dark"] .stat-icon.orange {
-    background: #3a2a1a;
-    color: #ff9a4a;
-}
-
-[data-theme="dark"] .status-badge.active {
-    background: #1a3a2a;
-    color: #4ac759;
-}
-
-[data-theme="dark"] .status-badge.blocked {
-    background: #3a1a1a;
-    color: #ff3b30;
-}
-
-[data-theme="dark"] .status-badge.inactive {
-    background: var(--bg-hover);
-    color: var(--text-muted);
-}
-
-[data-theme="dark"] .status-badge.present {
-    background: #1a3a2a;
-    color: #4ac759;
-}
-
-[data-theme="dark"] .status-badge.absent {
-    background: #3a1a1a;
-    color: #ff3b30;
-}
-
-[data-theme="dark"] .status-badge.absent-reason {
-    background: #3a2a1a;
-    color: #ff9a4a;
-}
-
-[data-theme="dark"] .payment-status.paid {
-    background: #1a3a2a;
-    color: #4ac759;
-}
-
-[data-theme="dark"] .payment-status.pending {
-    background: #3a2a1a;
-    color: #ff9a4a;
-}
-
-[data-theme="dark"] .payment-status.unpaid {
-    background: #3a1a1a;
-    color: #ff3b30;
-}
-
-/* ============================================
-   BASE
-   ============================================ */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-html {
-    font-family: var(--font-family);
-    font-size: 16px;
-    -webkit-font-smoothing: antialiased;
-}
-
-body {
-    background: var(--bg-primary);
-    color: var(--text-primary);
-    min-height: 100vh;
-    transition: var(--transition);
-}
-
-/* ============================================
-   SCROLLBAR
-   ============================================ */
-::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-}
-
-::-webkit-scrollbar-track {
-    background: var(--bg-hover);
-    border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb {
-    background: var(--border-color);
-    border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: var(--text-muted);
-}
-
-/* ============================================
-   LOGIN PAGE
-   ============================================ */
-.login-page {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    padding: 20px;
-    background: var(--bg-primary);
-}
-
-.login-container {
-    width: 100%;
-    max-width: 400px;
-}
-
-.login-card {
+.attendance-detail-card {
     background: var(--bg-card);
     border-radius: var(--radius);
-    padding: 40px 32px;
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+    padding: 14px 18px;
     border: 1px solid var(--border-color);
-}
-
-.login-logo {
-    text-align: center;
-    margin-bottom: 32px;
-}
-
-.login-logo .logo-icon {
-    width: 72px;
-    height: 72px;
-    background: var(--text-primary);
-    border-radius: 20px;
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    justify-content: center;
-    margin: 0 auto 16px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    flex-wrap: wrap;
+    gap: 10px;
 }
 
-.login-logo .logo-icon i {
-    font-size: 32px;
-    color: var(--bg-primary);
-}
-
-.login-logo h1 {
-    font-size: 1.75rem;
-    font-weight: 700;
+.attendance-detail-card .info .name {
+    font-weight: 600;
+    font-size: 0.9rem;
     color: var(--text-primary);
 }
-
-.login-logo .text-muted {
+.attendance-detail-card .info .role {
+    font-size: 0.75rem;
     color: var(--text-muted);
+}
+.attendance-detail-card .info .time {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+}
+.attendance-detail-card .status-badge {
+    font-size: 0.7rem;
+}
+
+.work-hours-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+    padding: 0 24px 24px;
+}
+
+.work-hours-card {
+    background: var(--bg-card);
+    border-radius: var(--radius);
+    padding: 14px 18px;
+    border: 1px solid var(--border-color);
+    text-align: center;
+}
+
+.work-hours-card .name {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+}
+.work-hours-card .hours {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-purple);
     margin-top: 4px;
 }
-
-.login-footer {
-    text-align: center;
-    margin-top: 24px;
-    font-size: 0.8rem;
-    color: var(--text-muted);
-}
-
-.login-footer .divider {
-    margin: 0 8px;
-}
-
-/* ============================================
-   FORM
-   ============================================ */
-.form-group {
-    margin-bottom: 18px;
-}
-
-.form-group label {
-    display: block;
-    font-size: 0.875rem;
-    font-weight: 500;
-    margin-bottom: 6px;
-    color: var(--text-secondary);
-}
-
-.form-group label i {
-    margin-right: 8px;
-    color: var(--text-muted);
-    width: 16px;
-    text-align: center;
-}
-
-.input-wrapper {
-    position: relative;
-    width: 100%;
-}
-
-.input-wrapper input,
-.input-wrapper select,
-.input-wrapper textarea {
-    width: 100%;
-    padding: 12px 16px;
-    border: 2px solid var(--border-color);
-    border-radius: var(--radius-sm);
-    font-size: 0.9375rem;
-    background: var(--bg-input);
-    color: var(--text-primary);
-    transition: var(--transition);
-    outline: none;
-    font-family: var(--font-family);
-    -webkit-appearance: none;
-    appearance: none;
-}
-
-.input-wrapper input:focus,
-.input-wrapper select:focus,
-.input-wrapper textarea:focus {
-    border-color: var(--border-focus);
-    box-shadow: var(--shadow-focus);
-}
-
-.input-wrapper input::placeholder,
-.input-wrapper textarea::placeholder {
-    color: var(--text-muted);
-    font-weight: 400;
-}
-
-.input-wrapper input[type="password"] {
-    padding-right: 48px;
-}
-
-/* Success/Error icons */
-.input-wrapper .input-icon {
-    position: absolute;
-    right: 14px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 1rem;
-    pointer-events: none;
-    z-index: 2;
-    opacity: 0;
-    transition: var(--transition);
-}
-
-.input-wrapper .input-icon.success {
-    color: var(--color-success);
-}
-
-.input-wrapper .input-icon.error {
-    color: var(--color-danger);
-}
-
-.input-wrapper input.success+.input-icon.success {
-    opacity: 1;
-}
-
-.input-wrapper input.error+.input-icon.error {
-    opacity: 1;
-}
-
-.input-wrapper input.success {
-    border-color: var(--color-success);
-    padding-right: 40px;
-}
-
-.input-wrapper input.error {
-    border-color: var(--color-danger);
-    padding-right: 40px;
-}
-
-/* Password toggle */
-.password-toggle {
-    position: absolute;
-    right: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    color: var(--text-muted);
-    cursor: pointer;
-    padding: 4px;
-    font-size: 1rem;
-    border-radius: 50%;
-    transition: var(--transition);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    z-index: 3;
-}
-
-.password-toggle:hover {
-    background: var(--bg-hover);
-    color: var(--text-primary);
-}
-
-.password-toggle:focus {
-    outline: none;
-}
-
-.password-toggle i {
-    pointer-events: none;
-}
-
-/* ============================================
-   BUTTONS
-   ============================================ */
-.btn-primary {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 12px 24px;
-    background: var(--text-primary);
-    color: var(--bg-primary);
-    border: none;
-    border-radius: var(--radius-sm);
-    font-size: 0.9375rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: var(--transition);
-    text-decoration: none;
-    width: 100%;
-}
-
-.btn-primary:hover {
-    transform: scale(0.98);
-    opacity: 0.85;
-}
-
-.btn-primary:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    transform: none;
-}
-
-.btn-primary i {
-    color: var(--bg-primary);
-}
-
-.btn-secondary {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 12px 24px;
-    background: var(--bg-hover);
-    color: var(--text-primary);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-sm);
-    font-size: 0.9375rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: var(--transition);
-    text-decoration: none;
-}
-
-.btn-secondary:hover {
-    background: var(--bg-active);
-}
-
-.btn-danger {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 12px 24px;
-    background: var(--color-danger);
-    color: #fff;
-    border: none;
-    border-radius: var(--radius-sm);
-    font-size: 0.9375rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: var(--transition);
-}
-
-.btn-danger:hover {
-    opacity: 0.8;
-    transform: scale(0.98);
-}
-
-.btn-success {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 12px 24px;
-    background: var(--color-success);
-    color: #fff;
-    border: none;
-    border-radius: var(--radius-sm);
-    font-size: 0.9375rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: var(--transition);
-}
-
-.btn-success:hover {
-    opacity: 0.8;
-    transform: scale(0.98);
-}
-
-.btn-view {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 4px;
-    padding: 6px 12px;
-    background: var(--color-purple);
-    color: #fff;
-    border: none;
-    border-radius: var(--radius-sm);
-    font-size: 0.75rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: var(--transition);
-    text-decoration: none;
-}
-
-.btn-view:hover {
-    opacity: 0.85;
-    transform: scale(0.95);
-}
-
-.btn-block {
-    width: 100%;
-}
-
-/* ============================================
-   ACTIONS CONTAINER - FLEX FORMAT
-   ============================================ */
-.actions-container {
-    display: flex;
-    gap: 6px;
-    align-items: center;
-    flex-wrap: nowrap;
-    justify-content: center;
-}
-
-.actions-container .btn-view,
-.actions-container .btn-secondary,
-.actions-container .btn-danger {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 4px 10px;
+.work-hours-card .label {
     font-size: 0.7rem;
-    border-radius: var(--radius-sm);
-    border: none;
-    cursor: pointer;
-    transition: var(--transition);
-    min-width: 32px;
-    height: 28px;
-}
-
-.actions-container .btn-view {
-    background: var(--color-purple);
-    color: #fff;
-}
-
-.actions-container .btn-view:hover {
-    opacity: 0.85;
-    transform: scale(0.95);
-}
-
-.actions-container .btn-secondary {
-    background: var(--bg-hover);
-    color: var(--text-primary);
-    border: 1px solid var(--border-color);
-}
-
-.actions-container .btn-secondary:hover {
-    background: var(--bg-active);
-}
-
-.actions-container .btn-danger {
-    background: var(--color-danger);
-    color: #fff;
-}
-
-.actions-container .btn-danger:hover {
-    opacity: 0.8;
-    transform: scale(0.95);
-}
-
-/* ============================================
-   ERROR MESSAGE
-   ============================================ */
-.error-message {
-    display: none;
-    align-items: center;
-    gap: 10px;
-    background: #fef2f2;
-    border: 1px solid #fecaca;
-    color: var(--color-danger);
-    padding: 12px 16px;
-    border-radius: var(--radius-sm);
-    font-size: 0.875rem;
-    margin-top: 16px;
-    width: 100%;
-}
-
-.error-message.show {
-    display: flex;
-}
-
-[data-theme="dark"] .error-message {
-    background: #3a1a1a;
-    border-color: var(--color-danger);
-}
-
-/* ============================================
-   THEME TOGGLE
-   ============================================ */
-.theme-toggle {
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    z-index: 1000;
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    border: 2px solid var(--border-color);
-    background: var(--bg-card);
-    color: var(--text-primary);
-    font-size: 1.25rem;
-    cursor: pointer;
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
-    transition: var(--transition);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.theme-toggle:hover {
-    transform: scale(1.1);
-    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.15);
-}
-
-.theme-toggle .sun {
-    display: none;
-}
-
-.theme-toggle .moon {
-    display: block;
-}
-
-[data-theme="dark"] .theme-toggle .sun {
-    display: block;
-}
-
-[data-theme="dark"] .theme-toggle .moon {
-    display: none;
-}
-
-/* ============================================
-   SIDEBAR - NAV PANEL
-   ============================================ */
-.app-container {
-    display: flex;
-    min-height: 100vh;
-    width: 100%;
-}
-
-.sidebar {
-    width: var(--sidebar-width);
-    min-width: var(--sidebar-width);
-    max-width: var(--sidebar-width);
-    flex: 0 0 var(--sidebar-width);
-    background: var(--bg-sidebar);
-    border-right: 1px solid var(--border-color);
-    display: flex;
-    flex-direction: column;
-    position: fixed;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    height: 100vh;
-    z-index: 100;
-    overflow-y: auto;
-    transition: transform 0.3s ease;
-}
-
-.sidebar-brand {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 18px 16px;
-    border-bottom: 1px solid var(--border-color);
-    flex-shrink: 0;
-}
-
-.sidebar-brand .brand-icon {
-    width: 32px;
-    height: 32px;
-    background: var(--text-primary);
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-
-.sidebar-brand .brand-icon i {
-    color: var(--bg-primary);
-    font-size: 14px;
-}
-
-.sidebar-brand .brand-text {
-    display: flex;
-    flex-direction: column;
-    line-height: 1.2;
-}
-
-.sidebar-brand .brand-text .brand-name {
-    font-size: 0.9rem;
-    font-weight: 700;
-    color: var(--text-primary);
-}
-
-.sidebar-brand .brand-text .brand-version {
-    font-size: 0.55rem;
-    font-weight: 400;
     color: var(--text-muted);
 }
 
-.sidebar-nav {
-    flex: 1;
-    padding: 12px 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    overflow-y: auto;
-}
-
-.nav-link {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 12px;
-    border-radius: var(--radius-sm);
-    color: var(--text-muted);
-    font-weight: 500;
-    font-size: 0.8rem;
-    transition: var(--transition);
-    text-decoration: none;
-    white-space: nowrap;
-}
-
-.nav-link i {
-    width: 18px;
-    text-align: center;
-    font-size: 0.9rem;
-    color: var(--text-muted);
-    flex-shrink: 0;
-}
-
-.nav-link:hover {
-    background: var(--bg-hover);
-    color: var(--text-primary);
-}
-
-.nav-link:hover i {
-    color: var(--text-primary);
-}
-
-.nav-link.active {
-    background: var(--bg-active);
-    color: var(--text-primary);
-    font-weight: 600;
-}
-
-.nav-link.active i {
-    color: var(--text-primary);
-}
-
-.sidebar-footer {
-    padding: 12px 10px;
-    border-top: 1px solid var(--border-color);
-    flex-shrink: 0;
-}
-
-.btn-logout {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    width: 100%;
-    padding: 10px 12px;
-    border: none;
-    border-radius: var(--radius-sm);
-    background: transparent;
-    color: var(--text-muted);
-    font-size: 0.8rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: var(--transition);
-}
-
-.btn-logout:hover {
-    background: #fef2f2;
-    color: var(--color-danger);
-}
-
-.btn-logout i {
-    width: 18px;
-    text-align: center;
-    flex-shrink: 0;
-}
-
-[data-theme="dark"] .btn-logout:hover {
-    background: #3a1a1a;
-    color: var(--color-danger);
-}
-
-/* ============================================
-   SIDEBAR OVERLAY (HAMBURGER UCHUN)
-   ============================================ */
-.sidebar-overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.3);
-    z-index: 99;
-}
-
-.sidebar-overlay.show {
-    display: block;
-}
-
-/* ============================================
-   MAIN CONTENT
-   ============================================ */
-.main-content {
-    flex: 1;
-    min-width: 0;
-    min-height: 100vh;
-    margin-left: var(--sidebar-width);
-    width: calc(100% - var(--sidebar-width));
-    max-width: calc(100% - var(--sidebar-width));
-}
-
-.top-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 16px 24px;
-    background: var(--bg-header);
-    border-bottom: 1px solid var(--border-color);
-    position: sticky;
-    top: 0;
-    z-index: 50;
-}
-
-.header-left {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.menu-toggle {
-    display: none;
-    background: none;
-    border: none;
-    font-size: 1.1rem;
-    color: var(--text-primary);
-    cursor: pointer;
-    padding: 4px;
-    transition: var(--transition);
-}
-
-.menu-toggle:hover {
-    color: var(--text-muted);
-}
-
-.header-left h2 {
-    font-size: 1.2rem;
-    font-weight: 700;
-    color: var(--text-primary);
-}
-
-.header-left h2 i {
-    margin-right: 8px;
-    color: var(--text-muted);
-}
-
-.header-left .text-muted {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-}
-
-.header-right {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.header-right .theme-toggle-small {
-    display: none !important;
-}
-
-.user-profile {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.user-avatar {
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
-    background: var(--text-primary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--bg-primary);
-    font-weight: 600;
-    font-size: 0.8rem;
-    flex-shrink: 0;
-}
-
-.user-info .user-name {
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: var(--text-primary);
-}
-
-.user-info .user-role {
-    font-size: 0.65rem;
-    color: var(--text-muted);
-}
-
-/* ============================================
-   RESPONSIVE - HAMBURGER MENU
-   ============================================ */
-@media (max-width: 768px) {
-    .sidebar {
-        position: fixed;
-        top: 0;
-        left: 0;
-        bottom: 0;
-        transform: translateX(-100%);
-        width: 260px;
-        min-width: 260px;
-        max-width: 260px;
-        flex: 0 0 260px;
-        height: 100vh;
-        z-index: 200;
-    }
-
-    .sidebar.open {
-        transform: translateX(0);
-        box-shadow: 4px 0 30px rgba(0, 0, 0, 0.15);
-    }
-
-    .main-content {
-        margin-left: 0;
-        width: 100%;
-        max-width: 100%;
-        min-width: 0;
-    }
-
-    .menu-toggle {
-        display: block !important;
-    }
-
-    .top-header {
-        padding: 12px 16px;
-    }
-
-    .header-left .text-muted {
-        display: none;
-    }
-
-    .user-info {
-        display: none;
-    }
-
-    .sidebar-overlay.show {
-        display: block;
-    }
-}
-
-@media (max-width: 480px) {
-    .login-card {
-        padding: 20px 14px;
-    }
-
-    .login-logo h1 {
-        font-size: 1.1rem;
-    }
-
-    .login-logo .logo-icon {
-        width: 48px;
-        height: 48px;
-        border-radius: 14px;
-    }
-
-    .login-logo .logo-icon i {
-        font-size: 20px;
-    }
-
-    .login-logo {
-        margin-bottom: 20px;
-    }
-
-    .form-group {
-        margin-bottom: 12px;
-    }
-
-    .input-wrapper input,
-    .input-wrapper select,
-    .input-wrapper textarea {
-        padding: 8px 12px;
-        font-size: 0.8rem;
-        border-radius: 8px;
-    }
-
-    .input-wrapper input[type="password"] {
-        padding-right: 40px;
-    }
-
-    .password-toggle {
-        width: 26px;
-        height: 26px;
-        font-size: 0.8rem;
-        right: 8px;
-    }
-
-    .btn-primary,
-    .btn-secondary,
-    .btn-danger {
-        padding: 8px 14px;
-        font-size: 0.8rem;
-        border-radius: 8px;
-    }
-
-    .theme-toggle {
-        bottom: 16px;
-        right: 16px;
-        width: 38px;
-        height: 38px;
-        font-size: 0.9rem;
-    }
-
-    .data-table th,
-    .data-table td {
-        padding: 6px 8px;
-        font-size: 0.65rem;
-    }
-}
-
-/* ============================================
-   BTN GROUP - O'QITUVCHILAR/O'QUVCHILAR/TO'LOVLAR
-   ============================================ */
-.btn-group-container {
-    display: flex;
-    gap: 8px;
-    padding: 12px 24px;
-    flex-wrap: wrap;
-}
-
-.btn-group-container .btn-group-btn {
-    padding: 8px 20px;
-    border: 2px solid var(--border-color);
-    border-radius: var(--radius-sm);
-    background: var(--bg-card);
-    color: var(--text-muted);
-    cursor: pointer;
-    font-size: 0.8rem;
-    font-weight: 500;
-    transition: var(--transition);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.btn-group-container .btn-group-btn:hover {
-    border-color: var(--text-primary);
-    color: var(--text-primary);
-}
-
-.btn-group-container .btn-group-btn.active {
-    border-color: var(--color-purple);
-    background: var(--color-purple);
-    color: #fff;
-}
-
-/* ============================================
+/* ============================================================
    PAYMENTS STATS
-   ============================================ */
+   ============================================================ */
 .payment-stats-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -3489,17 +2310,14 @@ body {
     background: #e8f0fe;
     color: #007aff;
 }
-
 .payment-stat-card .stat-icon.green {
     background: #e8f5e9;
     color: #34c759;
 }
-
 .payment-stat-card .stat-icon.purple {
     background: #f3e8ff;
     color: #7c3aed;
 }
-
 .payment-stat-card .stat-icon.orange {
     background: #fff3e0;
     color: #ff9500;
@@ -3509,223 +2327,57 @@ body {
     font-size: 0.75rem;
     color: var(--text-muted);
 }
-
 .payment-stat-card .stat-info .stat-value {
     font-size: 1.3rem;
     font-weight: 700;
     color: var(--text-primary);
 }
 
-
-/* ============================================
-   REPORTS PAGE - QO'SHIMCHA
-   ============================================ */
-
-/* Report cards */
-.report-card {
-    background: var(--bg-card);
-    border-radius: var(--radius);
-    padding: 20px 24px;
-    border: 1px solid var(--border-color);
+/* ============================================================
+   OTHER - QO'SHIMCHA
+   ============================================================ */
+.btn-group-container {
     display: flex;
-    flex-direction: column;
-    gap: 10px;
-    transition: var(--transition);
-}
-
-.report-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
-}
-
-.report-card .report-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    width: 100%;
-}
-
-.report-card .report-header .icon {
-    width: 42px;
-    height: 42px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.2rem;
-    flex-shrink: 0;
-}
-
-.report-card .report-header .icon.blue {
-    background: #e8f0fe;
-    color: #007aff;
-}
-
-.report-card .report-header .icon.green {
-    background: #e8f5e9;
-    color: #34c759;
-}
-
-.report-card .report-header .icon.purple {
-    background: #f3e8ff;
-    color: #7c3aed;
-}
-
-.report-card .report-header .icon.orange {
-    background: #fff3e0;
-    color: #ff9500;
-}
-
-.report-card .report-header h4 {
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    margin: 0;
-}
-
-.report-card .report-stats {
-    display: flex;
-    gap: 16px;
-    font-size: 0.8rem;
-    color: var(--text-secondary);
+    gap: 8px;
+    padding: 12px 24px;
     flex-wrap: wrap;
 }
 
-.report-card .report-stats strong {
-    color: var(--text-primary);
-}
-
-/* ============================================
-   ATTENDANCE DETAILS - DAVOMAT TAFSILOTLARI
-   ============================================ */
-.attendance-detail-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 12px;
-    padding: 0 24px 24px;
-}
-
-.attendance-detail-card {
-    background: var(--bg-card);
-    border-radius: var(--radius);
-    padding: 14px 18px;
-    border: 1px solid var(--border-color);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-
-.attendance-detail-card .info .name {
-    font-weight: 600;
-    font-size: 0.9rem;
-    color: var(--text-primary);
-}
-
-.attendance-detail-card .info .role {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-}
-
-.attendance-detail-card .info .time {
-    font-size: 0.7rem;
-    color: var(--text-muted);
-}
-
-.attendance-detail-card .status-badge {
-    font-size: 0.7rem;
-}
-
-/* ============================================
-   WORK HOURS - ISH VAQTLARI
-   ============================================ */
-.work-hours-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 12px;
-    padding: 0 24px 24px;
-}
-
-.work-hours-card {
-    background: var(--bg-card);
-    border-radius: var(--radius);
-    padding: 14px 18px;
-    border: 1px solid var(--border-color);
-    text-align: center;
-}
-
-.work-hours-card .name {
-    font-weight: 600;
-    font-size: 0.9rem;
-    color: var(--text-primary);
-}
-
-.work-hours-card .hours {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: var(--color-purple);
-    margin-top: 4px;
-}
-
-.work-hours-card .label {
-    font-size: 0.7rem;
-    color: var(--text-muted);
-}
-
-/* ============================================
-   SUBJECTS MODAL - INPUT FIX
-   ============================================ */
-.modal .form-group .input-wrapper {
-    position: relative;
-    width: 100%;
-}
-
-.modal .form-group .input-wrapper input,
-.modal .form-group .input-wrapper select {
-    width: 100%;
-    padding: 12px 16px;
+.btn-group-container .btn-group-btn {
+    padding: 8px 20px;
     border: 2px solid var(--border-color);
     border-radius: var(--radius-sm);
-    font-size: 0.9375rem;
-    background: var(--bg-input);
-    color: var(--text-primary);
-    transition: var(--transition);
-    outline: none;
-    font-family: var(--font-family);
-    -webkit-appearance: none;
-    appearance: none;
-}
-
-.modal .form-group .input-wrapper input:focus,
-.modal .form-group .input-wrapper select:focus {
-    border-color: var(--border-focus);
-    box-shadow: var(--shadow-focus);
-}
-
-.modal .form-group .input-wrapper input::placeholder {
+    background: var(--bg-card);
     color: var(--text-muted);
-    font-weight: 400;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 500;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
-/* ============================================
-   PAYMENT ITEMS - TO'LOVLAR
-   ============================================ */
+.btn-group-container .btn-group-btn:hover {
+    border-color: var(--text-primary);
+    color: var(--text-primary);
+}
+.btn-group-container .btn-group-btn.active {
+    border-color: var(--color-purple);
+    background: var(--color-purple);
+    color: #fff;
+}
+
 .payment-item {
     transition: var(--transition);
 }
-
 .payment-item:hover {
     background: var(--bg-hover);
 }
 
-/* ============================================
-   REASON INPUT - SABAB
-   ============================================ */
 .reason-input {
     transition: var(--transition);
 }
-
 .reason-input:focus {
     border-color: var(--border-focus);
     box-shadow: var(--shadow-focus);
@@ -3735,20 +2387,15 @@ body {
 .btn-save-reason {
     transition: var(--transition);
 }
-
 .btn-save-reason:hover {
     opacity: 0.85;
     transform: scale(0.95);
 }
-
 .btn-save-reason:disabled {
     opacity: 0.5;
     cursor: not-allowed;
 }
 
-/* ============================================
-   TEACHER PROFILE - O'QITUVCHI PROFILI
-   ============================================ */
 .teacher-profile-view {
     background: var(--bg-card);
     border-radius: var(--radius);
@@ -3763,9 +2410,69 @@ body {
     border: 1px solid var(--border-color);
 }
 
-/* ============================================
-   MONEY FORMAT - PUL FORMATI
-   ============================================ */
+.teacher-profile-view .profile-header,
+.student-profile-view .profile-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.teacher-profile-view .profile-header .avatar,
+.student-profile-view .profile-header .avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: var(--text-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    color: var(--bg-primary);
+}
+
+.teacher-profile-view .profile-header .info h3,
+.student-profile-view .profile-header .info h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.teacher-profile-view .profile-header .info p,
+.student-profile-view .profile-header .info p {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.teacher-profile-view .profile-stats,
+.student-profile-view .profile-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin: 14px 0;
+}
+
+.teacher-profile-view .profile-stats .stat-item,
+.student-profile-view .profile-stats .stat-item {
+    text-align: center;
+    padding: 10px;
+    background: var(--bg-hover);
+    border-radius: var(--radius-sm);
+}
+
+.teacher-profile-view .profile-stats .stat-item .number,
+.student-profile-view .profile-stats .stat-item .number {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.teacher-profile-view .profile-stats .stat-item .label,
+.student-profile-view .profile-stats .stat-item .label {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+}
+
 .money-amount {
     font-weight: 600;
     font-variant-numeric: tabular-nums;
@@ -3775,293 +2482,11 @@ body {
 .money-amount.uzs {
     color: var(--color-success);
 }
-
 .money-amount.usd {
     color: #007aff;
 }
-
 .money-amount.eur {
     color: #ff9500;
 }
 
-/* ============================================
-   SIDEBAR - NAVIGATION
-   ============================================ */
-.sidebar-nav {
-    flex: 1;
-    padding: 12px 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    overflow-y: auto;
-}
-
-.nav-link {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 12px;
-    border-radius: var(--radius-sm);
-    color: var(--text-muted);
-    font-weight: 500;
-    font-size: 0.8rem;
-    transition: var(--transition);
-    text-decoration: none;
-    white-space: nowrap;
-}
-
-.nav-link i {
-    width: 18px;
-    text-align: center;
-    font-size: 0.9rem;
-    color: var(--text-muted);
-    flex-shrink: 0;
-}
-
-.nav-link:hover {
-    background: var(--bg-hover);
-    color: var(--text-primary);
-}
-
-.nav-link:hover i {
-    color: var(--text-primary);
-}
-
-.nav-link.active {
-    background: var(--bg-active);
-    color: var(--text-primary);
-    font-weight: 600;
-}
-
-.nav-link.active i {
-    color: var(--text-primary);
-}
-
-/* ============================================
-   CHARTS - GRAFIKLAR
-   ============================================ */
-.charts-grid {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 14px;
-    padding: 0 24px 14px;
-}
-
-.chart-card {
-    background: var(--bg-card);
-    border-radius: var(--radius);
-    padding: 16px 20px;
-    border: 1px solid var(--border-color);
-    min-width: 0;
-}
-
-.chart-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 12px;
-}
-
-.chart-header h3 {
-    flex: 1 1 0;
-    min-width: 0;
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    white-space: normal;
-    word-break: break-word;
-}
-
-.chart-header h3 i {
-    margin-right: 6px;
-    color: var(--text-muted);
-}
-
-.chart-card canvas {
-    max-height: 220px;
-    width: 100% !important;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .charts-grid {
-        grid-template-columns: 1fr;
-        padding: 0 16px 12px;
-    }
-}
-
-/* ============================================================
-           NOTIFICATION PANEL — RESPONSIVE + SCROLL
-           ============================================================ */
- 
-        .notification-wrapper {
-            position: relative;
-            display: inline-block;
-        }
- 
-        .notification-btn {
-            background: none;
-            border: none;
-            font-size: 1.2rem;
-            color: var(--text-primary);
-            position: relative;
-            padding: 8px;
-            cursor: pointer;
-        }
- 
-        #notificationBadge {
-            position: absolute;
-            top: -2px;
-            right: -4px;
-            background: #ff3b30;
-            color: white;
-            font-size: 0.6rem;
-            border-radius: 50%;
-            padding: 2px 5px;
-            min-width: 18px;
-            text-align: center;
-            display: none;
-            font-weight: 600;
-            line-height: 1.4;
-        }
- 
-        /* Panel */
-        #notificationPanel {
-            display: none;
-            position: fixed;          /* fixed — ekrandan chiqmaydi */
-            top: 60px;
-            right: 12px;
-            left: 12px;               /* mobilda to'liq kenglik */
-            max-width: 420px;
-            margin-left: auto;        /* o'ngga yopishadi */
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 14px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.18);
-            z-index: 9999;
-            overflow: hidden;
-            display: none;
-            flex-direction: column;
-        }
- 
-        /* Panel header — fikslanadi */
-        .notif-panel-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 14px;
-            border-bottom: 1px solid var(--border-color);
-            background: var(--bg-card);
-            flex-shrink: 0;
-        }
- 
-        .notif-panel-header h4 {
-            font-size: 0.9rem;
-            font-weight: 600;
-            margin: 0;
-            color: var(--text-primary);
-        }
- 
-        #markAllRead {
-            background: none;
-            border: none;
-            color: #007aff;
-            font-size: 0.72rem;
-            cursor: pointer;
-            white-space: nowrap;
-            padding: 4px 0;
-        }
- 
-        /* Scroll bo'ladigan qism */
-        #notificationList {
-            overflow-y: auto;
-            max-height: 360px;        /* bu yerda scroll bo'ladi */
-            padding: 6px 0;
-        }
- 
-        /* Har bir xabar */
-        .notification-item {
-            padding: 10px 14px;
-            border-bottom: 1px solid var(--border-color);
-            transition: background 0.2s;
-        }
- 
-        .notification-item:last-child {
-            border-bottom: none;
-        }
- 
-        .notification-item.unread {
-            background: var(--bg-hover);
-            border-left: 3px solid #007aff;
-        }
- 
-        .notification-item-inner {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 8px;
-        }
- 
-        .notification-body {
-            flex: 1;
-            min-width: 0;             /* matn uzun bo'lsa wrap bo'ladi */
-        }
- 
-        .notification-title {
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            display: block;
-            word-break: break-word;
-            margin-bottom: 4px;
-        }
- 
-        .notification-message {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            margin: 0 0 4px 0;
-            word-break: break-word;
-            white-space: pre-wrap;    /* uzun matn pastga tushadi, height oshmaydi */
-            line-height: 1.45;
-        }
- 
-        .notification-time {
-            font-size: 0.7rem;
-            color: var(--text-muted);
-        }
- 
-        .mark-read-btn {
-            background: none;
-            border: 1px solid #007aff;
-            color: #007aff;
-            font-size: 0.68rem;
-            cursor: pointer;
-            white-space: nowrap;
-            padding: 3px 8px;
-            border-radius: 6px;
-            flex-shrink: 0;
-            align-self: flex-start;
-        }
- 
-        .notif-read-label {
-            font-size: 0.68rem;
-            color: var(--text-muted);
-            white-space: nowrap;
-            padding: 3px 0;
-            flex-shrink: 0;
-            align-self: flex-start;
-        }
- 
-        /* Katta ekranda panel o'ngdan */
-        @media (min-width: 480px) {
-            #notificationPanel {
-                position: absolute;
-                top: 45px;
-                right: 0;
-                left: auto;
-                width: 380px;
-                fixed: unset;
-            }
-        }
+console.log('✅ style.css yuklandi (Admin-Customer - Clean Version)');
