@@ -2426,9 +2426,11 @@ body {
     display: block;
 }
 
-/* ⭐ MOBILE - SIDEBAR YASHIRISH VA OCHISH */
+/* ============================================================
+   RESPONSIVE - HAMBURGER MENU (TO'G'RI)
+   ============================================================ */
 @media (max-width: 768px) {
-    /* Sidebar yashirin */
+    /* SIDEBAR - YASHIRIN */
     .sidebar {
         position: fixed !important;
         top: 0;
@@ -2439,7 +2441,7 @@ body {
         min-width: 280px !important;
         max-width: 280px !important;
         height: 100vh !important;
-        z-index: 200 !important;
+        z-index: 999 !important;
         background: var(--bg-sidebar) !important;
         border-right: 1px solid var(--border-color) !important;
         transition: transform 0.3s ease !important;
@@ -2447,13 +2449,20 @@ body {
         overflow-y: auto !important;
     }
 
-    /* Sidebar ochiq */
+    /* SIDEBAR - OCHIQ */
     .sidebar.open {
         transform: translateX(0) !important;
         box-shadow: 4px 0 30px rgba(0, 0, 0, 0.2) !important;
     }
 
-    /* ⭐ HAMBURGER TUGMA */
+    /* MAIN CONTENT - TO'LIQ KENGLIK */
+    .main-content {
+        margin-left: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    /* HAMBURGER TUGMA */
     .menu-toggle {
         display: flex !important;
         align-items: center;
@@ -2469,19 +2478,11 @@ body {
         transition: background 0.2s;
         padding: 0;
     }
-
     .menu-toggle:hover {
         background: var(--bg-hover);
     }
 
-    /* Main content to'liq kenglikda */
-    .main-content {
-        margin-left: 0 !important;
-        width: 100% !important;
-        max-width: 100% !important;
-    }
-
-    /* ⭐ OVERLAY - sidebar ochilganda ko'rinadi */
+    /* OVERLAY */
     .sidebar-overlay {
         display: none !important;
         position: fixed !important;
@@ -2490,14 +2491,264 @@ body {
         right: 0;
         bottom: 0;
         background: rgba(0, 0, 0, 0.4);
-        z-index: 199 !important;
+        z-index: 998 !important;
     }
-
     .sidebar-overlay.show {
         display: block !important;
     }
+
+    /* HEADER */
+    .top-header {
+        padding: 12px 16px;
+    }
+    .header-left .text-muted {
+        display: none;
+    }
+    .user-info {
+        display: none;
+    }
+
+    /* STATS */
+    .stats-grid {
+        padding: 12px 16px;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+    .stat-card {
+        padding: 12px 14px;
+    }
+    .stat-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 1rem;
+    }
+    .stat-info .stat-value {
+        font-size: 1.1rem;
+    }
+
+    /* TABLE */
+    .table-container {
+        padding: 0 16px 16px;
+    }
+    .data-table th,
+    .data-table td {
+        padding: 8px 10px;
+        font-size: 0.7rem;
+    }
+
+    /* CHARTS */
+    .charts-grid {
+        padding: 0 16px 12px;
+        grid-template-columns: 1fr;
+    }
+    .chart-card {
+        padding: 14px;
+    }
+
+    /* SUBSCRIPTION */
+    .subscription-card {
+        grid-template-columns: 1fr 1fr;
+        padding: 12px 16px;
+        gap: 10px;
+    }
+    .subscription-card .sub-item {
+        padding: 10px 14px;
+    }
+
+    /* SETTINGS */
+    .settings-container {
+        padding: 12px 16px;
+    }
+    .settings-card {
+        padding: 16px 18px;
+    }
+
+    /* TOOLBAR */
+    .toolbar {
+        padding: 12px 16px;
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .filter-box {
+        justify-content: stretch;
+    }
+    .filter-box select {
+        flex: 1;
+    }
+
+    /* THEME OPTIONS */
+    .theme-options {
+        flex-wrap: wrap;
+    }
+    .theme-option {
+        flex: 1;
+        min-width: 60px;
+        padding: 10px 14px;
+    }
+
+    /* SUBJECTS */
+    .subjects-grid {
+        padding: 0 16px 16px;
+        grid-template-columns: 1fr !important;
+    }
+
+    /* PROFILE */
+    .profile-section {
+        padding: 12px 16px;
+        grid-template-columns: 1fr;
+    }
+    .profile-card {
+        padding: 18px;
+    }
+    .profile-avatar {
+        width: 72px;
+        height: 72px;
+        font-size: 2rem;
+    }
+
+    /* ALL */
+    .all-stats-grid {
+        padding: 12px 16px;
+        grid-template-columns: 1fr;
+    }
+    .all-attendance-grid {
+        padding: 0 16px 16px;
+    }
+
+    /* ATTENDANCE */
+    .attendance-page-grid {
+        padding: 12px 16px;
+        grid-template-columns: 1fr;
+    }
+    .attendance-cards {
+        grid-template-columns: 1fr 1fr;
+        padding: 0 16px 12px;
+    }
+
+    /* REPORTS */
+    .reports-grid {
+        padding: 12px 16px;
+        grid-template-columns: 1fr;
+    }
+
+    /* MODAL */
+    .modal-content {
+        padding: 20px;
+        max-width: 95%;
+    }
+
+    /* LOGIN */
+    .login-card {
+        padding: 24px 18px;
+    }
+
+    /* THEME TOGGLE */
+    .theme-toggle {
+        bottom: 16px;
+        right: 16px;
+        width: 42px;
+        height: 42px;
+        font-size: 1rem;
+    }
 }
 
+@media (max-width: 480px) {
+    .login-card {
+        padding: 20px 14px;
+    }
+    .login-logo h1 {
+        font-size: 1.1rem;
+    }
+    .login-logo .logo-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 14px;
+    }
+    .login-logo .logo-icon i {
+        font-size: 20px;
+    }
+    .login-logo {
+        margin-bottom: 20px;
+    }
+    .form-group {
+        margin-bottom: 12px;
+    }
+    .input-wrapper input,
+    .input-wrapper select,
+    .input-wrapper textarea {
+        padding: 8px 12px;
+        font-size: 0.8rem;
+        border-radius: 8px;
+    }
+    .input-wrapper input[type="password"] {
+        padding-right: 40px;
+    }
+    .password-toggle {
+        width: 26px;
+        height: 26px;
+        font-size: 0.8rem;
+        right: 8px;
+    }
+    .btn-primary,
+    .btn-secondary,
+    .btn-danger {
+        padding: 8px 14px;
+        font-size: 0.8rem;
+        border-radius: 8px;
+    }
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    .attendance-cards {
+        grid-template-columns: 1fr;
+    }
+    .subscription-card {
+        grid-template-columns: 1fr;
+    }
+    .theme-toggle {
+        bottom: 16px;
+        right: 16px;
+        width: 38px;
+        height: 38px;
+        font-size: 0.9rem;
+    }
+    .data-table th,
+    .data-table td {
+        padding: 6px 8px;
+        font-size: 0.65rem;
+    }
+    .all-attendance-card {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .attendance-btn-group {
+        justify-content: center;
+    }
+    .reports-grid {
+        grid-template-columns: 1fr;
+    }
+    .modal-content {
+        padding: 16px;
+        max-width: 100%;
+    }
+    .modal-header h3 {
+        font-size: 0.9rem;
+    }
+    .modal-footer .btn-secondary,
+    .modal-footer .btn-primary {
+        padding: 6px 14px;
+        font-size: 0.75rem;
+    }
+    .teacher-profile-view .profile-stats,
+    .student-profile-view .profile-stats {
+        grid-template-columns: 1fr;
+    }
+    .teacher-profile-view .profile-header,
+    .student-profile-view .profile-header {
+        flex-direction: column;
+        text-align: center;
+    }
+}
 /* ============================================
    LOGIN PAGE
    ============================================ */
