@@ -415,6 +415,41 @@ body {
     background: var(--bg-active);
 }
 
+/* ============================================================
+   BACK BUTTON - MOBIL UCHUN
+   ============================================================ */
+
+.back-button {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: background 0.2s;
+    text-decoration: none;
+}
+
+.back-button:hover {
+    background: var(--bg-hover);
+}
+
+@media (max-width: 768px) {
+    .back-button {
+        display: flex !important;
+    }
+    
+    /* Hamburger tugmani yashirish */
+    .menu-toggle {
+        display: none !important;
+    }
+}
+
 .btn-danger {
     display: inline-flex;
     align-items: center;
