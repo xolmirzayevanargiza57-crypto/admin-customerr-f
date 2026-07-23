@@ -1,5 +1,5 @@
 // ============================================================
-// THEME - ADMIN-CUSTOMER (TO'LIQ)
+// THEME - ADMIN-CUSTOMER (TO'LIQ TUZATILGAN)
 // Loyiha: Admin-Customer Frontend
 // Fayl: js/theme.js
 // ============================================================
@@ -7,9 +7,6 @@
 const Theme = {
     currentTheme: localStorage.getItem('theme') || 'auto',
 
-    // ============================================================
-    // THEME QO'LLASH
-    // ============================================================
     applyTheme(theme) {
         this.currentTheme = theme;
         localStorage.setItem('theme', theme);
@@ -26,9 +23,6 @@ const Theme = {
         this.updateServerTheme(theme);
     },
 
-    // ============================================================
-    // THEME OPTION TUGMALARINI YANGILASH
-    // ============================================================
     updateThemeOptionButtons() {
         document.querySelectorAll('.theme-option[data-theme]').forEach(button => {
             const theme = button.dataset.theme;
@@ -36,9 +30,6 @@ const Theme = {
         });
     },
 
-    // ============================================================
-    // TOGGLE ICON YANGILASH
-    // ============================================================
     updateToggleIcon() {
         const themeToggle = document.getElementById('themeToggle');
         if (!themeToggle) return;
@@ -56,9 +47,6 @@ const Theme = {
         }
     },
 
-    // ============================================================
-    // SERVERGA THEME SAQLASH
-    // ============================================================
     async updateServerTheme(theme) {
         try {
             const token = localStorage.getItem('customerToken') || sessionStorage.getItem('customerToken');
@@ -69,9 +57,6 @@ const Theme = {
         }
     },
 
-    // ============================================================
-    // SERVERDAN THEME YUKLASH
-    // ============================================================
     async loadThemeFromServer() {
         try {
             const token = localStorage.getItem('customerToken') || sessionStorage.getItem('customerToken');
@@ -89,18 +74,13 @@ const Theme = {
         }
     },
 
-    // ============================================================
-    // 1 CLICK THEME TOGGLE - LIGHT <-> DARK
-    // ============================================================
     toggle() {
         const current = document.documentElement.getAttribute('data-theme');
         const newTheme = current === 'dark' ? 'light' : 'dark';
         this.applyTheme(newTheme);
     },
 
-    // ============================================================
-    // ⭐ HAMBURGER MENU - TO'G'RI VA ISHONCHLI
-    // ============================================================
+    // ⭐ HAMBURGER MENU - TO'G'RI
     initSidebar() {
         const menuToggle = document.getElementById('menuToggle');
         const sidebar = document.getElementById('sidebar');
@@ -119,11 +99,16 @@ const Theme = {
         newToggle.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
-            sidebar.classList.toggle('open');
-            if (overlay) {
-                overlay.classList.toggle('show');
+            
+            if (sidebar.classList.contains('open')) {
+                sidebar.classList.remove('open');
+                if (overlay) overlay.classList.remove('show');
+                console.log('🔒 Sidebar yopildi');
+            } else {
+                sidebar.classList.add('open');
+                if (overlay) overlay.classList.add('show');
+                console.log('🍔 Sidebar ochildi');
             }
-            console.log('🍔 Sidebar toggled:', sidebar.classList.contains('open'));
         });
 
         // Overlay bosilganda yopish
@@ -147,14 +132,6 @@ const Theme = {
             }
         });
 
-        // Window resize da yopish (agar mobile dan desktop ga o'tsa)
-        window.addEventListener('resize', function() {
-            if (window.innerWidth > 768 && sidebar.classList.contains('open')) {
-                sidebar.classList.remove('open');
-                if (overlay) overlay.classList.remove('show');
-            }
-        });
-
         console.log('✅ Sidebar init complete');
     }
 };
@@ -164,7 +141,6 @@ const Theme = {
 // ============================================================
 document.addEventListener('DOMContentLoaded', async () => {
 
-    // ⭐ Theme toggle - 1 click
     const themeToggle = document.getElementById('themeToggle');
     if (themeToggle) {
         const newBtn = themeToggle.cloneNode(true);
@@ -172,7 +148,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         newBtn.addEventListener('click', () => Theme.toggle());
     }
 
-    // ⭐ Theme options (settings sahifasi)
     document.querySelectorAll('.theme-option[data-theme]').forEach(button => {
         button.addEventListener('click', () => {
             const theme = button.dataset.theme;
@@ -182,10 +157,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     });
 
-    // ⭐ Hamburger menu - init
     Theme.initSidebar();
 
-    // System theme o'zgarishi
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
         if (Theme.currentTheme === 'auto') {
             document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
@@ -193,7 +166,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    // Hozir saqlangan themeni qo'llash
     Theme.applyTheme(Theme.currentTheme);
     await Theme.loadThemeFromServer();
 });
