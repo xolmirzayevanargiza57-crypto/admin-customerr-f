@@ -2406,161 +2406,96 @@ body {
     }
 }
 
+/* ============================================================
+   HAMBURGER MENU - TO'LIQ TUZATISH
+   ============================================================ */
 
-/* ============================================
-   THEME - LIGHT / DARK / AUTO
-   ============================================ */
-
-:root {
-    --bg-primary: #f5f5f7;
-    --bg-secondary: #ffffff;
-    --bg-card: #ffffff;
-    --bg-sidebar: #ffffff;
-    --bg-header: #ffffff;
-    --bg-input: #ffffff;
-    --bg-hover: #f1f1f3;
-    --bg-active: #e8e8ed;
-    --text-primary: #1c1c1e;
-    --text-secondary: #48484a;
-    --text-muted: #8e8e93;
-    --border-color: #d1d1d6;
-    --border-focus: #1c1c1e;
-    --shadow-focus: 0 0 0 4px rgba(0, 0, 0, 0.05);
-    --color-success: #34c759;
-    --color-danger: #ff3b30;
-    --color-warning: #ff9500;
-    --color-purple: #7c3aed;
-    --radius: 16px;
-    --radius-sm: 10px;
-    --transition: all 0.3s ease;
-    --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    --sidebar-width: 220px;
+/* ⭐ SIDEBAR OVERLAY */
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 99;
 }
 
-[data-theme="dark"] {
-    --bg-primary: #0a0a0a;
-    --bg-secondary: #1c1c1e;
-    --bg-card: #1c1c1e;
-    --bg-sidebar: #1c1c1e;
-    --bg-header: #1c1c1e;
-    --bg-input: #2c2c2e;
-    --bg-hover: #2c2c2e;
-    --bg-active: #3a3a3c;
-    --text-primary: #ffffff;
-    --text-secondary: #aeaeb2;
-    --text-muted: #636366;
-    --border-color: #3a3a3c;
-    --border-focus: #ffffff;
-    --shadow-focus: 0 0 0 4px rgba(255, 255, 255, 0.05);
+.sidebar-overlay.show {
+    display: block;
 }
 
-[data-theme="dark"] .stat-icon.blue {
-    background: #1a2a4a;
-    color: #4a9aff;
-}
+/* ⭐ MOBILE - SIDEBAR YASHIRISH VA OCHISH */
+@media (max-width: 768px) {
+    /* Sidebar yashirin */
+    .sidebar {
+        position: fixed !important;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        transform: translateX(-100%) !important;
+        width: 280px !important;
+        min-width: 280px !important;
+        max-width: 280px !important;
+        height: 100vh !important;
+        z-index: 200 !important;
+        background: var(--bg-sidebar) !important;
+        border-right: 1px solid var(--border-color) !important;
+        transition: transform 0.3s ease !important;
+        box-shadow: none !important;
+        overflow-y: auto !important;
+    }
 
-[data-theme="dark"] .stat-icon.green {
-    background: #1a3a2a;
-    color: #4ac759;
-}
+    /* Sidebar ochiq */
+    .sidebar.open {
+        transform: translateX(0) !important;
+        box-shadow: 4px 0 30px rgba(0, 0, 0, 0.2) !important;
+    }
 
-[data-theme="dark"] .stat-icon.purple {
-    background: #2a1a4a;
-    color: #9a6aff;
-}
+    /* ⭐ HAMBURGER TUGMA */
+    .menu-toggle {
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        background: none;
+        border: none;
+        font-size: 1.2rem;
+        color: var(--text-primary);
+        cursor: pointer;
+        transition: background 0.2s;
+        padding: 0;
+    }
 
-[data-theme="dark"] .stat-icon.orange {
-    background: #3a2a1a;
-    color: #ff9a4a;
-}
+    .menu-toggle:hover {
+        background: var(--bg-hover);
+    }
 
-[data-theme="dark"] .status-badge.active {
-    background: #1a3a2a;
-    color: #4ac759;
-}
+    /* Main content to'liq kenglikda */
+    .main-content {
+        margin-left: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
 
-[data-theme="dark"] .status-badge.blocked {
-    background: #3a1a1a;
-    color: #ff3b30;
-}
+    /* ⭐ OVERLAY - sidebar ochilganda ko'rinadi */
+    .sidebar-overlay {
+        display: none !important;
+        position: fixed !important;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.4);
+        z-index: 199 !important;
+    }
 
-[data-theme="dark"] .status-badge.inactive {
-    background: var(--bg-hover);
-    color: var(--text-muted);
-}
-
-[data-theme="dark"] .status-badge.present {
-    background: #1a3a2a;
-    color: #4ac759;
-}
-
-[data-theme="dark"] .status-badge.absent {
-    background: #3a1a1a;
-    color: #ff3b30;
-}
-
-[data-theme="dark"] .status-badge.absent-reason {
-    background: #3a2a1a;
-    color: #ff9a4a;
-}
-
-[data-theme="dark"] .payment-status.paid {
-    background: #1a3a2a;
-    color: #4ac759;
-}
-
-[data-theme="dark"] .payment-status.pending {
-    background: #3a2a1a;
-    color: #ff9a4a;
-}
-
-[data-theme="dark"] .payment-status.unpaid {
-    background: #3a1a1a;
-    color: #ff3b30;
-}
-
-/* ============================================
-   BASE
-   ============================================ */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-html {
-    font-family: var(--font-family);
-    font-size: 16px;
-    -webkit-font-smoothing: antialiased;
-}
-
-body {
-    background: var(--bg-primary);
-    color: var(--text-primary);
-    min-height: 100vh;
-    transition: var(--transition);
-}
-
-/* ============================================
-   SCROLLBAR
-   ============================================ */
-::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-}
-
-::-webkit-scrollbar-track {
-    background: var(--bg-hover);
-    border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb {
-    background: var(--border-color);
-    border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: var(--text-muted);
+    .sidebar-overlay.show {
+        display: block !important;
+    }
 }
 
 /* ============================================
