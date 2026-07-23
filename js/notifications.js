@@ -1,10 +1,11 @@
 // ============================================================
-// NOTIFICATIONS - ADMIN CUSTOMER (TO'LIQ)
+// NOTIFICATIONS - ADMIN CUSTOMER (TO'LIQ TUZATILGAN)
 // ============================================================
 
 let allNotifications = [];
 let currentFilter = 'all';
 let refreshInterval = null;
+let lastNotificationCount = 0;
 
 // ⭐ NOTIFICATION PERMISSION SO'RASH
 async function requestNotificationPermission() {
@@ -23,7 +24,6 @@ async function requestNotificationPermission() {
         return;
     }
     
-    // ⭐ RUXSAT SO'RASH
     try {
         const permission = await Notification.requestPermission();
         console.log('📨 Notification ruxsati:', permission);
@@ -46,10 +46,12 @@ function sendPushNotification(title, message, data = {}) {
             badge: '/favicon.ico',
             vibrate: [200, 100, 200],
             data: data,
-            requireInteraction: true
+            requireInteraction: true,
+            silent: false
         };
         
         const notification = new Notification(title || 'Yangi xabar', options);
+        
         notification.onclick = function() {
             window.focus();
             if (data.url) {
@@ -159,6 +161,7 @@ async function loadNotifications() {
                     });
                 }
             }
+            lastNotificationCount = newCount;
         } else {
             showError('Xabarlar yuklanmadi: ' + (response.message || 'Noma\'lum xatolik'));
         }
@@ -168,14 +171,22 @@ async function loadNotifications() {
     }
 }
 
-// ⭐ XABARLARNI KO'RSATISH
+// ⭐ XABARLARNI KO'RSATISH (TO'G'RI FILTR + FLEX + SCROLL)
 function renderNotifications(notifications) {
     const container = document.getElementById('notificationsList');
     if (!container) return;
 
-    const filtered = filterByDate(notifications, currentFilter);
+    const user = Auth.getUser();
+    const userId = user?._id;
+    
+    // ⭐ FAQAT O'ZIGA KELGAN XABARLAR
+    let filtered = notifications.filter(n => {
+        return n.recipientId === userId || n.recipientRole === 'all';
+    });
 
-    if (!filtered || filtered.length === 0) {
+    const filteredByDate = filterByDate(filtered, currentFilter);
+
+    if (!filteredByDate || filteredByDate.length === 0) {
         const filterLabels = {
             'all': 'Hozircha xabarlar yo\'q',
             'today': 'Bugun xabarlar yo\'q',
@@ -196,7 +207,7 @@ function renderNotifications(notifications) {
 
     // ⭐ Xabarlarni sana bo'yicha guruhlash
     const grouped = {};
-    filtered.forEach(notif => {
+    filteredByDate.forEach(notif => {
         const date = new Date(notif.createdAt);
         const dateKey = date.toLocaleDateString('uz-UZ', {
             timeZone: 'Asia/Tashkent',
@@ -229,7 +240,9 @@ function renderNotifications(notifications) {
                 <div class="notification-item ${isUnread ? 'unread' : ''}" style="padding: 14px 18px; border-bottom: 1px solid var(--border-color); transition: background 0.2s ease; display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; ${isUnread ? 'background: var(--bg-hover); border-left: 4px solid #007aff;' : ''}">
                     <div class="notification-body" style="flex: 1; min-width: 0;">
                         <span class="notification-title" style="font-size: 0.95rem; font-weight: 600; color: var(--text-primary); display: block; margin-bottom: 4px;">${notif.title || 'Xabar'}</span>
-                        <p class="notification-message" style="font-size: 0.85rem; color: var(--text-secondary); margin: 0 0 8px 0; word-break: break-word; white-space: pre-wrap; line-height: 1.5; max-height: 100px; overflow-y: auto;">${notif.message || ''}</p>
+                        <div class="notification-message-wrapper" style="max-height: 100px; overflow-y: auto; padding-right: 4px; margin: 4px 0;">
+                            <p class="notification-message" style="font-size: 0.85rem; color: var(--text-secondary); margin: 0; word-break: break-word; white-space: pre-wrap; line-height: 1.5;">${notif.message || ''}</p>
+                        </div>
                         <div class="notification-meta" style="display: flex; flex-wrap: wrap; gap: 12px; font-size: 0.7rem; color: var(--text-muted);">
                             <span><i class="fas fa-user"></i> ✉️ Yuborgan: ${sentByName}</span>
                             <span><i class="fas fa-clock"></i> ${formattedDate}</span>
@@ -401,18 +414,15 @@ function setupListeners() {
     // Sidebar toggle
     const menuToggle = document.getElementById('menuToggle');
     const sidebar = document.getElementById('sidebar');
-    if (menuToggle && sidebar) {
-        menuToggle.addEventListener('click', () => {
+    const overlay = document.getElementById('sidebarOverlay');
+    if (menuToggle && sidebar && overlay) {
+        menuToggle.addEventListener('click', function() {
             sidebar.classList.toggle('open');
+            overlay.classList.toggle('show');
         });
-        document.addEventListener('click', (e) => {
-            if (window.innerWidth <= 768) {
-                const isSidebar = sidebar.contains(e.target);
-                const isToggle = menuToggle.contains(e.target);
-                if (!isSidebar && !isToggle) {
-                    sidebar.classList.remove('open');
-                }
-            }
+        overlay.addEventListener('click', function() {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('show');
         });
     }
 }
@@ -490,7 +500,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         refreshInterval = setInterval(() => {
             loadNotifications();
-        }, 5000); // ⭐ 5 soniyada yangilash
+        }, 5000);
 
         setupListeners();
 
