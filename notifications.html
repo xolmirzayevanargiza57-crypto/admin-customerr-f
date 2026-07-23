@@ -1,412 +1,397 @@
-<!DOCTYPE html>
-<html lang="uz" data-theme="light">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Admin Customer - Bildirishnomalar</title>
+// ============================================================
+// NOTIFICATIONS - ADMIN-CUSTOMER (TO'LIQ)
+// Loyiha: Admin-Customer Frontend
+// Fayl: js/notifications.js
+// ============================================================
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+let allNotifications = [];
+let currentFilter = 'all';
+let refreshInterval = null;
 
-    <link rel="stylesheet" href="css/style.css" />
-    <link rel="stylesheet" href="css/input.css" />
-    <link rel="stylesheet" href="css/modal.css" />
-    <link rel="stylesheet" href="css/responsive.css" />
-    <link rel="stylesheet" href="css/theme.css" />
+// ============================================================
+// SAHIFA YUKLANGANDA
+// ============================================================
+document.addEventListener('DOMContentLoaded', async () => {
+    console.log('🚀 Notifications sahifasi yuklanmoqda...');
 
-    <style>
-        /* ============================================================
-           NOTIFICATIONS PAGE STYLES
-           ============================================================ */
-        .notifications-container {
-            padding: 16px 24px 24px 24px;
-            max-width: 900px;
-            margin: 0 auto;
+    try {
+        const token = localStorage.getItem('customerToken') || sessionStorage.getItem('customerToken');
+        if (!token) {
+            window.location.replace('index.html');
+            return;
         }
 
-        .notifications-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
+        const user = Auth.getUser();
+        if (user) {
+            const nameEl = document.getElementById('userName');
+            const initialEl = document.getElementById('userInitial');
+            if (nameEl) nameEl.textContent = Auth.getUserName();
+            if (initialEl) initialEl.textContent = Auth.getUserInitial();
         }
 
-        .notification-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 12px;
-            padding: 14px 18px;
-            background: var(--bg-card);
-            border-radius: var(--radius-sm);
-            border: 1px solid var(--border-color);
-            transition: var(--transition);
+        await loadNotifications();
+        setupListeners();
+
+        // Har 30 soniyada yangilash
+        refreshInterval = setInterval(() => {
+            loadNotifications();
+        }, 30000);
+
+        console.log('✅ Notifications sahifasi yuklandi!');
+    } catch (error) {
+        console.error('❌ Notifications yuklash xatosi:', error);
+        showError('Notifications yuklashda xatolik: ' + error.message);
+    }
+});
+
+// ============================================================
+// XABARLARNI YUKLASH
+// ============================================================
+async function loadNotifications() {
+    try {
+        const token = Auth.getToken();
+        if (!token) return;
+
+        const response = await API.getNotifications();
+        console.log('📨 Xabarlar javobi:', response);
+
+        if (response.success) {
+            allNotifications = response.data || [];
+            renderNotifications(allNotifications);
+        } else {
+            showError('Xabarlar yuklanmadi: ' + (response.message || 'Noma\'lum xatolik'));
         }
+    } catch (error) {
+        console.error('❌ Xabarlarni yuklash xatosi:', error);
+        showError('Xatolik yuz berdi: ' + error.message);
+    }
+}
 
-        .notification-item:hover {
-            border-color: var(--text-muted);
-        }
+// ============================================================
+// XABARLARNI KO'RSATISH
+// ============================================================
+function renderNotifications(notifications) {
+    const container = document.getElementById('notificationsList');
+    if (!container) return;
 
-        .notification-item.unread {
-            border-left: 4px solid #007aff;
-            background: var(--bg-hover);
-        }
+    const user = Auth.getUser();
+    const userId = user?._id;
 
-        .notification-body {
-            flex: 1;
-            min-width: 0;
-        }
+    // ⭐ FAQAT O'ZIGA KELGAN XABARLAR
+    let filtered = notifications.filter(n => {
+        return n.recipientId === userId || n.recipientRole === 'all' || n.recipientRole === 'admin_customer';
+    });
 
-        .notification-title {
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            display: block;
-            margin-bottom: 4px;
-        }
+    // ⭐ FILTRLASH
+    const filteredByDate = filterByDate(filtered, currentFilter);
 
-        .notification-message {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            margin: 0;
-            word-break: break-word;
-            white-space: pre-wrap;
-            line-height: 1.5;
-        }
-
-        .notification-message-wrapper {
-            max-height: 100px;
-            overflow-y: auto;
-            padding-right: 4px;
-            margin: 4px 0;
-        }
-
-        .notification-meta {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            font-size: 0.7rem;
-            color: var(--text-muted);
-            margin-top: 6px;
-        }
-
-        .notification-actions {
-            display: flex;
-            gap: 6px;
-            flex-shrink: 0;
-            align-items: center;
-        }
-
-        .btn-read {
-            background: none;
-            border: 1px solid #007aff;
-            color: #007aff;
-            font-size: 0.7rem;
-            cursor: pointer;
-            padding: 4px 12px;
-            border-radius: 6px;
-            transition: all 0.2s ease;
-            white-space: nowrap;
-            font-family: var(--font-family);
-        }
-
-        .btn-read:hover {
-            background: #007aff;
-            color: #fff;
-        }
-
-        .read-label {
-            font-size: 0.7rem;
-            color: var(--text-muted);
-            padding: 4px 0;
-        }
-
-        .notification-empty {
-            text-align: center;
-            padding: 50px 20px;
-            color: var(--text-muted);
-        }
-
-        .notification-empty i {
-            font-size: 3rem;
-            display: block;
-            margin-bottom: 16px;
-            opacity: 0.3;
-        }
-
-        /* ============================================================
-           FILTER BAR
-           ============================================================ */
-        .filter-bar {
-            padding: 12px 24px;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 10px;
-            border-bottom: 1px solid var(--border-color);
-            background: var(--bg-header);
-        }
-
-        .filter-pills {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-        }
-
-        .filter-pill {
-            padding: 6px 14px;
-            border: 2px solid var(--border-color);
-            border-radius: var(--radius-sm);
-            font-size: 0.78rem;
-            background: var(--bg-input);
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: var(--transition);
-            font-family: var(--font-family);
-        }
-
-        .filter-pill:hover {
-            border-color: var(--text-muted);
-            background: var(--bg-hover);
-            color: var(--text-primary);
-        }
-
-        .filter-pill.active {
-            border-color: #007aff;
-            background: #007aff;
-            color: #fff;
-        }
-
-        [data-theme="dark"] .filter-pill.active {
-            border-color: #4a9aff;
-            background: #1a2a4a;
-            color: #4a9aff;
-        }
-
-        .filter-actions {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-left: auto;
-        }
-
-        .filter-actions .btn-secondary {
-            padding: 6px 14px;
-            font-size: 0.78rem;
-            width: auto;
-        }
-
-        /* ============================================================
-           BACK BUTTON - MOBILE
-           ============================================================ */
-        .back-button {
-            display: none;
-            align-items: center;
-            justify-content: center;
-            width: 40px;
-            height: 40px;
-            border-radius: 8px;
-            background: none;
-            border: none;
-            font-size: 1.2rem;
-            color: var(--text-primary);
-            cursor: pointer;
-            transition: background 0.2s;
-            text-decoration: none;
-        }
-
-        .back-button:hover {
-            background: var(--bg-hover);
-        }
-
-        .menu-toggle {
-            display: none !important;
-        }
-
-        /* ============================================================
-           RESPONSIVE
-           ============================================================ */
-        @media (max-width: 768px) {
-            .back-button {
-                display: flex !important;
-            }
-
-            .notifications-container {
-                padding: 12px 16px 16px 16px;
-            }
-
-            .filter-bar {
-                padding: 10px 16px;
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .filter-actions {
-                margin-left: 0;
-            }
-
-            .notification-item {
-                flex-direction: column;
-            }
-
-            .notification-actions {
-                width: 100%;
-                justify-content: flex-end;
-            }
-
-            .notification-meta {
-                gap: 8px;
-                font-size: 0.65rem;
-            }
-
-            .top-header {
-                padding: 12px 16px;
-            }
-
-            .header-left .text-muted {
-                display: none;
-            }
-
-            .user-info {
-                display: none;
-            }
-
-            .sidebar {
-                display: none !important;
-            }
-
-            .main-content {
-                margin-left: 0 !important;
-                width: 100% !important;
-                max-width: 100% !important;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .filter-pill {
-                font-size: 0.7rem;
-                padding: 4px 10px;
-            }
-
-            .notification-title {
-                font-size: 0.85rem;
-            }
-
-            .notification-message {
-                font-size: 0.78rem;
-            }
-
-            .top-header h2 {
-                font-size: 0.95rem;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="app-container">
-
-        <!-- ==================== SIDEBAR ==================== -->
-        <aside class="sidebar" id="sidebar">
-            <div class="sidebar-brand">
-                <div class="brand-icon"><i class="fas fa-crown"></i></div>
-                <div class="brand-text">
-                    <span class="brand-name">Admin Customer</span>
-                    <span class="brand-version">v1.0</span>
-                </div>
+    if (!filteredByDate || filteredByDate.length === 0) {
+        const filterLabels = {
+            'all': 'Hozircha xabarlar yo\'q',
+            'today': 'Bugun xabarlar yo\'q',
+            'week': 'Shu hafta xabarlar yo\'q',
+            'month': 'Shu oy xabarlar yo\'q',
+            'unread': 'O\'qilmagan xabarlar yo\'q',
+            'read': 'O\'qilgan xabarlar yo\'q'
+        };
+        container.innerHTML = `
+            <div class="notification-empty">
+                <i class="fas fa-bell-slash"></i>
+                <p>${filterLabels[currentFilter] || 'Xabarlar yo\'q'}</p>
+                <p style="font-size:0.85rem;color:var(--text-muted);margin-top:4px;">Sizga yuborilgan xabarlar shu yerda ko\'rinadi</p>
             </div>
-            <nav class="sidebar-nav">
-                <a href="dashboard.html" class="nav-link"><i class="fas fa-chart-pie"></i> Dashboard</a>
-                <a href="teachers.html" class="nav-link"><i class="fas fa-chalkboard-teacher"></i> O'qituvchilar</a>
-                <a href="students.html" class="nav-link"><i class="fas fa-graduation-cap"></i> O'quvchilar</a>
-                <a href="payments.html" class="nav-link"><i class="fas fa-money-bill"></i> To'lovlar</a>
-                <a href="attendance.html" class="nav-link"><i class="fas fa-calendar-check"></i> Davomat</a>
-                <a href="reports.html" class="nav-link"><i class="fas fa-file-alt"></i> Hisobotlar</a>
-                <a href="subjects.html" class="nav-link"><i class="fas fa-book"></i> Fanlar</a>
-                <a href="all.html" class="nav-link"><i class="fas fa-th-list"></i> Barchasi</a>
-                <a href="notifications.html" class="nav-link active"><i class="fas fa-bell"></i> Bildirishnomalar</a>
-                <a href="settings.html" class="nav-link"><i class="fas fa-cog"></i> Sozlamalar</a>
-            </nav>
-            <div class="sidebar-footer">
-                <button id="logoutBtn" class="btn-logout"><i class="fas fa-sign-out-alt"></i> Chiqish</button>
-            </div>
-        </aside>
+        `;
+        return;
+    }
 
-        <!-- ==================== SIDEBAR OVERLAY ==================== -->
-        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    // ⭐ Xabarlarni sana bo'yicha guruhlash
+    const grouped = {};
+    filteredByDate.forEach(notif => {
+        const date = new Date(notif.createdAt);
+        const dateKey = date.toLocaleDateString('uz-UZ', {
+            timeZone: 'Asia/Tashkent',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+        if (!grouped[dateKey]) grouped[dateKey] = [];
+        grouped[dateKey].push(notif);
+    });
 
-        <!-- ==================== MAIN CONTENT ==================== -->
-        <main class="main-content">
-
-            <!-- HEADER -->
-            <header class="top-header">
-                <div class="header-left">
-                    <!-- ⭐ BACK BUTTON - Dashboardga qaytadi -->
-                    <a href="dashboard.html" class="back-button" id="backBtn">
-                        <i class="fas fa-arrow-left"></i>
-                    </a>
-                    <button id="menuToggle" class="menu-toggle">
-                        <i class="fas fa-bars"></i>
-                    </button>
-                    <div>
-                        <h2><i class="fas fa-bell"></i> Bildirishnomalar</h2>
-                        <p class="text-muted">Barcha xabarlar va bildirishnomalar</p>
-                    </div>
+    let html = '';
+    Object.keys(grouped).forEach(dateKey => {
+        html += `
+            <div style="margin-bottom:16px;">
+                <div style="padding:6px 0;font-size:0.78rem;font-weight:600;color:var(--text-muted);border-bottom:2px solid var(--border-color);margin-bottom:8px;display:flex;align-items:center;gap:8px;">
+                    <i class="fas fa-calendar"></i> ${dateKey}
+                    <span style="font-size:0.65rem;font-weight:400;color:var(--text-muted);margin-left:8px;">
+                        ${grouped[dateKey].length} ta xabar
+                    </span>
                 </div>
-                <div class="header-right">
-                    <div class="user-profile">
-                        <div class="user-avatar"><span id="userInitial">A</span></div>
-                        <div class="user-info">
-                            <p class="user-name" id="userName">Admin</p>
-                            <p class="user-role text-muted">Admin Customer</p>
+        `;
+
+        grouped[dateKey].forEach(notif => {
+            const isUnread = !notif.isRead;
+            const sentByName = notif.sentByName || 'Admin';
+            const formattedDate = formatDateTime(notif.createdAt);
+            const isSentByMe = notif.sentBy === user?._id;
+
+            html += `
+                <div class="notification-item ${isUnread ? 'unread' : ''}">
+                    <div class="notification-body">
+                        <span class="notification-title">${notif.title || 'Xabar'}</span>
+                        <div class="notification-message-wrapper">
+                            <p class="notification-message">${notif.message || ''}</p>
+                        </div>
+                        <div class="notification-meta">
+                            <span><i class="fas fa-user"></i> ${isSentByMe ? '✉️ Yuborgan: Men' : '✉️ Yuborgan: ' + sentByName}</span>
+                            <span><i class="fas fa-clock"></i> ${formattedDate}</span>
+                            <span><i class="fas fa-circle" style="color: ${isUnread ? '#007aff' : '#34c759'}; font-size: 0.5rem;"></i> ${isUnread ? 'O\'qilmagan' : 'O\'qilgan'}</span>
                         </div>
                     </div>
-                </div>
-            </header>
-
-            <!-- FILTER BAR -->
-            <div class="filter-bar">
-                <div class="filter-pills">
-                    <button class="filter-pill active" data-filter="all">Barchasi</button>
-                    <button class="filter-pill" data-filter="today">Bugun</button>
-                    <button class="filter-pill" data-filter="week">Shu hafta</button>
-                    <button class="filter-pill" data-filter="month">Shu oy</button>
-                    <button class="filter-pill" data-filter="unread">O'qilmagan</button>
-                    <button class="filter-pill" data-filter="read">O'qilgan</button>
-                </div>
-                <div class="filter-actions">
-                    <button id="refreshBtn" class="btn-secondary"><i class="fas fa-sync-alt"></i> Yangilash</button>
-                    <button id="markAllReadBtn" class="btn-secondary"><i class="fas fa-check-double"></i> Hammasini o'qildi</button>
-                </div>
-            </div>
-
-            <!-- NOTIFICATIONS LIST -->
-            <section class="notifications-container">
-                <div id="notificationsList" class="notifications-list">
-                    <div class="notification-empty">
-                        <i class="fas fa-spinner fa-spin"></i>
-                        <p>Yuklanmoqda...</p>
+                    <div class="notification-actions">
+                        ${isUnread ? `
+                            <button class="btn-read" data-id="${notif._id}">
+                                <i class="fas fa-check"></i> O'qildi
+                            </button>
+                        ` : `
+                            <span class="read-label">✓ O'qilgan</span>
+                        `}
                     </div>
                 </div>
-            </section>
+            `;
+        });
 
-        </main>
-    </div>
+        html += `</div>`;
+    });
 
-    <!-- Theme Toggle -->
-    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
-        <i class="fas fa-moon moon"></i>
-        <i class="fas fa-sun sun" style="display:none;"></i>
-    </button>
+    container.innerHTML = html;
 
-    <script>
-        window.__API_BASE_URL__ = 'https://admin-customerr.onrender.com';
-    </script>
-    <script src="js/api.js"></script>
-    <script src="js/auth.js"></script>
-    <script src="js/theme.js"></script>
-    <script src="js/i18n.js"></script>
-    <script src="js/utils.js"></script>
-    <script src="js/notifications.js"></script>
-</body>
-</html>
+    // ⭐ O'qilgan deb belgilash
+    document.querySelectorAll('.btn-read').forEach(btn => {
+        btn.addEventListener('click', async function() {
+            const id = this.dataset.id;
+            await markAsRead(id);
+        });
+    });
+}
+
+// ============================================================
+// KUN BO'YICHA FILTRLASH
+// ============================================================
+function filterByDate(notifications, filter) {
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const weekAgo = new Date(now);
+    weekAgo.setDate(weekAgo.getDate() - 7);
+    const monthAgo = new Date(now);
+    monthAgo.setMonth(monthAgo.getMonth() - 1);
+
+    return notifications.filter(notif => {
+        const notifDate = new Date(notif.createdAt);
+        
+        switch (filter) {
+            case 'today':
+                return notifDate >= today;
+            case 'week':
+                return notifDate >= weekAgo;
+            case 'month':
+                return notifDate >= monthAgo;
+            case 'unread':
+                return !notif.isRead;
+            case 'read':
+                return notif.isRead;
+            case 'all':
+            default:
+                return true;
+        }
+    });
+}
+
+// ============================================================
+// XABARNI O'QILGAN DEB BELGILASH
+// ============================================================
+async function markAsRead(id) {
+    try {
+        const response = await API.markNotificationRead(id);
+        if (response.success) {
+            showSuccess('Xabar o\'qilgan deb belgilandi!');
+            await loadNotifications();
+        } else {
+            showError(response.message || 'Xatolik yuz berdi!');
+        }
+    } catch (error) {
+        console.error('❌ Xatolik:', error);
+        showError('Xabarni o\'qilgan deb belgilashda xatolik!');
+    }
+}
+
+// ============================================================
+// BARCHA XABARLARNI O'QILGAN DEB BELGILASH
+// ============================================================
+async function markAllAsRead() {
+    try {
+        const response = await API.markAllNotificationsRead();
+        if (response.success) {
+            showSuccess('Barcha xabarlar o\'qilgan deb belgilandi!');
+            await loadNotifications();
+        } else {
+            showError(response.message || 'Xatolik yuz berdi!');
+        }
+    } catch (error) {
+        console.error('❌ Xatolik:', error);
+        showError('Xatolik yuz berdi: ' + error.message);
+    }
+}
+
+// ============================================================
+// VAQTNI FORMATLASH
+// ============================================================
+function formatDateTime(date) {
+    if (!date) return 'Noma\'lum vaqt';
+    try {
+        const d = new Date(date);
+        if (isNaN(d.getTime())) return 'Noma\'lum vaqt';
+        return d.toLocaleString('uz-UZ', {
+            timeZone: 'Asia/Tashkent',
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false
+        });
+    } catch (error) {
+        return 'Noma\'lum vaqt';
+    }
+}
+
+// ============================================================
+// FILTER TUGMALARI
+// ============================================================
+function updateFilterButtons() {
+    document.querySelectorAll('.filter-pill').forEach(btn => {
+        btn.classList.remove('active');
+        const filter = btn.dataset.filter;
+        if (filter === currentFilter) {
+            btn.classList.add('active');
+        }
+    });
+}
+
+// ============================================================
+// EVENT LISTENERLAR
+// ============================================================
+function setupListeners() {
+    // Logout
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        const newLogoutBtn = logoutBtn.cloneNode(true);
+        logoutBtn.parentNode.replaceChild(newLogoutBtn, logoutBtn);
+        newLogoutBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (confirm('Haqiqatan ham chiqmoqchimisiz?')) {
+                Auth.logout();
+            }
+        });
+    }
+
+    // Filter - Barchasi
+    document.querySelectorAll('.filter-pill').forEach(btn => {
+        btn.addEventListener('click', function() {
+            currentFilter = this.dataset.filter;
+            updateFilterButtons();
+            renderNotifications(allNotifications);
+        });
+    });
+
+    // Refresh
+    const refreshBtn = document.getElementById('refreshBtn');
+    if (refreshBtn) {
+        refreshBtn.addEventListener('click', function() {
+            loadNotifications();
+            showSuccess('Yangilandi!');
+        });
+    }
+
+    // Mark all as read
+    const markAllReadBtn = document.getElementById('markAllReadBtn');
+    if (markAllReadBtn) {
+        markAllReadBtn.addEventListener('click', markAllAsRead);
+    }
+
+    // Back button - Dashboardga qaytish
+    const backBtn = document.getElementById('backBtn');
+    if (backBtn) {
+        backBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            // Agar oldingi sahifa mavjud bo'lsa, o'sha sahifaga o'tish
+            if (document.referrer && document.referrer.includes(window.location.host)) {
+                window.history.back();
+            } else {
+                window.location.href = 'dashboard.html';
+            }
+        });
+    }
+}
+
+// ============================================================
+// XATOLIK VA MUVAFFAQIYAT XABARLARI
+// ============================================================
+function showError(msg) {
+    console.error('⚠️ Xatolik:', msg);
+    const div = document.createElement('div');
+    div.style.cssText = `
+        position: fixed; top: 20px; right: 20px; z-index: 9999;
+        padding: 14px 18px; background: #fef2f2;
+        border: 1px solid #fecaca; border-radius: 10px;
+        color: #dc2626; max-width: 400px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        display: flex; align-items: center; gap: 10px;
+        font-size: 0.85rem;
+        z-index: 10000;
+    `;
+    div.innerHTML = `
+        <i class="fas fa-exclamation-circle"></i>
+        <span>${msg}</span>
+        <button onclick="this.parentElement.remove()" style="margin-left: auto; background: none; border: none; color: #dc2626; cursor: pointer; font-size: 1.1rem;">×</button>
+    `;
+    document.body.appendChild(div);
+    setTimeout(() => div.remove(), 6000);
+}
+
+function showSuccess(msg) {
+    console.log('✅ Muvaffaqiyat:', msg);
+    const div = document.createElement('div');
+    div.style.cssText = `
+        position: fixed; top: 20px; right: 20px; z-index: 9999;
+        padding: 14px 18px; background: #ecfdf5;
+        border: 1px solid #a7f3d0; border-radius: 10px;
+        color: #065f46; max-width: 400px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        display: flex; align-items: center; gap: 10px;
+        font-size: 0.85rem;
+        z-index: 10000;
+    `;
+    div.innerHTML = `
+        <i class="fas fa-check-circle"></i>
+        <span>${msg}</span>
+        <button onclick="this.parentElement.remove()" style="margin-left: auto; background: none; border: none; color: #065f46; cursor: pointer; font-size: 1.1rem;">×</button>
+    `;
+    document.body.appendChild(div);
+    setTimeout(() => div.remove(), 3000);
+}
+
+// ============================================================
+// CLEANUP
+// ============================================================
+window.addEventListener('beforeunload', function() {
+    if (refreshInterval) {
+        clearInterval(refreshInterval);
+        refreshInterval = null;
+    }
+});
+
+console.log('✅ notifications.js yuklandi (Admin-Customer)');
