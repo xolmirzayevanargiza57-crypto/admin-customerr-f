@@ -1,5 +1,7 @@
 // ============================================================
-// DASHBOARD - ADMIN CUSTOMER (TO'LIQ)
+// DASHBOARD - ADMIN-CUSTOMER (TO'LIQ TUZATILGAN)
+// Loyiha: Admin-Customer Frontend
+// Fayl: js/dashboard.js
 // ============================================================
 
 let dashboardLoaded = false;
@@ -7,136 +9,192 @@ let lastDashboardStats = null;
 let refreshInterval = null;
 let countdownInterval = null;
 
-// ⭐ NOTIFICATION BADGE NI YANGILASH
-async function updateNotificationBadge() {
+// ============================================================
+// SAHIFA YUKLANGANDA
+// ============================================================
+document.addEventListener('DOMContentLoaded', async () => {
+    if (dashboardLoaded) {
+        console.log('⚠️ Dashboard allaqachon yuklangan');
+        return;
+    }
+    dashboardLoaded = true;
+
+    console.log('🚀 Dashboard yuklanmoqda...');
+
     try {
-        const token = Auth.getToken();
-        if (!token) return;
-        
-        const response = await API.getNotifications();
-        if (response.success && response.data) {
-            const unreadCount = response.data.filter(n => !n.isRead).length;
-            
-            // Header dagi badge
-            const badge = document.getElementById('notificationBadge');
-            if (badge) {
-                if (unreadCount > 0) {
-                    badge.style.display = 'block';
-                    badge.textContent = unreadCount > 99 ? '99+' : unreadCount;
+        const token = localStorage.getItem('customerToken') || sessionStorage.getItem('customerToken');
+        if (!token) {
+            window.location.replace('index.html');
+            return;
+        }
+
+        const user = Auth.getUser();
+        if (user) {
+            const nameEl = document.getElementById('userName');
+            const initialEl = document.getElementById('userInitial');
+            const schoolEl = document.getElementById('schoolName');
+            if (nameEl) nameEl.textContent = Auth.getUserName();
+            if (initialEl) initialEl.textContent = Auth.getUserInitial();
+            if (schoolEl) schoolEl.textContent = user.schoolName || 'Nurli Ta\'lim Markazi';
+        }
+
+        // ⭐ LOGOUT TUGMASI
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+            const newLogoutBtn = logoutBtn.cloneNode(true);
+            logoutBtn.parentNode.replaceChild(newLogoutBtn, logoutBtn);
+            newLogoutBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                if (confirm('Haqiqatan ham chiqmoqchimisiz?')) {
+                    Auth.logout();
+                }
+            });
+        }
+
+        // ⭐ Dashboard statistikasini yuklash
+        await loadDashboardStats();
+
+        // ⭐ HAR 60 SONIYADA YANGILASH (30 emas!)
+        refreshInterval = setInterval(() => {
+            loadDashboardStats();
+        }, 60000);
+
+        startCountdown();
+
+        console.log('✅ Dashboard yuklandi!');
+    } catch (error) {
+        console.error('❌ Dashboard yuklash xatosi:', error);
+        showError('Dashboard yuklashda xatolik: ' + error.message);
+    }
+});
+
+// ============================================================
+// DASHBOARD STATISTIKASINI YUKLASH
+// ============================================================
+async function loadDashboardStats() {
+    try {
+        console.log('📊 Statistika yuklanmoqda...');
+        const data = await API.getDashboardStats();
+        console.log('📊 Statistika javobi:', data);
+
+        if (!data.success) {
+            if (data.status === 401 || data.status === 403) {
+                Auth.logout();
+                return;
+            }
+            console.error('❌ Statistika xatosi:', data.message);
+            return;
+        }
+
+        const stats = data.data;
+        lastDashboardStats = stats;
+        console.log('📊 Statistika ma\'lumotlari:', stats);
+
+        // ⭐ STATS
+        const teacherCount = document.getElementById('teacherCount');
+        const studentCount = document.getElementById('studentCount');
+        const totalXP = document.getElementById('totalXP');
+        const todayAttendance = document.getElementById('todayAttendance');
+        const presentCount = document.getElementById('presentCount');
+        const absentReasonCount = document.getElementById('absentReasonCount');
+        const absentCount = document.getElementById('absentCount');
+        const attendancePercent = document.getElementById('attendancePercent');
+        const subscriptionStatus = document.getElementById('subscriptionStatus');
+        const subscriptionType = document.getElementById('subscriptionType');
+        const subscriptionEnd = document.getElementById('subscriptionEnd');
+        const subscriptionDays = document.getElementById('subscriptionDays');
+
+        if (teacherCount) teacherCount.textContent = stats.teacherCount || 0;
+        if (studentCount) studentCount.textContent = stats.studentCount || 0;
+        if (totalXP) totalXP.textContent = stats.totalXP || 0;
+        if (todayAttendance) todayAttendance.textContent = stats.todayAttendance || 0;
+
+        // ⭐ ATTENDANCE
+        const present = stats.attendanceStats?.present || 0;
+        const absentReason = stats.attendanceStats?.absent_reason || 0;
+        const absent = stats.attendanceStats?.absent || 0;
+
+        if (presentCount) presentCount.textContent = present;
+        if (absentReasonCount) absentReasonCount.textContent = absentReason;
+        if (absentCount) absentCount.textContent = absent;
+
+        const total = present + absentReason + absent;
+        if (attendancePercent) {
+            if (total > 0) {
+                const percent = Math.round((present / total) * 100);
+                attendancePercent.textContent = `${percent}%`;
+                attendancePercent.className = `stat-change ${percent >= 70 ? 'positive' : 'negative'}`;
+            } else {
+                attendancePercent.textContent = '0%';
+            }
+        }
+
+        // ⭐ SUBSCRIPTION
+        if (stats.subscription) {
+            const sub = stats.subscription;
+            const statusMap = { 'active': '✅ Faol', 'inactive': '⛔ Faol emas', 'expired': '⚠️ Muddati tugagan' };
+            if (subscriptionStatus) {
+                subscriptionStatus.textContent = statusMap[sub.status] || sub.status || 'Noma\'lum';
+            }
+            const typeMap = { 'monthly': '📅 Oylik', '6months': '📅 6 oylik', 'yearly': '📅 Yillik', 'custom': '⚙️ Custom', 'none': '❌ Yo\'q' };
+            if (subscriptionType) {
+                subscriptionType.textContent = typeMap[sub.type] || sub.type || 'Noma\'lum';
+            }
+            if (subscriptionEnd) {
+                if (sub.formattedEndDate) {
+                    subscriptionEnd.textContent = sub.formattedEndDate;
+                } else if (sub.endDate) {
+                    subscriptionEnd.textContent = formatDateTime(sub.endDate);
                 } else {
-                    badge.style.display = 'none';
+                    subscriptionEnd.textContent = 'Muddati yo\'q';
                 }
             }
-            
-            // Sidebar dagi badge
-            const sidebarBadge = document.getElementById('sidebarBadge');
-            if (sidebarBadge) {
-                if (unreadCount > 0) {
-                    sidebarBadge.style.display = 'inline';
-                    sidebarBadge.textContent = unreadCount > 99 ? '99+' : unreadCount;
+            if (subscriptionDays) {
+                if (!sub.endDate) {
+                    subscriptionDays.textContent = '-';
                 } else {
-                    sidebarBadge.style.display = 'none';
+                    let endDate = null;
+                    if (typeof sub.endDate === 'string' && sub.endDate.includes('M01')) {
+                        const parts = sub.endDate.split(' ');
+                        if (parts.length === 4) {
+                            const year = parts[0];
+                            const month = parts[1].replace('M', '').padStart(2, '0');
+                            const day = parts[2].padStart(2, '0');
+                            const time = parts[3];
+                            endDate = new Date(`${year}-${month}-${day}T${time}`);
+                        }
+                    } else {
+                        endDate = new Date(sub.endDate);
+                    }
+                    if (endDate && !isNaN(endDate.getTime())) {
+                        const now = new Date();
+                        const diff = endDate - now;
+                        if (diff > 0) {
+                            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+                            subscriptionDays.textContent = `${days} kun ${hours}s ${minutes}m ${seconds}s`;
+                        } else {
+                            subscriptionDays.textContent = '⚠️ Vaqt tugagan!';
+                        }
+                    } else {
+                        subscriptionDays.textContent = sub.endDate || '-';
+                    }
                 }
             }
         }
+
+        console.log('✅ Dashboard statistikasi yuklandi!');
     } catch (error) {
-        console.error('❌ Badge yangilash xatosi:', error);
+        console.error('❌ Statistikani yuklash xatosi:', error);
     }
 }
 
-// ⭐ NOTIFICATION RUXSAT SO'RASH
-async function requestNotificationPermission() {
-    if (!('Notification' in window)) {
-        console.log('❌ Bu brauzer Notification API ni qo\'llab-quvvatlamaydi');
-        return;
-    }
-    
-    if (Notification.permission === 'granted') {
-        console.log('✅ Notification ruxsati allaqachon berilgan');
-        return;
-    }
-    
-    if (Notification.permission === 'denied') {
-        console.log('⚠️ Notification ruxsati rad etilgan');
-        return;
-    }
-    
-    try {
-        const permission = await Notification.requestPermission();
-        console.log('📨 Notification ruxsati:', permission);
-        
-        if (permission === 'granted') {
-            // Ruxsat berilganda, yangi xabarlarni tekshirish
-            await loadDashboardStats();
-            await updateNotificationBadge();
-        }
-        return permission === 'granted';
-    } catch (error) {
-        console.error('❌ Notification ruxsati xatosi:', error);
-        return false;
-    }
-}
-
-// ⭐ XABAR KELGANDA PUSH NOTIFICATION YUBORISH
-function sendPushNotification(title, message, data = {}) {
-    if (!('Notification' in window)) return;
-    if (Notification.permission !== 'granted') return;
-    
-    try {
-        const options = {
-            body: message,
-            icon: '/favicon.ico',
-            badge: '/favicon.ico',
-            vibrate: [200, 100, 200],
-            data: data,
-            requireInteraction: true,
-            silent: false
-        };
-        
-        const notification = new Notification(title || 'Yangi xabar', options);
-        
-        notification.onclick = function() {
-            window.focus();
-            if (data.url) {
-                window.location.href = data.url;
-            }
-            notification.close();
-        };
-        
-        notification.onclose = function() {
-            console.log('🔔 Notification yopildi');
-        };
-        
-        setTimeout(() => {
-            notification.close();
-        }, 30000);
-        
-        console.log('🔔 Push notification yuborildi:', title);
-    } catch (error) {
-        console.error('❌ Push notification xatosi:', error);
-    }
-}
-
-// ⭐ FORMAT DATE FUNCTION
-function formatDate(date) {
-    if (!date) return 'Noma\'lum vaqt';
-    try {
-        const d = new Date(date);
-        if (isNaN(d.getTime())) return 'Noma\'lum vaqt';
-        const year = d.getFullYear();
-        const monthNames = ['yanvar', 'fevral', 'mart', 'aprel', 'may', 'iyun', 'iyul', 'avgust', 'sentabr', 'oktabr', 'noyabr', 'dekabr'];
-        const month = monthNames[d.getMonth()];
-        const day = d.getDate();
-        const hours = String(d.getHours()).padStart(2, '0');
-        const minutes = String(d.getMinutes()).padStart(2, '0');
-        const seconds = String(d.getSeconds()).padStart(2, '0');
-        return `${year}-yil ${day}-${month} ${hours}:${minutes}:${seconds}`;
-    } catch (error) {
-        return 'Noma\'lum vaqt';
-    }
-}
-
-// ⭐ COUNTDOWN - REAL TIME
+// ============================================================
+// COUNTDOWN - REAL TIME
+// ============================================================
 function startCountdown() {
     if (countdownInterval) {
         clearInterval(countdownInterval);
@@ -157,7 +215,7 @@ function updateCountdown() {
         if (sub.formattedEndDate) {
             endEl.textContent = sub.formattedEndDate;
         } else if (sub.endDate) {
-            endEl.textContent = formatDate(sub.endDate);
+            endEl.textContent = formatDateTime(sub.endDate);
         } else {
             endEl.textContent = 'Muddati yo\'q';
         }
@@ -203,276 +261,59 @@ function updateCountdown() {
     daysEl.textContent = `${days} kun ${hours}s ${minutes}m ${seconds}s`;
 }
 
-// ⭐ YANGI XABAR BORLIGINI TEKSHIRISH
-let lastNotificationCount = 0;
-
-async function checkNewNotifications() {
+// ============================================================
+// VAQTNI FORMATLASH
+// ============================================================
+function formatDateTime(date) {
+    if (!date) return 'Noma\'lum vaqt';
     try {
-        const token = Auth.getToken();
-        if (!token) return;
-        
-        const response = await API.getNotifications();
-        if (response.success && response.data) {
-            const unreadCount = response.data.filter(n => !n.isRead).length;
-            
-            // ⭐ Yangi xabar kelganmi?
-            if (unreadCount > lastNotificationCount) {
-                const newNotifications = response.data.filter(n => !n.isRead);
-                const latest = newNotifications[0];
-                if (latest) {
-                    sendPushNotification(
-                        latest.title || 'Yangi xabar', 
-                        latest.message || '', 
-                        { url: '/notifications.html' }
-                    );
-                }
-            }
-            
-            lastNotificationCount = unreadCount;
-            await updateNotificationBadge();
-        }
+        const d = new Date(date);
+        if (isNaN(d.getTime())) return 'Noma\'lum vaqt';
+        return d.toLocaleString('uz-UZ', {
+            timeZone: 'Asia/Tashkent',
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false
+        });
     } catch (error) {
-        console.error('❌ Xabarlarni tekshirish xatosi:', error);
+        return 'Noma\'lum vaqt';
     }
 }
 
-// ⭐ LOAD DASHBOARD STATS
-async function loadDashboardStats() {
-    try {
-        console.log('📊 Statistika yuklanmoqda...');
-        const data = await API.getDashboardStats();
-        console.log('📊 Statistika javobi:', data);
-
-        if (!data.success) {
-            if (data.status === 401 || data.status === 403) {
-                Auth.logout();
-                return;
-            }
-            console.error('❌ Statistika xatosi:', data.message);
-            showError('Ma\'lumotlarni yuklashda xatolik: ' + data.message);
-            return;
-        }
-
-        const stats = data.data;
-        lastDashboardStats = stats;
-        console.log('📊 Statistika ma\'lumotlari:', stats);
-
-        const elements = {
-            teacherCount: document.getElementById('teacherCount'),
-            studentCount: document.getElementById('studentCount'),
-            totalXP: document.getElementById('totalXP'),
-            todayAttendance: document.getElementById('todayAttendance'),
-            presentCount: document.getElementById('presentCount'),
-            absentReasonCount: document.getElementById('absentReasonCount'),
-            absentCount: document.getElementById('absentCount'),
-            attendancePercent: document.getElementById('attendancePercent'),
-            subscriptionStatus: document.getElementById('subscriptionStatus'),
-            subscriptionType: document.getElementById('subscriptionType'),
-            subscriptionEnd: document.getElementById('subscriptionEnd'),
-            subscriptionDays: document.getElementById('subscriptionDays')
-        };
-
-        if (elements.teacherCount) elements.teacherCount.textContent = stats.teacherCount || 0;
-        if (elements.studentCount) elements.studentCount.textContent = stats.studentCount || 0;
-        if (elements.totalXP) elements.totalXP.textContent = stats.totalXP || 0;
-        if (elements.todayAttendance) elements.todayAttendance.textContent = stats.todayAttendance || 0;
-
-        const present = stats.attendanceStats?.present || 0;
-        const absentReason = stats.attendanceStats?.absent_reason || 0;
-        const absent = stats.attendanceStats?.absent || 0;
-
-        if (elements.presentCount) elements.presentCount.textContent = present;
-        if (elements.absentReasonCount) elements.absentReasonCount.textContent = absentReason;
-        if (elements.absentCount) elements.absentCount.textContent = absent;
-
-        const total = present + absentReason + absent;
-        if (elements.attendancePercent) {
-            if (total > 0) {
-                const percent = Math.round((present / total) * 100);
-                elements.attendancePercent.textContent = `${percent}%`;
-                elements.attendancePercent.className = `stat-change ${percent >= 70 ? 'positive' : 'negative'}`;
-            } else {
-                elements.attendancePercent.textContent = '0%';
-            }
-        }
-
-        // SUBSCRIPTION
-        if (stats.subscription) {
-            const sub = stats.subscription;
-            const statusMap = { 'active': '✅ Faol', 'inactive': '⛔ Faol emas', 'expired': '⚠️ Muddati tugagan' };
-            if (elements.subscriptionStatus) {
-                elements.subscriptionStatus.textContent = statusMap[sub.status] || sub.status || 'Noma\'lum';
-            }
-            const typeMap = { 'monthly': '📅 Oylik', '6months': '📅 6 oylik', 'yearly': '📅 Yillik', 'custom': '⚙️ Custom', 'none': '❌ Yo\'q' };
-            if (elements.subscriptionType) {
-                elements.subscriptionType.textContent = typeMap[sub.type] || sub.type || 'Noma\'lum';
-            }
-            if (elements.subscriptionEnd) {
-                if (sub.formattedEndDate) {
-                    elements.subscriptionEnd.textContent = sub.formattedEndDate;
-                } else if (sub.endDate) {
-                    elements.subscriptionEnd.textContent = formatDate(sub.endDate);
-                } else {
-                    elements.subscriptionEnd.textContent = 'Muddati yo\'q';
-                }
-            }
-            if (elements.subscriptionDays) {
-                if (!sub.endDate) {
-                    elements.subscriptionDays.textContent = '-';
-                } else {
-                    let endDate = null;
-                    if (typeof sub.endDate === 'string' && sub.endDate.includes('M01')) {
-                        const parts = sub.endDate.split(' ');
-                        if (parts.length === 4) {
-                            const year = parts[0];
-                            const month = parts[1].replace('M', '').padStart(2, '0');
-                            const day = parts[2].padStart(2, '0');
-                            const time = parts[3];
-                            endDate = new Date(`${year}-${month}-${day}T${time}`);
-                        }
-                    } else {
-                        endDate = new Date(sub.endDate);
-                    }
-                    if (endDate && !isNaN(endDate.getTime())) {
-                        const now = new Date();
-                        const diff = endDate - now;
-                        if (diff > 0) {
-                            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-                            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-                            elements.subscriptionDays.textContent = `${days} kun ${hours}s ${minutes}m ${seconds}s`;
-                        } else {
-                            elements.subscriptionDays.textContent = '⚠️ Vaqt tugagan!';
-                        }
-                    } else {
-                        elements.subscriptionDays.textContent = sub.endDate || '-';
-                    }
-                }
-            }
-        }
-
-        console.log('✅ Dashboard statistikasi yuklandi!');
-    } catch (error) {
-        console.error('❌ Statistikani yuklash xatosi:', error);
-        showError('Ma\'lumotlarni yuklashda xatolik: ' + error.message);
-    }
-}
-
-// ⭐ SHOW ERROR
+// ============================================================
+// XATOLIK KO'RSATISH
+// ============================================================
 function showError(msg) {
     console.error('⚠️ Xatolik:', msg);
-    const div = document.createElement('div');
-    div.style.cssText = `
-        position: fixed; top: 20px; right: 20px; z-index: 9999;
-        padding: 14px 18px; background: #fef2f2;
-        border: 1px solid #fecaca; border-radius: 10px;
-        color: #dc2626; max-width: 400px;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-        display: flex; align-items: center; gap: 10px;
-        font-size: 0.85rem;
-        z-index: 10000;
-    `;
-    div.innerHTML = `
-        <i class="fas fa-exclamation-circle"></i>
-        <span>${msg}</span>
-        <button onclick="this.parentElement.remove()" style="margin-left: auto; background: none; border: none; color: #dc2626; cursor: pointer; font-size: 1.1rem;">×</button>
-    `;
-    document.body.appendChild(div);
-    setTimeout(() => div.remove(), 8000);
+    // Ekranda xatolikni ko'rsatish
+    const container = document.querySelector('.stats-grid');
+    if (container) {
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'stat-card';
+        errorDiv.style.cssText = 'grid-column: 1 / -1; text-align: center; padding: 20px; border-color: var(--color-danger);';
+        errorDiv.innerHTML = `
+            <p style="color: var(--color-danger);">
+                <i class="fas fa-exclamation-circle"></i> 
+                ${msg}
+            </p>
+            <button onclick="location.reload()" class="btn-secondary" style="margin-top: 8px; width: auto; padding: 8px 16px;">
+                <i class="fas fa-sync-alt"></i> Qayta yuklash
+            </button>
+        `;
+        container.prepend(errorDiv);
+        setTimeout(() => {
+            if (errorDiv.parentNode) errorDiv.remove();
+        }, 10000);
+    }
 }
 
-// ⭐ SHOW SUCCESS
-function showSuccess(msg) {
-    console.log('✅ Muvaffaqiyat:', msg);
-    const div = document.createElement('div');
-    div.style.cssText = `
-        position: fixed; top: 20px; right: 20px; z-index: 9999;
-        padding: 14px 18px; background: #ecfdf5;
-        border: 1px solid #a7f3d0; border-radius: 10px;
-        color: #065f46; max-width: 400px;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-        display: flex; align-items: center; gap: 10px;
-        font-size: 0.85rem;
-        z-index: 10000;
-    `;
-    div.innerHTML = `
-        <i class="fas fa-check-circle"></i>
-        <span>${msg}</span>
-        <button onclick="this.parentElement.remove()" style="margin-left: auto; background: none; border: none; color: #065f46; cursor: pointer; font-size: 1.1rem;">×</button>
-    `;
-    document.body.appendChild(div);
-    setTimeout(() => div.remove(), 3000);
-}
-
-// ⭐ DOCUMENT LOAD
-document.addEventListener('DOMContentLoaded', async () => {
-    if (dashboardLoaded) {
-        console.log('⚠️ Dashboard allaqachon yuklangan');
-        return;
-    }
-    dashboardLoaded = true;
-
-    console.log('🚀 Dashboard yuklanmoqda...');
-
-    try {
-        const token = localStorage.getItem('customerToken') || sessionStorage.getItem('customerToken');
-        if (!token) {
-            window.location.replace('index.html');
-            return;
-        }
-
-        const user = Auth.getUser();
-        if (user) {
-            const nameEl = document.getElementById('userName');
-            const initialEl = document.getElementById('userInitial');
-            const schoolEl = document.getElementById('schoolName');
-            if (nameEl) nameEl.textContent = Auth.getUserName();
-            if (initialEl) initialEl.textContent = Auth.getUserInitial();
-            if (schoolEl) schoolEl.textContent = user.schoolName || 'Nurli Ta\'lim Markazi';
-        }
-
-        // ⭐ LOGOUT TUGMASI
-        const logoutBtn = document.getElementById('logoutBtn');
-        if (logoutBtn) {
-            const newLogoutBtn = logoutBtn.cloneNode(true);
-            logoutBtn.parentNode.replaceChild(newLogoutBtn, logoutBtn);
-            newLogoutBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                if (confirm('Haqiqatan ham chiqmoqchimisiz?')) {
-                    Auth.logout();
-                }
-            });
-        }
-
-        // ⭐ Notification ruxsat so'rash
-        await requestNotificationPermission();
-
-        // ⭐ Dashboard statistikasini yuklash
-        await loadDashboardStats();
-
-        // ⭐ Xabarlarni tekshirish
-        await updateNotificationBadge();
-        await checkNewNotifications();
-
-        // ⭐ Har 5 soniyada xabarlarni tekshirish
-        refreshInterval = setInterval(() => {
-            loadDashboardStats();
-            checkNewNotifications();
-            updateNotificationBadge();
-        }, 5000);
-
-        startCountdown();
-
-        console.log('✅ Dashboard yuklandi!');
-    } catch (error) {
-        console.error('❌ Dashboard yuklash xatosi:', error);
-        showError('Dashboard yuklashda xatolik: ' + error.message);
-    }
-});
-
-// ⭐ CLEANUP
+// ============================================================
+// CLEANUP
+// ============================================================
 window.addEventListener('beforeunload', function() {
     if (refreshInterval) {
         clearInterval(refreshInterval);
@@ -484,4 +325,4 @@ window.addEventListener('beforeunload', function() {
     }
 });
 
-console.log('✅ dashboard.js yuklandi (Admin Customer)');
+console.log('✅ dashboard.js yuklandi (Admin-Customer)');
