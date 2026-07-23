@@ -7,6 +7,9 @@
 const Theme = {
     currentTheme: localStorage.getItem('theme') || 'auto',
 
+    // ============================================================
+    // THEME QO'LLASH
+    // ============================================================
     applyTheme(theme) {
         this.currentTheme = theme;
         localStorage.setItem('theme', theme);
@@ -23,6 +26,9 @@ const Theme = {
         this.updateServerTheme(theme);
     },
 
+    // ============================================================
+    // THEME OPTION TUGMALARINI YANGILASH
+    // ============================================================
     updateThemeOptionButtons() {
         document.querySelectorAll('.theme-option[data-theme]').forEach(button => {
             const theme = button.dataset.theme;
@@ -30,6 +36,9 @@ const Theme = {
         });
     },
 
+    // ============================================================
+    // TOGGLE ICON YANGILASH
+    // ============================================================
     updateToggleIcon() {
         const themeToggle = document.getElementById('themeToggle');
         if (!themeToggle) return;
@@ -47,6 +56,9 @@ const Theme = {
         }
     },
 
+    // ============================================================
+    // SERVERGA THEME SAQLASH
+    // ============================================================
     async updateServerTheme(theme) {
         try {
             const token = localStorage.getItem('customerToken') || sessionStorage.getItem('customerToken');
@@ -57,6 +69,9 @@ const Theme = {
         }
     },
 
+    // ============================================================
+    // SERVERDAN THEME YUKLASH
+    // ============================================================
     async loadThemeFromServer() {
         try {
             const token = localStorage.getItem('customerToken') || sessionStorage.getItem('customerToken');
@@ -74,13 +89,18 @@ const Theme = {
         }
     },
 
+    // ============================================================
+    // 1 CLICK THEME TOGGLE - LIGHT <-> DARK
+    // ============================================================
     toggle() {
         const current = document.documentElement.getAttribute('data-theme');
         const newTheme = current === 'dark' ? 'light' : 'dark';
         this.applyTheme(newTheme);
     },
 
-    // ⭐ HAMBURGER MENU - TO'G'RI
+    // ============================================================
+    // ⭐ HAMBURGER MENU - TO'G'RI (OCHILADI, YOPILADI, OUTSIDE CLICK)
+    // ============================================================
     initSidebar() {
         const menuToggle = document.getElementById('menuToggle');
         const sidebar = document.getElementById('sidebar');
@@ -91,11 +111,15 @@ const Theme = {
             return;
         }
 
-        // Eski eventlarni tozalash
+        // ============================================================
+        // 1. ESKI EVENTLARNI TOZALASH
+        // ============================================================
         const newToggle = menuToggle.cloneNode(true);
         menuToggle.parentNode.replaceChild(newToggle, menuToggle);
 
-        // Hamburger bosilganda
+        // ============================================================
+        // 2. HAMBURGER BOSILGANDA - OCHISH/YOPISH
+        // ============================================================
         newToggle.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
@@ -103,34 +127,82 @@ const Theme = {
             if (sidebar.classList.contains('open')) {
                 sidebar.classList.remove('open');
                 if (overlay) overlay.classList.remove('show');
-                console.log('🔒 Sidebar yopildi');
+                console.log('🔒 Sidebar yopildi (hamburger)');
             } else {
                 sidebar.classList.add('open');
                 if (overlay) overlay.classList.add('show');
-                console.log('🍔 Sidebar ochildi');
+                console.log('🍔 Sidebar ochildi (hamburger)');
             }
         });
 
-        // Overlay bosilganda yopish
+        // ============================================================
+        // 3. OVERLAY BOSILGANDA YOPISH
+        // ============================================================
         if (overlay) {
             const newOverlay = overlay.cloneNode(true);
             overlay.parentNode.replaceChild(newOverlay, overlay);
             
-            newOverlay.addEventListener('click', function() {
+            newOverlay.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
                 sidebar.classList.remove('open');
                 this.classList.remove('show');
-                console.log('🔒 Sidebar closed via overlay');
+                console.log('🔒 Sidebar yopildi (overlay)');
             });
         }
 
-        // ESC tugmasi bosilganda yopish
+        // ============================================================
+        // 4. EKRAN CHEGASIGA (OUTSIDE) BOSILGANDA YOPISH
+        // ============================================================
+        document.addEventListener('click', function(e) {
+            // Sidebar ochiq bo'lsa
+            if (sidebar.classList.contains('open')) {
+                const target = e.target;
+                
+                // Agar bosilgan joy sidebar ichida bo'lmasa VA menuToggle ichida bo'lmasa
+                if (!sidebar.contains(target) && !menuToggle.contains(target)) {
+                    sidebar.classList.remove('open');
+                    if (overlay) overlay.classList.remove('show');
+                    console.log('🔒 Sidebar yopildi (outside click)');
+                }
+            }
+        });
+
+        // ============================================================
+        // 5. ESC TUGMASI BOSILGANDA YOPISH
+        // ============================================================
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape' && sidebar.classList.contains('open')) {
                 sidebar.classList.remove('open');
                 if (overlay) overlay.classList.remove('show');
-                console.log('🔒 Sidebar closed via ESC');
+                console.log('🔒 Sidebar yopildi (ESC)');
             }
         });
+
+        // ============================================================
+        // 6. WINDOW RESIZE DA YOPISH (MOBILE -> DESKTOP)
+        // ============================================================
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768 && sidebar.classList.contains('open')) {
+                sidebar.classList.remove('open');
+                if (overlay) overlay.classList.remove('show');
+                console.log('🔒 Sidebar yopildi (resize)');
+            }
+        });
+
+        // ============================================================
+        // 7. TOUCH EVENT - MOBIL UCHUN QO'SHIMCHA
+        // ============================================================
+        document.addEventListener('touchstart', function(e) {
+            if (sidebar.classList.contains('open')) {
+                const target = e.target;
+                if (!sidebar.contains(target) && !menuToggle.contains(target)) {
+                    sidebar.classList.remove('open');
+                    if (overlay) overlay.classList.remove('show');
+                    console.log('🔒 Sidebar yopildi (touch outside)');
+                }
+            }
+        }, { passive: true });
 
         console.log('✅ Sidebar init complete');
     }
@@ -141,6 +213,9 @@ const Theme = {
 // ============================================================
 document.addEventListener('DOMContentLoaded', async () => {
 
+    // ============================================================
+    // 1. THEME TOGGLE - 1 CLICK
+    // ============================================================
     const themeToggle = document.getElementById('themeToggle');
     if (themeToggle) {
         const newBtn = themeToggle.cloneNode(true);
@@ -148,6 +223,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         newBtn.addEventListener('click', () => Theme.toggle());
     }
 
+    // ============================================================
+    // 2. THEME OPTIONS (SETTINGS SAHIFASI)
+    // ============================================================
     document.querySelectorAll('.theme-option[data-theme]').forEach(button => {
         button.addEventListener('click', () => {
             const theme = button.dataset.theme;
@@ -157,8 +235,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     });
 
+    // ============================================================
+    // 3. HAMBURGER MENU - INIT
+    // ============================================================
     Theme.initSidebar();
 
+    // ============================================================
+    // 4. SYSTEM THEME O'ZGARISHI
+    // ============================================================
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
         if (Theme.currentTheme === 'auto') {
             document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
@@ -166,6 +250,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
+    // ============================================================
+    // 5. HOZIR SAQLANGAN THEMENI QO'LLASH
+    // ============================================================
     Theme.applyTheme(Theme.currentTheme);
     await Theme.loadThemeFromServer();
 });
