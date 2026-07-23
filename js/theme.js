@@ -1,5 +1,5 @@
 // ============================================================
-// THEME - ADMIN-CUSTOMER (TO'LIQ TUZATILGAN)
+// THEME - ADMIN-CUSTOMER (TO'LIQ)
 // Loyiha: Admin-Customer Frontend
 // Fayl: js/theme.js
 // ============================================================
@@ -104,11 +104,14 @@ const Theme = {
     initSidebar() {
         const menuToggle = document.getElementById('menuToggle');
         const sidebar = document.getElementById('sidebar');
-        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        const overlay = document.getElementById('sidebarOverlay');
 
-        if (!menuToggle || !sidebar) return;
+        if (!menuToggle || !sidebar) {
+            console.warn('⚠️ Sidebar yoki menuToggle topilmadi');
+            return;
+        }
 
-        // Eski event listenerlarni tozalash
+        // Eski eventlarni tozalash
         const newToggle = menuToggle.cloneNode(true);
         menuToggle.parentNode.replaceChild(newToggle, menuToggle);
 
@@ -117,38 +120,42 @@ const Theme = {
             e.preventDefault();
             e.stopPropagation();
             sidebar.classList.toggle('open');
-            if (sidebarOverlay) {
-                sidebarOverlay.classList.toggle('show');
+            if (overlay) {
+                overlay.classList.toggle('show');
             }
+            console.log('🍔 Sidebar toggled:', sidebar.classList.contains('open'));
         });
 
         // Overlay bosilganda yopish
-        if (sidebarOverlay) {
-            const newOverlay = sidebarOverlay.cloneNode(true);
-            sidebarOverlay.parentNode.replaceChild(newOverlay, sidebarOverlay);
+        if (overlay) {
+            const newOverlay = overlay.cloneNode(true);
+            overlay.parentNode.replaceChild(newOverlay, overlay);
             
             newOverlay.addEventListener('click', function() {
                 sidebar.classList.remove('open');
                 this.classList.remove('show');
+                console.log('🔒 Sidebar closed via overlay');
             });
         }
 
-        // Document bosilganda yopish (mobile)
-        document.addEventListener('click', function(e) {
-            if (window.innerWidth <= 768) {
-                const sidebarEl = document.getElementById('sidebar');
-                const menuToggleEl = document.getElementById('menuToggle');
-                if (sidebarEl && menuToggleEl) {
-                    const isSidebar = sidebarEl.contains(e.target);
-                    const isToggle = menuToggleEl.contains(e.target);
-                    if (!isSidebar && !isToggle) {
-                        sidebarEl.classList.remove('open');
-                        const overlay = document.getElementById('sidebarOverlay');
-                        if (overlay) overlay.classList.remove('show');
-                    }
-                }
+        // ESC tugmasi bosilganda yopish
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && sidebar.classList.contains('open')) {
+                sidebar.classList.remove('open');
+                if (overlay) overlay.classList.remove('show');
+                console.log('🔒 Sidebar closed via ESC');
             }
         });
+
+        // Window resize da yopish (agar mobile dan desktop ga o'tsa)
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768 && sidebar.classList.contains('open')) {
+                sidebar.classList.remove('open');
+                if (overlay) overlay.classList.remove('show');
+            }
+        });
+
+        console.log('✅ Sidebar init complete');
     }
 };
 
