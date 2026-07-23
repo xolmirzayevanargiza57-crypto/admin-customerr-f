@@ -15,6 +15,322 @@
     <link rel="stylesheet" href="css/modal.css" />
     <link rel="stylesheet" href="css/responsive.css" />
     <link rel="stylesheet" href="css/theme.css" />
+
+    <style>
+        /* =============================================
+           NOTIFICATIONS PAGE — PAGE-SPECIFIC STYLES
+           ============================================= */
+
+        /* === SIDEBAR FIX: faqat bitta qoida, conflict yo'q === */
+        .sidebar {
+            position: fixed !important;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            height: 100vh;
+            z-index: 200;
+            transform: none; /* desktop: doim ko'rinadi */
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            width: calc(100% - var(--sidebar-width));
+            max-width: calc(100% - var(--sidebar-width));
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* === FILTER TUGMALAR — inline style o'rniga CSS === */
+        .filter-bar {
+            padding: 14px 20px 10px 20px;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--bg-header);
+        }
+
+        .filter-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .filter-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 7px 14px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            font-size: 0.78rem;
+            font-weight: 500;
+            background: var(--bg-input);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: var(--transition);
+            white-space: nowrap;
+            font-family: var(--font-family);
+        }
+
+        .filter-pill:hover {
+            border-color: var(--text-muted);
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        .filter-pill.active {
+            border-color: #007aff;
+            background: #007aff;
+            color: #fff;
+        }
+
+        .filter-pill.active i {
+            color: #fff;
+        }
+
+        [data-theme="dark"] .filter-pill.active {
+            border-color: #4a9aff;
+            background: #1a2a4a;
+            color: #4a9aff;
+        }
+
+        /* === ACTION TUGMALAR === */
+        .filter-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .filter-actions .btn-secondary {
+            padding: 7px 16px;
+            font-size: 0.78rem;
+            width: auto;
+        }
+
+        /* === NOTIFICATIONS CONTAINER === */
+        .notifications-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 20px 24px 20px;
+        }
+
+        .notifications-container::-webkit-scrollbar {
+            width: 5px;
+        }
+        .notifications-container::-webkit-scrollbar-track {
+            background: var(--bg-hover);
+            border-radius: 10px;
+        }
+        .notifications-container::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 10px;
+        }
+        .notifications-container::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted);
+        }
+
+        /* === NOTIFICATION ITEM === */
+        .notification-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border-color);
+            border-left: 3px solid transparent;
+            transition: background 0.2s ease;
+            border-radius: 0;
+        }
+
+        .notification-item:hover {
+            background: var(--bg-hover);
+        }
+
+        .notification-item.unread {
+            background: var(--bg-hover);
+            border-left-color: #007aff;
+        }
+
+        .notification-body {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .notification-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .notification-message-wrapper {
+            max-height: 90px;
+            overflow-y: auto;
+            padding-right: 4px;
+            margin: 4px 0;
+        }
+
+        .notification-message {
+            font-size: 0.83rem;
+            color: var(--text-secondary);
+            margin: 0;
+            word-break: break-word;
+            white-space: pre-wrap;
+            line-height: 1.5;
+        }
+
+        .notification-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-top: 6px;
+        }
+
+        .notification-actions {
+            display: flex;
+            gap: 6px;
+            flex-shrink: 0;
+            align-items: flex-start;
+        }
+
+        .btn-read {
+            background: none;
+            border: 1px solid #007aff;
+            color: #007aff;
+            font-size: 0.7rem;
+            cursor: pointer;
+            padding: 4px 12px;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            font-family: var(--font-family);
+        }
+
+        .btn-read:hover {
+            background: #007aff;
+            color: #fff;
+        }
+
+        .read-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            padding: 4px 0;
+        }
+
+        /* === DATE GROUP === */
+        .notification-date-group {
+            margin-bottom: 20px;
+        }
+
+        .date-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 0;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            border-bottom: 2px solid var(--border-color);
+            margin-bottom: 8px;
+        }
+
+        /* === HAMBURGER — MOBILE === */
+        @media (max-width: 768px) {
+            /* Sidebar mobilda yashirin, hamburger ochadi */
+            .sidebar {
+                transform: translateX(-100%) !important;
+                width: 270px !important;
+                min-width: 270px !important;
+                max-width: 270px !important;
+                z-index: 300 !important;
+            }
+
+            .sidebar.open {
+                transform: translateX(0) !important;
+                box-shadow: 4px 0 30px rgba(0, 0, 0, 0.18) !important;
+            }
+
+            /* Main content mobilda to'liq kenglikda */
+            .main-content {
+                margin-left: 0 !important;
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+
+            /* Hamburger ko'rinadi */
+            .menu-toggle {
+                display: flex !important;
+                align-items: center;
+                justify-content: center;
+                width: 36px;
+                height: 36px;
+                border-radius: 8px;
+                transition: background 0.2s;
+            }
+
+            .menu-toggle:hover {
+                background: var(--bg-hover);
+            }
+
+            /* Filter pills mobilda kichikroq */
+            .filter-pill {
+                font-size: 0.72rem;
+                padding: 6px 10px;
+            }
+
+            .filter-bar {
+                padding: 10px 14px 8px 14px;
+            }
+
+            .notifications-container {
+                padding: 12px 14px 20px 14px;
+            }
+
+            /* Notification item mobilda column */
+            .notification-item {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .notification-actions {
+                width: 100%;
+            }
+
+            .notification-meta {
+                gap: 8px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .filter-pill {
+                font-size: 0.68rem;
+                padding: 5px 9px;
+                gap: 4px;
+            }
+
+            .filter-pills {
+                gap: 6px;
+            }
+
+            .notification-title {
+                font-size: 0.85rem;
+            }
+
+            .notification-message {
+                font-size: 0.78rem;
+            }
+
+            .filter-actions .btn-secondary {
+                font-size: 0.72rem;
+                padding: 6px 12px;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="app-container">
@@ -66,13 +382,17 @@
             </div>
         </aside>
 
+        <!-- Overlay (hamburger uchun) -->
         <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
         <!-- Main Content -->
         <main class="main-content">
             <header class="top-header">
                 <div class="header-left">
-                    <button id="menuToggle" class="menu-toggle"><i class="fas fa-bars"></i></button>
+                    <!-- Hamburger tugma — mobilda ko'rinadi -->
+                    <button id="menuToggle" class="menu-toggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
                     <div>
                         <h2><i class="fas fa-bell"></i> Bildirishnomalar</h2>
                         <p class="text-muted">Barcha xabarlar va bildirishnomalar</p>
@@ -90,50 +410,44 @@
                 </div>
             </header>
 
-            <!-- FILTER TUGMALARI (FLEX HOLATDA) -->
-            <section class="toolbar" style="padding: 12px 16px; border-bottom: 1px solid var(--border-color);">
-                <div class="filter-box" style="display: flex; gap: 6px; flex-wrap: wrap; align-items: center;">
-                    <button id="filterAll" class="filter-pill active" data-filter="all" 
-                            style="padding: 6px 12px; border: 2px solid var(--border-color); border-radius: var(--radius-sm); font-size: 0.7rem; background: var(--bg-input); color: var(--text-primary); cursor: pointer; transition: var(--transition); display: inline-flex; align-items: center; gap: 4px;">
+            <!-- FILTER TUGMALARI -->
+            <div class="filter-bar">
+                <div class="filter-pills">
+                    <button class="filter-pill active" id="filterAll" data-filter="all">
                         <i class="fas fa-list"></i> Barchasi
                     </button>
-                    <button id="filterToday" class="filter-pill" data-filter="today"
-                            style="padding: 6px 12px; border: 2px solid var(--border-color); border-radius: var(--radius-sm); font-size: 0.7rem; background: var(--bg-input); color: var(--text-primary); cursor: pointer; transition: var(--transition); display: inline-flex; align-items: center; gap: 4px;">
+                    <button class="filter-pill" id="filterToday" data-filter="today">
                         <i class="fas fa-calendar-day"></i> Bugun
                     </button>
-                    <button id="filterWeek" class="filter-pill" data-filter="week"
-                            style="padding: 6px 12px; border: 2px solid var(--border-color); border-radius: var(--radius-sm); font-size: 0.7rem; background: var(--bg-input); color: var(--text-primary); cursor: pointer; transition: var(--transition); display: inline-flex; align-items: center; gap: 4px;">
+                    <button class="filter-pill" id="filterWeek" data-filter="week">
                         <i class="fas fa-calendar-week"></i> Shu hafta
                     </button>
-                    <button id="filterMonth" class="filter-pill" data-filter="month"
-                            style="padding: 6px 12px; border: 2px solid var(--border-color); border-radius: var(--radius-sm); font-size: 0.7rem; background: var(--bg-input); color: var(--text-primary); cursor: pointer; transition: var(--transition); display: inline-flex; align-items: center; gap: 4px;">
+                    <button class="filter-pill" id="filterMonth" data-filter="month">
                         <i class="fas fa-calendar-alt"></i> Shu oy
                     </button>
-                    <button id="filterUnread" class="filter-pill" data-filter="unread"
-                            style="padding: 6px 12px; border: 2px solid var(--border-color); border-radius: var(--radius-sm); font-size: 0.7rem; background: var(--bg-input); color: var(--text-primary); cursor: pointer; transition: var(--transition); display: inline-flex; align-items: center; gap: 4px;">
+                    <button class="filter-pill" id="filterUnread" data-filter="unread">
                         <i class="fas fa-envelope"></i> O'qilmagan
                     </button>
-                    <button id="filterRead" class="filter-pill" data-filter="read"
-                            style="padding: 6px 12px; border: 2px solid var(--border-color); border-radius: var(--radius-sm); font-size: 0.7rem; background: var(--bg-input); color: var(--text-primary); cursor: pointer; transition: var(--transition); display: inline-flex; align-items: center; gap: 4px;">
+                    <button class="filter-pill" id="filterRead" data-filter="read">
                         <i class="fas fa-check-double"></i> O'qilgan
                     </button>
                 </div>
-                <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px;">
-                    <button id="refreshNotifications" class="btn-secondary" style="width: auto; padding: 6px 14px; font-size: 0.7rem;">
+                <div class="filter-actions">
+                    <button id="refreshNotifications" class="btn-secondary">
                         <i class="fas fa-sync-alt"></i> Yangilash
                     </button>
-                    <button id="markAllRead" class="btn-secondary" style="width: auto; padding: 6px 14px; font-size: 0.7rem;">
+                    <button id="markAllRead" class="btn-secondary">
                         <i class="fas fa-check-double"></i> Hammasini o'qilgan deb belgilash
                     </button>
                 </div>
-            </section>
+            </div>
 
-            <!-- XABARLAR RO'YXATI (SCROLL) -->
-            <section class="notifications-container" style="padding: 12px 16px 16px 16px; overflow-y: auto; flex: 1;">
+            <!-- XABARLAR RO'YXATI -->
+            <section class="notifications-container">
                 <div id="notificationsList" class="notifications-list">
-                    <div class="notif-loading" style="text-align: center; padding: 40px 0;">
-                        <i class="fas fa-spinner fa-spin" style="font-size: 2rem;"></i>
-                        <p style="margin-top: 12px; color: var(--text-muted);">Yuklanmoqda...</p>
+                    <div style="text-align: center; padding: 50px 0;">
+                        <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--text-muted);"></i>
+                        <p style="margin-top: 14px; color: var(--text-muted);">Yuklanmoqda...</p>
                     </div>
                 </div>
             </section>
@@ -145,122 +459,6 @@
         <i class="fas fa-moon moon"></i>
         <i class="fas fa-sun sun"></i>
     </button>
-
-    <style>
-        .notifications-container {
-            flex: 1;
-            overflow-y: auto;
-            max-height: calc(100vh - 160px);
-        }
-
-        .notifications-container::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .notifications-container::-webkit-scrollbar-track {
-            background: var(--bg-hover);
-            border-radius: 10px;
-        }
-
-        .notifications-container::-webkit-scrollbar-thumb {
-            background: var(--border-color);
-            border-radius: 10px;
-        }
-
-        .notifications-container::-webkit-scrollbar-thumb:hover {
-            background: var(--text-muted);
-        }
-
-        .filter-pill:hover {
-            border-color: var(--text-muted);
-            background: var(--bg-hover);
-        }
-
-        .filter-pill.active {
-            border-color: var(--border-focus);
-            background: var(--bg-active);
-            color: var(--text-primary);
-        }
-
-        [data-theme="dark"] .filter-pill.active {
-            background: var(--text-primary);
-            color: var(--bg-primary);
-        }
-
-        .notification-item:hover {
-            background: var(--bg-hover);
-        }
-
-        .notification-item .notification-message {
-            max-height: 100px;
-            overflow-y: auto;
-        }
-
-        .notification-item .notification-message::-webkit-scrollbar {
-            width: 4px;
-        }
-
-        .notification-item .notification-message::-webkit-scrollbar-track {
-            background: var(--bg-hover);
-            border-radius: 4px;
-        }
-
-        .notification-item .notification-message::-webkit-scrollbar-thumb {
-            background: var(--border-color);
-            border-radius: 4px;
-        }
-
-        @media (max-width: 768px) {
-            .toolbar .filter-box {
-                flex-wrap: wrap;
-            }
-            
-            .filter-pill {
-                font-size: 0.6rem;
-                padding: 4px 8px;
-            }
-            
-            .notification-item {
-                flex-direction: column;
-                padding: 10px 12px;
-            }
-            
-            .notification-item .notification-actions {
-                width: 100%;
-                justify-content: flex-start;
-                margin-top: 6px;
-            }
-            
-            .notifications-container {
-                padding: 8px 12px 12px 12px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .filter-pill {
-                font-size: 0.55rem;
-                padding: 3px 6px;
-            }
-            
-            .notification-item .notification-title {
-                font-size: 0.8rem;
-            }
-            
-            .notification-item .notification-message {
-                font-size: 0.75rem;
-            }
-            
-            .notification-item .notification-meta {
-                font-size: 0.6rem;
-                gap: 6px;
-            }
-            
-            .btn-secondary {
-                font-size: 0.6rem;
-                padding: 4px 10px;
-            }
-        }
-    </style>
 
     <script>
         window.__API_BASE_URL__ = 'https://admin-customerr.onrender.com';
