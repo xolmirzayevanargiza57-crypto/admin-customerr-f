@@ -1,7 +1,5 @@
 // ============================================================
-// NOTIFICATIONS - ADMIN-CUSTOMER (TO'LIQ)
-// Loyiha: Admin-Customer Frontend
-// Fayl: js/notifications.js
+// NOTIFICATIONS - ADMIN-CUSTOMER (TO'LIQ TUZATILGAN)
 // ============================================================
 
 let allNotifications = [];
@@ -32,7 +30,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         await loadNotifications();
         setupListeners();
 
-        // Har 30 soniyada yangilash
         refreshInterval = setInterval(() => {
             loadNotifications();
         }, 30000);
@@ -68,7 +65,7 @@ async function loadNotifications() {
 }
 
 // ============================================================
-// XABARLARNI KO'RSATISH
+// XABARLARNI KO'RSATISH (FAQAT O'ZIGA KELGANLAR)
 // ============================================================
 function renderNotifications(notifications) {
     const container = document.getElementById('notificationsList');
@@ -77,10 +74,33 @@ function renderNotifications(notifications) {
     const user = Auth.getUser();
     const userId = user?._id;
 
-    // ⭐ FAQAT O'ZIGA KELGAN XABARLAR
+    console.log('👤 Current userId:', userId);
+    console.log('📨 Barcha xabarlar:', notifications);
+
+    // ⭐ FAQAT O'ZIGA KELGAN XABARLAR - TO'G'RI FILTR
     let filtered = notifications.filter(n => {
-        return n.recipientId === userId || n.recipientRole === 'all' || n.recipientRole === 'admin_customer';
+        // recipientId ni string ga aylantirib solishtirish
+        const recipientIdStr = n.recipientId ? String(n.recipientId) : null;
+        const userIdStr = userId ? String(userId) : null;
+        
+        // Agar recipientId mavjud bo'lsa va u user ID ga teng bo'lsa
+        if (recipientIdStr && userIdStr) {
+            const isMatch = recipientIdStr === userIdStr;
+            if (isMatch) {
+                console.log('✅ O\'z xabari:', n.title);
+            }
+            return isMatch;
+        }
+        
+        // Agar recipientId bo'lmasa, recipientRole bo'yicha tekshirish
+        const isRoleMatch = n.recipientRole === 'all' || n.recipientRole === 'admin_customer';
+        if (isRoleMatch) {
+            console.log('✅ Role bo\'yicha xabar:', n.title);
+        }
+        return isRoleMatch;
     });
+
+    console.log('📨 Filtrdan keyin:', filtered);
 
     // ⭐ FILTRLASH
     const filteredByDate = filterByDate(filtered, currentFilter);
@@ -298,7 +318,7 @@ function setupListeners() {
         });
     }
 
-    // Filter - Barchasi
+    // Filter
     document.querySelectorAll('.filter-pill').forEach(btn => {
         btn.addEventListener('click', function() {
             currentFilter = this.dataset.filter;
@@ -322,12 +342,11 @@ function setupListeners() {
         markAllReadBtn.addEventListener('click', markAllAsRead);
     }
 
-    // Back button - Dashboardga qaytish
+    // Back button
     const backBtn = document.getElementById('backBtn');
     if (backBtn) {
         backBtn.addEventListener('click', function(e) {
             e.preventDefault();
-            // Agar oldingi sahifa mavjud bo'lsa, o'sha sahifaga o'tish
             if (document.referrer && document.referrer.includes(window.location.host)) {
                 window.history.back();
             } else {
