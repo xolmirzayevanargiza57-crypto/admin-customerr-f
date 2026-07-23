@@ -1,6 +1,6 @@
-/* ============================================
+/* ============================================================
    THEME - LIGHT / DARK / AUTO
-   ============================================ */
+   ============================================================ */
 
 :root {
     --bg-primary: #f5f5f7;
@@ -49,70 +49,58 @@
     background: #1a2a4a;
     color: #4a9aff;
 }
-
 [data-theme="dark"] .stat-icon.green {
     background: #1a3a2a;
     color: #4ac759;
 }
-
 [data-theme="dark"] .stat-icon.purple {
     background: #2a1a4a;
     color: #9a6aff;
 }
-
 [data-theme="dark"] .stat-icon.orange {
     background: #3a2a1a;
     color: #ff9a4a;
 }
-
 [data-theme="dark"] .status-badge.active {
     background: #1a3a2a;
     color: #4ac759;
 }
-
 [data-theme="dark"] .status-badge.blocked {
     background: #3a1a1a;
     color: #ff3b30;
 }
-
 [data-theme="dark"] .status-badge.inactive {
     background: var(--bg-hover);
     color: var(--text-muted);
 }
-
 [data-theme="dark"] .status-badge.present {
     background: #1a3a2a;
     color: #4ac759;
 }
-
 [data-theme="dark"] .status-badge.absent {
     background: #3a1a1a;
     color: #ff3b30;
 }
-
 [data-theme="dark"] .status-badge.absent-reason {
     background: #3a2a1a;
     color: #ff9a4a;
 }
-
 [data-theme="dark"] .payment-status.paid {
     background: #1a3a2a;
     color: #4ac759;
 }
-
 [data-theme="dark"] .payment-status.pending {
     background: #3a2a1a;
     color: #ff9a4a;
 }
-
 [data-theme="dark"] .payment-status.unpaid {
     background: #3a1a1a;
     color: #ff3b30;
 }
 
-/* ============================================
+/* ============================================================
    BASE
-   ============================================ */
+   ============================================================ */
 * {
     margin: 0;
     padding: 0;
@@ -132,31 +120,28 @@ body {
     transition: var(--transition);
 }
 
-/* ============================================
+/* ============================================================
    SCROLLBAR
-   ============================================ */
+   ============================================================ */
 ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
 }
-
 ::-webkit-scrollbar-track {
     background: var(--bg-hover);
     border-radius: 10px;
 }
-
 ::-webkit-scrollbar-thumb {
     background: var(--border-color);
     border-radius: 10px;
 }
-
 ::-webkit-scrollbar-thumb:hover {
     background: var(--text-muted);
 }
 
-/* ============================================
+/* ============================================================
    LOGIN PAGE
-   ============================================ */
+   ============================================================ */
 .login-page {
     display: flex;
     align-items: center;
@@ -218,14 +203,13 @@ body {
     font-size: 0.8rem;
     color: var(--text-muted);
 }
-
 .login-footer .divider {
     margin: 0 8px;
 }
 
-/* ============================================
+/* ============================================================
    FORM
-   ============================================ */
+   ============================================================ */
 .form-group {
     margin-bottom: 18px;
 }
@@ -237,7 +221,6 @@ body {
     margin-bottom: 6px;
     color: var(--text-secondary);
 }
-
 .form-group label i {
     margin-right: 8px;
     color: var(--text-muted);
@@ -284,7 +267,6 @@ body {
     padding-right: 48px;
 }
 
-/* Success/Error icons */
 .input-wrapper .input-icon {
     position: absolute;
     right: 14px;
@@ -300,7 +282,6 @@ body {
 .input-wrapper .input-icon.success {
     color: var(--color-success);
 }
-
 .input-wrapper .input-icon.error {
     color: var(--color-danger);
 }
@@ -308,7 +289,6 @@ body {
 .input-wrapper input.success+.input-icon.success {
     opacity: 1;
 }
-
 .input-wrapper input.error+.input-icon.error {
     opacity: 1;
 }
@@ -317,13 +297,11 @@ body {
     border-color: var(--color-success);
     padding-right: 40px;
 }
-
 .input-wrapper input.error {
     border-color: var(--color-danger);
     padding-right: 40px;
 }
 
-/* Password toggle */
 .password-toggle {
     position: absolute;
     right: 12px;
@@ -349,18 +327,16 @@ body {
     background: var(--bg-hover);
     color: var(--text-primary);
 }
-
 .password-toggle:focus {
     outline: none;
 }
-
 .password-toggle i {
     pointer-events: none;
 }
 
-/* ============================================
+/* ============================================================
    BUTTONS
-   ============================================ */
+   ============================================================ */
 .btn-primary {
     display: inline-flex;
     align-items: center;
@@ -383,13 +359,11 @@ body {
     transform: scale(0.98);
     opacity: 0.85;
 }
-
 .btn-primary:disabled {
     opacity: 0.5;
     cursor: not-allowed;
     transform: none;
 }
-
 .btn-primary i {
     color: var(--bg-primary);
 }
@@ -413,53 +387,6 @@ body {
 
 .btn-secondary:hover {
     background: var(--bg-active);
-}
-
-/* ============================================================
-   BACK BUTTON - MOBIL UCHUN
-   ============================================================ */
-
-.back-button {
-    display: none;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    border-radius: 8px;
-    background: none;
-    border: none;
-    font-size: 1.2rem;
-    color: var(--text-primary);
-    cursor: pointer;
-    transition: background 0.2s;
-    text-decoration: none;
-}
-
-.back-button:hover {
-    background: var(--bg-hover);
-}
-
-@media (max-width: 768px) {
-    .back-button {
-        display: flex !important;
-    }
-    
-    /* Hamburger tugmani yashirish */
-    .menu-toggle {
-        display: block !important;
-        align-items: center;
-        justify-content: center;
-        width: 40px;
-        height: 40px;
-        border-radius: 8px;
-        background: none;
-        border: none;
-        font-size: 1.2rem;
-        color: #1c1c1e;
-        cursor: pointer;
-        transition: background 0.2s;
-        padding: 0;
-    }
 }
 
 .btn-danger {
@@ -530,9 +457,9 @@ body {
     width: 100%;
 }
 
-/* ============================================
-   ACTIONS CONTAINER - FLEX FORMAT
-   ============================================ */
+/* ============================================================
+   ACTIONS CONTAINER
+   ============================================================ */
 .actions-container {
     display: flex;
     gap: 6px;
@@ -561,7 +488,6 @@ body {
     background: var(--color-purple);
     color: #fff;
 }
-
 .actions-container .btn-view:hover {
     opacity: 0.85;
     transform: scale(0.95);
@@ -572,7 +498,6 @@ body {
     color: var(--text-primary);
     border: 1px solid var(--border-color);
 }
-
 .actions-container .btn-secondary:hover {
     background: var(--bg-active);
 }
@@ -581,15 +506,14 @@ body {
     background: var(--color-danger);
     color: #fff;
 }
-
 .actions-container .btn-danger:hover {
     opacity: 0.8;
     transform: scale(0.95);
 }
 
-/* ============================================
+/* ============================================================
    ERROR MESSAGE
-   ============================================ */
+   ============================================================ */
 .error-message {
     display: none;
     align-items: center;
@@ -613,9 +537,9 @@ body {
     border-color: var(--color-danger);
 }
 
-/* ============================================
+/* ============================================================
    THEME TOGGLE
-   ============================================ */
+   ============================================================ */
 .theme-toggle {
     position: fixed;
     bottom: 16px;
@@ -644,7 +568,6 @@ body {
 .theme-toggle .sun {
     display: none;
 }
-
 .theme-toggle .moon {
     display: block;
 }
@@ -652,14 +575,13 @@ body {
 [data-theme="dark"] .theme-toggle .sun {
     display: block;
 }
-
 [data-theme="dark"] .theme-toggle .moon {
     display: none;
 }
 
-/* ============================================
-   SIDEBAR
-   ============================================ */
+/* ============================================================
+   SIDEBAR - DESKTOP
+   ============================================================ */
 .app-container {
     display: flex;
     min-height: 100vh;
@@ -677,12 +599,12 @@ body {
     flex-direction: column;
     position: fixed;
     top: 0;
+    left: 0;
+    bottom: 0;
     height: 100vh;
     z-index: 100;
     overflow-y: auto;
     transition: transform 0.3s ease;
-    left: 0;
-    bottom: 0;
 }
 
 .sidebar-brand {
@@ -763,7 +685,6 @@ body {
     background: var(--bg-hover);
     color: var(--text-primary);
 }
-
 .nav-link:hover i {
     color: var(--text-primary);
 }
@@ -773,7 +694,6 @@ body {
     color: var(--text-primary);
     font-weight: 600;
 }
-
 .nav-link.active i {
     color: var(--text-primary);
 }
@@ -804,7 +724,6 @@ body {
     background: #fef2f2;
     color: var(--color-danger);
 }
-
 .btn-logout i {
     width: 18px;
     text-align: center;
@@ -816,6 +735,9 @@ body {
     color: var(--color-danger);
 }
 
+/* ============================================================
+   SIDEBAR OVERLAY
+   ============================================================ */
 .sidebar-overlay {
     display: none;
     position: fixed;
@@ -831,16 +753,16 @@ body {
     display: block;
 }
 
-/* ============================================
+/* ============================================================
    MAIN CONTENT
-   ============================================ */
+   ============================================================ */
 .main-content {
     flex: 1;
     min-width: 0;
     min-height: 100vh;
+    margin-left: var(--sidebar-width);
     width: calc(100% - var(--sidebar-width));
     max-width: calc(100% - var(--sidebar-width));
-    margin-left: 220px;
 }
 
 .top-header {
@@ -862,7 +784,7 @@ body {
 }
 
 .menu-toggle {
-    display: block !important;
+    display: none !important;
     background: none;
     border: none;
     font-size: 1.1rem;
@@ -886,7 +808,7 @@ body {
 .header-left .text-muted {
     font-size: 0.75rem;
     color: var(--text-muted);
-        display: none;
+    display: none;
 }
 
 .header-right {
@@ -930,9 +852,9 @@ body {
     color: var(--text-muted);
 }
 
-/* ============================================
+/* ============================================================
    STATS CARDS
-   ============================================ */
+   ============================================================ */
 .stats-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -970,17 +892,14 @@ body {
     background: #e8f0fe;
     color: #007aff;
 }
-
 .stat-icon.green {
     background: #e8f5e9;
     color: #34c759;
 }
-
 .stat-icon.purple {
     background: #f3e8ff;
     color: #7c3aed;
 }
-
 .stat-icon.orange {
     background: #fff3e0;
     color: #ff9500;
@@ -1010,14 +929,13 @@ body {
 .stat-change.positive {
     color: var(--color-success);
 }
-
 .stat-change.negative {
     color: var(--color-danger);
 }
 
-/* ============================================
+/* ============================================================
    ATTENDANCE CARDS
-   ============================================ */
+   ============================================================ */
 .attendance-cards {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -1033,9 +951,9 @@ body {
     border-left: 4px solid var(--color-danger);
 }
 
-/* ============================================
+/* ============================================================
    CHARTS
-   ============================================ */
+   ============================================================ */
 .charts-grid {
     display: grid;
     grid-template-columns: 1fr;
@@ -1080,9 +998,9 @@ body {
     width: 100% !important;
 }
 
-/* ============================================
+/* ============================================================
    SUBSCRIPTION
-   ============================================ */
+   ============================================================ */
 .subscription-card {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -1114,9 +1032,9 @@ body {
     color: var(--text-primary);
 }
 
-/* ============================================
+/* ============================================================
    TABLE
-   ============================================ */
+   ============================================================ */
 .table-container {
     padding: 0 16px 16px;
     overflow-x: auto;
@@ -1161,9 +1079,9 @@ body {
     justify-content: center;
 }
 
-/* ============================================
+/* ============================================================
    BADGES
-   ============================================ */
+   ============================================================ */
 .status-badge {
     display: inline-flex;
     align-items: center;
@@ -1180,27 +1098,22 @@ body {
     background: #e8f5e9;
     color: #34c759;
 }
-
 .status-badge.blocked {
     background: #fef2f2;
     color: #ff3b30;
 }
-
 .status-badge.inactive {
     background: var(--bg-hover);
     color: var(--text-muted);
 }
-
 .status-badge.present {
     background: #e8f5e9;
     color: #34c759;
 }
-
 .status-badge.absent {
     background: #fef2f2;
     color: #ff3b30;
 }
-
 .status-badge.absent-reason {
     background: #fff3e0;
     color: #ff9500;
@@ -1220,20 +1133,18 @@ body {
     background: #e8f5e9;
     color: #34c759;
 }
-
 .payment-status.pending {
     background: #fff3e0;
     color: #ff9500;
 }
-
 .payment-status.unpaid {
     background: #fef2f2;
     color: #ff3b30;
 }
 
-/* ============================================
+/* ============================================================
    AGE BADGE
-   ============================================ */
+   ============================================================ */
 .age-badge {
     display: inline-flex;
     align-items: center;
@@ -1250,16 +1161,16 @@ body {
     font-size: 0.55rem;
 }
 
-/* ============================================
+/* ============================================================
    TOOLBAR
-   ============================================ */
+   ============================================================ */
 .toolbar {
     display: flex;
     align-items: stretch;
     gap: 12px;
     padding: 12px 16px;
     flex-wrap: wrap;
-        flex-direction: column;
+    flex-direction: column;
 }
 
 .search-box {
@@ -1297,7 +1208,7 @@ body {
 .filter-box {
     display: flex;
     gap: 6px;
-        justify-content: stretch;
+    justify-content: stretch;
 }
 
 .filter-box select {
@@ -1316,7 +1227,7 @@ body {
     background-repeat: no-repeat;
     background-position: right 12px center;
     padding-right: 34px;
-        flex: 1;
+    flex: 1;
 }
 
 .filter-box select:focus {
@@ -1324,9 +1235,9 @@ body {
     box-shadow: var(--shadow-focus);
 }
 
-/* ============================================
+/* ============================================================
    SETTINGS
-   ============================================ */
+   ============================================================ */
 .settings-container {
     padding: 12px 16px;
     max-width: 700px;
@@ -1357,11 +1268,9 @@ body {
 .settings-card.danger {
     border-color: var(--color-danger);
 }
-
 .settings-card.danger h3 {
     color: var(--color-danger);
 }
-
 .settings-card.danger p {
     font-size: 0.8rem;
     color: var(--text-muted);
@@ -1371,14 +1280,13 @@ body {
 .settings-card .form-group {
     margin-bottom: 14px;
 }
-
 .settings-card .form-group:last-of-type {
     margin-bottom: 18px;
 }
 
-/* ============================================
+/* ============================================================
    THEME OPTIONS
-   ============================================ */
+   ============================================================ */
 .theme-options {
     display: flex;
     gap: 10px;
@@ -1415,15 +1323,14 @@ body {
 .theme-option i {
     font-size: 1.2rem;
 }
-
 .theme-option span {
     font-size: 0.7rem;
     font-weight: 500;
 }
 
-/* ============================================
+/* ============================================================
    LANGUAGE SELECTOR
-   ============================================ */
+   ============================================================ */
 .language-selector {
     display: flex;
     gap: 6px;
@@ -1458,9 +1365,9 @@ body {
     transform: translateY(-1px);
 }
 
-/* ============================================
-   SUBJECTS GRID
-   ============================================ */
+/* ============================================================
+   SUBJECTS
+   ============================================================ */
 .subjects-grid {
     padding: 0 16px 16px;
     display: grid;
@@ -1489,9 +1396,9 @@ body {
     box-shadow: 0 8px 30px rgba(255, 255, 255, 0.05);
 }
 
-/* ============================================
-   PROFILE SECTION
-   ============================================ */
+/* ============================================================
+   PROFILE
+   ============================================================ */
 .profile-section {
     padding: 12px 16px;
     display: grid;
@@ -1543,15 +1450,14 @@ body {
     color: var(--text-muted);
     text-align: center;
 }
-
 .profile-info-item strong {
     color: var(--text-primary);
     font-weight: 600;
 }
 
-/* ============================================
-   ATTENDANCE PAGE - DAVOMAT PANELI
-   ============================================ */
+/* ============================================================
+   ATTENDANCE PAGE
+   ============================================================ */
 .attendance-page-grid {
     display: grid;
     grid-template-columns: 1fr;
@@ -1629,9 +1535,9 @@ body {
     color: var(--text-primary);
 }
 
-/* ============================================
-   ATTENDANCE BUTTONS - REAL TIME UPDATE
-   ============================================ */
+/* ============================================================
+   ATTENDANCE BUTTONS
+   ============================================================ */
 .attendance-btn-group {
     display: flex;
     gap: 4px;
@@ -1688,24 +1594,20 @@ body {
     border-color: #4ac759;
     color: #4ac759;
 }
-
 [data-theme="dark"] .attendance-btn-group .btn-attendance.active-absent {
     background: #3a1a1a;
     border-color: #ff3b30;
     color: #ff3b30;
 }
-
 [data-theme="dark"] .attendance-btn-group .btn-attendance.active-absent-reason {
     background: #3a2a1a;
     border-color: #ff9a4a;
     color: #ff9a4a;
 }
 
-/* Status badge update animation */
-
-/* ============================================
-   ALL.HTML - BARCHA MA'LUMOTLAR
-   ============================================ */
+/* ============================================================
+   ALL.HTML
+   ============================================================ */
 .all-stats-grid {
     display: grid;
     grid-template-columns: 1fr;
@@ -1732,12 +1634,10 @@ body {
     font-weight: 700;
     color: var(--text-primary);
 }
-
 .all-stat-card .stat-label {
     font-size: 0.875rem;
     color: var(--text-muted);
 }
-
 .all-stat-card .stat-icon-big {
     font-size: 2.5rem;
     opacity: 0.2;
@@ -1767,19 +1667,17 @@ body {
     font-size: 0.9rem;
     color: var(--text-primary);
 }
-
 .all-attendance-card .info .role {
     font-size: 0.75rem;
     color: var(--text-muted);
 }
-
 .all-attendance-card .status-badge {
     font-size: 0.7rem;
 }
 
-/* ============================================
+/* ============================================================
    TEACHER PROFILE VIEW
-   ============================================ */
+   ============================================================ */
 .teacher-profile-view {
     background: var(--bg-card);
     border-radius: var(--radius);
@@ -1811,7 +1709,6 @@ body {
     font-weight: 700;
     color: var(--text-primary);
 }
-
 .teacher-profile-view .profile-header .info p {
     font-size: 0.8rem;
     color: var(--text-muted);
@@ -1836,7 +1733,6 @@ body {
     font-weight: 700;
     color: var(--text-primary);
 }
-
 .teacher-profile-view .profile-stats .stat-item .label {
     font-size: 0.7rem;
     color: var(--text-muted);
@@ -1845,13 +1741,11 @@ body {
 .teacher-profile-view .profile-students {
     margin-top: 14px;
 }
-
 .teacher-profile-view .profile-students h4 {
     font-size: 0.8rem;
     font-weight: 600;
     margin-bottom: 6px;
 }
-
 .teacher-profile-view .profile-students .student-item {
     display: flex;
     justify-content: space-between;
@@ -1859,14 +1753,13 @@ body {
     padding: 6px 10px;
     border-bottom: 1px solid var(--border-color);
 }
-
 .teacher-profile-view .profile-students .student-item:last-child {
     border-bottom: none;
 }
 
-/* ============================================
+/* ============================================================
    STUDENT PROFILE VIEW
-   ============================================ */
+   ============================================================ */
 .student-profile-view {
     background: var(--bg-card);
     border-radius: var(--radius);
@@ -1898,7 +1791,6 @@ body {
     font-weight: 700;
     color: var(--text-primary);
 }
-
 .student-profile-view .profile-header .info p {
     font-size: 0.8rem;
     color: var(--text-muted);
@@ -1923,15 +1815,14 @@ body {
     font-weight: 700;
     color: var(--text-primary);
 }
-
 .student-profile-view .profile-stats .stat-item .label {
     font-size: 0.7rem;
     color: var(--text-muted);
 }
 
-/* ============================================
+/* ============================================================
    REPORTS PAGE
-   ============================================ */
+   ============================================================ */
 .reports-grid {
     padding: 12px 16px;
     display: grid;
@@ -1973,17 +1864,14 @@ body {
     background: #e8f0fe;
     color: #007aff;
 }
-
 .report-card .report-header .icon.green {
     background: #e8f5e9;
     color: #34c759;
 }
-
 .report-card .report-header .icon.purple {
     background: #f3e8ff;
     color: #7c3aed;
 }
-
 .report-card .report-header .icon.orange {
     background: #fff3e0;
     color: #ff9500;
@@ -2003,14 +1891,13 @@ body {
     color: var(--text-secondary);
     flex-wrap: wrap;
 }
-
 .report-card .report-stats strong {
     color: var(--text-primary);
 }
 
-/* ============================================
-   MODAL - TUZATILGAN (PASTDA OCHILMAYDI)
-   ============================================ */
+/* ============================================================
+   MODAL
+   ============================================================ */
 .modal {
     position: fixed;
     top: 0;
@@ -2084,59 +1971,475 @@ body {
     from {
         opacity: 0;
     }
-
     to {
         opacity: 1;
     }
 }
 
-/* ============================================
-   RESPONSIVE
-   ============================================ */
-@media (max-width: 1024px) {
-    .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
+@keyframes slideUp {
+    from {
+        transform: translateY(30px);
+        opacity: 0;
     }
-
-    .charts-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .subscription-card {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    .subjects-grid {
-        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    }
-
-    .profile-section {
-        grid-template-columns: 1fr;
-    }
-
-    .all-stats-grid {
-        grid-template-columns: 1fr 1fr;
-    }
-
-    .all-attendance-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .attendance-page-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .reports-grid {
-        grid-template-columns: 1fr 1fr;
+    to {
+        transform: translateY(0);
+        opacity: 1;
     }
 }
 
+/* ============================================================
+   PAYMENTS STATS
+   ============================================================ */
+.payment-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    padding: 0 24px 16px;
+}
+
+.payment-stat-card {
+    background: var(--bg-card);
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    border: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.payment-stat-card .stat-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+.payment-stat-card .stat-icon.blue {
+    background: #e8f0fe;
+    color: #007aff;
+}
+.payment-stat-card .stat-icon.green {
+    background: #e8f5e9;
+    color: #34c759;
+}
+.payment-stat-card .stat-icon.purple {
+    background: #f3e8ff;
+    color: #7c3aed;
+}
+.payment-stat-card .stat-icon.orange {
+    background: #fff3e0;
+    color: #ff9500;
+}
+
+.payment-stat-card .stat-info .stat-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+.payment-stat-card .stat-info .stat-value {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+/* ============================================================
+   ATTENDANCE DETAILS
+   ============================================================ */
+.attendance-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 12px;
+    padding: 0 24px 24px;
+}
+
+.attendance-detail-card {
+    background: var(--bg-card);
+    border-radius: var(--radius);
+    padding: 14px 18px;
+    border: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.attendance-detail-card .info .name {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+}
+.attendance-detail-card .info .role {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+.attendance-detail-card .info .time {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+}
+.attendance-detail-card .status-badge {
+    font-size: 0.7rem;
+}
+
+/* ============================================================
+   WORK HOURS
+   ============================================================ */
+.work-hours-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+    padding: 0 24px 24px;
+}
+
+.work-hours-card {
+    background: var(--bg-card);
+    border-radius: var(--radius);
+    padding: 14px 18px;
+    border: 1px solid var(--border-color);
+    text-align: center;
+}
+
+.work-hours-card .name {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+}
+.work-hours-card .hours {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-purple);
+    margin-top: 4px;
+}
+.work-hours-card .label {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+}
+
+/* ============================================================
+   SUBJECTS MODAL
+   ============================================================ */
+.modal .form-group .input-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.modal .form-group .input-wrapper input,
+.modal .form-group .input-wrapper select {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    font-size: 0.9375rem;
+    background: var(--bg-input);
+    color: var(--text-primary);
+    transition: var(--transition);
+    outline: none;
+    font-family: var(--font-family);
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.modal .form-group .input-wrapper input:focus,
+.modal .form-group .input-wrapper select:focus {
+    border-color: var(--border-focus);
+    box-shadow: var(--shadow-focus);
+}
+
+.modal .form-group .input-wrapper input::placeholder {
+    color: var(--text-muted);
+    font-weight: 400;
+}
+
+/* ============================================================
+   PAYMENT ITEMS
+   ============================================================ */
+.payment-item {
+    transition: var(--transition);
+}
+.payment-item:hover {
+    background: var(--bg-hover);
+}
+
+/* ============================================================
+   REASON INPUT
+   ============================================================ */
+.reason-input {
+    transition: var(--transition);
+}
+.reason-input:focus {
+    border-color: var(--border-focus);
+    box-shadow: var(--shadow-focus);
+    outline: none;
+}
+
+.btn-save-reason {
+    transition: var(--transition);
+}
+.btn-save-reason:hover {
+    opacity: 0.85;
+    transform: scale(0.95);
+}
+.btn-save-reason:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ============================================================
+   MONEY FORMAT
+   ============================================================ */
+.money-amount {
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.5px;
+}
+
+.money-amount.uzs {
+    color: var(--color-success);
+}
+.money-amount.usd {
+    color: #007aff;
+}
+.money-amount.eur {
+    color: #ff9500;
+}
+
+/* ============================================================
+   BTN GROUP
+   ============================================================ */
+.btn-group-container {
+    display: flex;
+    gap: 8px;
+    padding: 12px 24px;
+    flex-wrap: wrap;
+}
+
+.btn-group-container .btn-group-btn {
+    padding: 8px 20px;
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    background: var(--bg-card);
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 500;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-group-container .btn-group-btn:hover {
+    border-color: var(--text-primary);
+    color: var(--text-primary);
+}
+.btn-group-container .btn-group-btn.active {
+    border-color: var(--color-purple);
+    background: var(--color-purple);
+    color: #fff;
+}
+
+/* ============================================================
+   BACK BUTTON - MOBILE
+   ============================================================ */
+.back-button {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: background 0.2s;
+    text-decoration: none;
+}
+
+.back-button:hover {
+    background: var(--bg-hover);
+}
+
+/* ============================================================
+   NOTIFICATION PANEL
+   ============================================================ */
+.notification-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.notification-btn {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    color: var(--text-primary);
+    position: relative;
+    padding: 8px;
+    cursor: pointer;
+}
+
+#notificationBadge {
+    position: absolute;
+    top: -2px;
+    right: -4px;
+    background: #ff3b30;
+    color: white;
+    font-size: 0.6rem;
+    border-radius: 50%;
+    padding: 2px 5px;
+    min-width: 18px;
+    text-align: center;
+    display: none;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+#notificationPanel {
+    display: none;
+    position: fixed;
+    top: 60px;
+    right: 12px;
+    left: 12px;
+    max-width: 420px;
+    margin-left: auto;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.18);
+    z-index: 9999;
+    overflow: hidden;
+    flex-direction: column;
+}
+
+.notif-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border-color);
+    background: var(--bg-card);
+    flex-shrink: 0;
+}
+
+.notif-panel-header h4 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin: 0;
+    color: var(--text-primary);
+}
+
+#markAllRead {
+    background: none;
+    border: none;
+    color: #007aff;
+    font-size: 0.72rem;
+    cursor: pointer;
+    white-space: nowrap;
+    padding: 4px 0;
+}
+
+#notificationList {
+    overflow-y: auto;
+    max-height: 360px;
+    padding: 6px 0;
+}
+
+.notification-item {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border-color);
+    transition: background 0.2s;
+}
+
+.notification-item:last-child {
+    border-bottom: none;
+}
+
+.notification-item.unread {
+    background: var(--bg-hover);
+    border-left: 3px solid #007aff;
+}
+
+.notification-item-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.notification-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.notification-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    display: block;
+    word-break: break-word;
+    margin-bottom: 4px;
+}
+
+.notification-message {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin: 0 0 4px 0;
+    word-break: break-word;
+    white-space: pre-wrap;
+    line-height: 1.45;
+}
+
+.notification-time {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+}
+
+.mark-read-btn {
+    background: none;
+    border: 1px solid #007aff;
+    color: #007aff;
+    font-size: 0.68rem;
+    cursor: pointer;
+    white-space: nowrap;
+    padding: 3px 8px;
+    border-radius: 6px;
+    flex-shrink: 0;
+    align-self: flex-start;
+}
+
+.notif-read-label {
+    font-size: 0.68rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+    padding: 3px 0;
+    flex-shrink: 0;
+    align-self: flex-start;
+}
+
+@media (min-width: 480px) {
+    #notificationPanel {
+        position: absolute;
+        top: 45px;
+        right: 0;
+        left: auto;
+        width: 380px;
+    }
+}
+
+/* ============================================================
+   RESPONSIVE - MOBILE (HAMBURGER MENU)
+   ============================================================ */
 @media (max-width: 768px) {
+    /* SIDEBAR - YASHIRIN */
     .sidebar {
         position: fixed !important;
-        top: 0;
-        left: 0;
-        bottom: 0;
+        top: 0 !important;
+        left: 0 !important;
+        bottom: 0 !important;
         transform: translateX(-100%) !important;
         width: 280px !important;
         min-width: 280px !important;
@@ -2148,24 +2451,44 @@ body {
         transition: transform 0.3s ease !important;
         box-shadow: none !important;
         overflow-y: auto !important;
-        flex: 0 0 260px;
+        display: flex !important;
+        flex-direction: column !important;
     }
 
+    /* SIDEBAR - OCHIQ */
     .sidebar.open {
         transform: translateX(0) !important;
         box-shadow: 4px 0 30px rgba(0, 0, 0, 0.2) !important;
     }
 
+    /* MAIN CONTENT - TO'LIQ KENGLIK */
     .main-content {
         margin-left: 0 !important;
         width: 100% !important;
         max-width: 100% !important;
-        min-width: 0;
+    }
+
+    /* HAMBURGER TUGMA - KO'RINADI */
+    .menu-toggle {
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        background: none;
+        border: none;
+        font-size: 1.2rem;
+        color: var(--text-primary);
+        cursor: pointer;
+        transition: background 0.2s;
+        padding: 0;
     }
     .menu-toggle:hover {
         background: var(--bg-hover);
     }
 
+    /* OVERLAY */
     .sidebar-overlay {
         display: none !important;
         position: fixed !important;
@@ -2179,163 +2502,6 @@ body {
     .sidebar-overlay.show {
         display: block !important;
     }
-}
-
-    .user-info {
-        display: none;
-    }
-
-    .data-table th,
-    .data-table td {
-        padding: 8px 10px;
-        font-size: 0.7rem;
-    }
-
-    .teacher-profile-view .profile-stats,
-    .student-profile-view .profile-stats {
-        grid-template-columns: 1fr 1fr;
-    }
-
-    .teacher-profile-view .profile-header,
-    .student-profile-view .profile-header {
-        flex-direction: column;
-        text-align: center;
-    }
-
-
-@media (max-width: 480px) {
-    .login-card {
-        padding: 20px 14px;
-    }
-
-    .login-logo h1 {
-        font-size: 1.1rem;
-    }
-
-    .login-logo .logo-icon {
-        width: 48px;
-        height: 48px;
-        border-radius: 14px;
-    }
-
-    .login-logo .logo-icon i {
-        font-size: 20px;
-    }
-
-    .login-logo {
-        margin-bottom: 20px;
-    }
-
-    .form-group {
-        margin-bottom: 12px;
-    }
-
-    .input-wrapper input,
-    .input-wrapper select,
-    .input-wrapper textarea {
-        padding: 8px 12px;
-        font-size: 0.8rem;
-        border-radius: 8px;
-    }
-
-    .input-wrapper input[type="password"] {
-        padding-right: 40px;
-    }
-
-    .password-toggle {
-        width: 26px;
-        height: 26px;
-        font-size: 0.8rem;
-        right: 8px;
-    }
-
-    .btn-primary,
-    .btn-secondary,
-    .btn-danger {
-        padding: 8px 14px;
-        font-size: 0.8rem;
-        border-radius: 8px;
-    }
-
-    .stats-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .attendance-cards {
-        grid-template-columns: 1fr;
-    }
-
-    .subscription-card {
-        grid-template-columns: 1fr;
-    }
-
-    .theme-toggle {
-        bottom: 16px;
-        right: 16px;
-        width: 38px;
-        height: 38px;
-        font-size: 0.9rem;
-    }
-
-    .data-table th,
-    .data-table td {
-        padding: 6px 8px;
-        font-size: 0.65rem;
-    }
-
-    .teacher-profile-view .profile-stats,
-    .student-profile-view .profile-stats {
-        grid-template-columns: 1fr;
-    }
-
-    .all-attendance-card {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .attendance-btn-group {
-        justify-content: center;
-    }
-
-    .reports-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .modal-content {
-        padding: 16px;
-        max-width: 100%;
-    }
-
-    .modal-header h3 {
-        font-size: 0.9rem;
-    }
-
-    .modal-footer .btn-secondary,
-    .modal-footer .btn-primary {
-        padding: 6px 14px;
-        font-size: 0.75rem;
-    }
-}
-
-/* ============================================================
-   HAMBURGER MENU - TO'LIQ TUZATISH
-   ============================================================ */
-
-/* ⭐ SIDEBAR OVERLAY */
-
-/* ============================================================
-   RESPONSIVE - HAMBURGER MENU (TO'G'RI)
-   ============================================================ */
-@media (max-width: 768px) {
-    /* SIDEBAR - YASHIRIN */
-
-    /* SIDEBAR - OCHIQ */
-
-    /* MAIN CONTENT - TO'LIQ KENGLIK */
-
-    /* HAMBURGER TUGMA */
-
-    /* OVERLAY */
 
     /* HEADER */
     .top-header {
@@ -2490,533 +2656,113 @@ body {
         height: 42px;
         font-size: 1rem;
     }
-}
 
-@media (max-width: 480px) {
+    /* TEACHER/STUDENT PROFILE */
+    .teacher-profile-view .profile-stats,
+    .student-profile-view .profile-stats {
+        grid-template-columns: 1fr 1fr;
+    }
     .teacher-profile-view .profile-header,
     .student-profile-view .profile-header {
         flex-direction: column;
         text-align: center;
     }
 }
-/* ============================================
-   LOGIN PAGE
-   ============================================ */
-
-/* ============================================
-   FORM
-   ============================================ */
-
-/* Success/Error icons */
-
-/* Password toggle */
-
-/* ============================================
-   BUTTONS
-   ============================================ */
-
-/* ============================================
-   ACTIONS CONTAINER - FLEX FORMAT
-   ============================================ */
-
-/* ============================================
-   ERROR MESSAGE
-   ============================================ */
-
-/* ============================================
-   THEME TOGGLE
-   ============================================ */
-
-/* ============================================
-   SIDEBAR - NAV PANEL
-   ============================================ */
-
-/* ============================================
-   SIDEBAR OVERLAY (HAMBURGER UCHUN)
-   ============================================ */
-
-/* ============================================
-   MAIN CONTENT
-   ============================================ */
-
-.menu-toggle:hover {
-    color: var(--text-muted);
-}
-
-/* ============================================
-   RESPONSIVE - HAMBURGER MENU
-   ============================================ */
 
 @media (max-width: 480px) {
+    .login-card {
+        padding: 20px 14px;
+    }
+    .login-logo h1 {
+        font-size: 1.1rem;
+    }
+    .login-logo .logo-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 14px;
+    }
+    .login-logo .logo-icon i {
+        font-size: 20px;
+    }
+    .login-logo {
+        margin-bottom: 20px;
+    }
+    .form-group {
+        margin-bottom: 12px;
+    }
+    .input-wrapper input,
+    .input-wrapper select,
+    .input-wrapper textarea {
+        padding: 8px 12px;
+        font-size: 0.8rem;
+        border-radius: 8px;
+    }
+    .input-wrapper input[type="password"] {
+        padding-right: 40px;
+    }
+    .password-toggle {
+        width: 26px;
+        height: 26px;
+        font-size: 0.8rem;
+        right: 8px;
+    }
+    .btn-primary,
+    .btn-secondary,
+    .btn-danger {
+        padding: 8px 14px;
+        font-size: 0.8rem;
+        border-radius: 8px;
+    }
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    .attendance-cards {
+        grid-template-columns: 1fr;
+    }
+    .subscription-card {
+        grid-template-columns: 1fr;
+    }
+    .theme-toggle {
+        bottom: 16px;
+        right: 16px;
+        width: 38px;
+        height: 38px;
+        font-size: 0.9rem;
+    }
+    .data-table th,
+    .data-table td {
+        padding: 6px 8px;
+        font-size: 0.65rem;
+    }
+    .all-attendance-card {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .attendance-btn-group {
+        justify-content: center;
+    }
+    .reports-grid {
+        grid-template-columns: 1fr;
+    }
+    .modal-content {
+        padding: 16px;
+        max-width: 100%;
+    }
+    .modal-header h3 {
+        font-size: 0.9rem;
+    }
+    .modal-footer .btn-secondary,
+    .modal-footer .btn-primary {
+        padding: 6px 14px;
+        font-size: 0.75rem;
+    }
+    .teacher-profile-view .profile-stats,
+    .student-profile-view .profile-stats {
+        grid-template-columns: 1fr;
+    }
+    .teacher-profile-view .profile-header,
+    .student-profile-view .profile-header {
+        flex-direction: column;
+        text-align: center;
+    }
 }
-
-/* ============================================
-   BTN GROUP - O'QITUVCHILAR/O'QUVCHILAR/TO'LOVLAR
-   ============================================ */
-.btn-group-container {
-    display: flex;
-    gap: 8px;
-    padding: 12px 24px;
-    flex-wrap: wrap;
-}
-
-.btn-group-container .btn-group-btn {
-    padding: 8px 20px;
-    border: 2px solid var(--border-color);
-    border-radius: var(--radius-sm);
-    background: var(--bg-card);
-    color: var(--text-muted);
-    cursor: pointer;
-    font-size: 0.8rem;
-    font-weight: 500;
-    transition: var(--transition);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.btn-group-container .btn-group-btn:hover {
-    border-color: var(--text-primary);
-    color: var(--text-primary);
-}
-
-.btn-group-container .btn-group-btn.active {
-    border-color: var(--color-purple);
-    background: var(--color-purple);
-    color: #fff;
-}
-
-/* ============================================
-   PAYMENTS STATS
-   ============================================ */
-.payment-stats-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 14px;
-    padding: 0 24px 16px;
-}
-
-.payment-stat-card {
-    background: var(--bg-card);
-    border-radius: var(--radius);
-    padding: 16px 20px;
-    border: 1px solid var(--border-color);
-    display: flex;
-    align-items: center;
-    gap: 14px;
-}
-
-.payment-stat-card .stat-icon {
-    width: 42px;
-    height: 42px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.2rem;
-    flex-shrink: 0;
-}
-
-.payment-stat-card .stat-icon.blue {
-    background: #e8f0fe;
-    color: #007aff;
-}
-
-.payment-stat-card .stat-icon.green {
-    background: #e8f5e9;
-    color: #34c759;
-}
-
-.payment-stat-card .stat-icon.purple {
-    background: #f3e8ff;
-    color: #7c3aed;
-}
-
-.payment-stat-card .stat-icon.orange {
-    background: #fff3e0;
-    color: #ff9500;
-}
-
-.payment-stat-card .stat-info .stat-label {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-}
-
-.payment-stat-card .stat-info .stat-value {
-    font-size: 1.3rem;
-    font-weight: 700;
-    color: var(--text-primary);
-}
-
-
-/* ============================================
-   REPORTS PAGE - QO'SHIMCHA
-   ============================================ */
-
-/* Report cards */
-
-.report-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
-}
-
-/* ============================================
-   ATTENDANCE DETAILS - DAVOMAT TAFSILOTLARI
-   ============================================ */
-.attendance-detail-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 12px;
-    padding: 0 24px 24px;
-}
-
-.attendance-detail-card {
-    background: var(--bg-card);
-    border-radius: var(--radius);
-    padding: 14px 18px;
-    border: 1px solid var(--border-color);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-
-.attendance-detail-card .info .name {
-    font-weight: 600;
-    font-size: 0.9rem;
-    color: var(--text-primary);
-}
-
-.attendance-detail-card .info .role {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-}
-
-.attendance-detail-card .info .time {
-    font-size: 0.7rem;
-    color: var(--text-muted);
-}
-
-.attendance-detail-card .status-badge {
-    font-size: 0.7rem;
-}
-
-/* ============================================
-   WORK HOURS - ISH VAQTLARI
-   ============================================ */
-.work-hours-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 12px;
-    padding: 0 24px 24px;
-}
-
-.work-hours-card {
-    background: var(--bg-card);
-    border-radius: var(--radius);
-    padding: 14px 18px;
-    border: 1px solid var(--border-color);
-    text-align: center;
-}
-
-.work-hours-card .name {
-    font-weight: 600;
-    font-size: 0.9rem;
-    color: var(--text-primary);
-}
-
-.work-hours-card .hours {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: var(--color-purple);
-    margin-top: 4px;
-}
-
-.work-hours-card .label {
-    font-size: 0.7rem;
-    color: var(--text-muted);
-}
-
-/* ============================================
-   SUBJECTS MODAL - INPUT FIX
-   ============================================ */
-.modal .form-group .input-wrapper {
-    position: relative;
-    width: 100%;
-}
-
-.modal .form-group .input-wrapper input,
-.modal .form-group .input-wrapper select {
-    width: 100%;
-    padding: 12px 16px;
-    border: 2px solid var(--border-color);
-    border-radius: var(--radius-sm);
-    font-size: 0.9375rem;
-    background: var(--bg-input);
-    color: var(--text-primary);
-    transition: var(--transition);
-    outline: none;
-    font-family: var(--font-family);
-    -webkit-appearance: none;
-    appearance: none;
-}
-
-.modal .form-group .input-wrapper input:focus,
-.modal .form-group .input-wrapper select:focus {
-    border-color: var(--border-focus);
-    box-shadow: var(--shadow-focus);
-}
-
-.modal .form-group .input-wrapper input::placeholder {
-    color: var(--text-muted);
-    font-weight: 400;
-}
-
-/* ============================================
-   PAYMENT ITEMS - TO'LOVLAR
-   ============================================ */
-.payment-item {
-    transition: var(--transition);
-}
-
-.payment-item:hover {
-    background: var(--bg-hover);
-}
-
-/* ============================================
-   REASON INPUT - SABAB
-   ============================================ */
-.reason-input {
-    transition: var(--transition);
-}
-
-.reason-input:focus {
-    border-color: var(--border-focus);
-    box-shadow: var(--shadow-focus);
-    outline: none;
-}
-
-.btn-save-reason {
-    transition: var(--transition);
-}
-
-.btn-save-reason:hover {
-    opacity: 0.85;
-    transform: scale(0.95);
-}
-
-.btn-save-reason:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-/* ============================================
-   TEACHER PROFILE - O'QITUVCHI PROFILI
-   ============================================ */
-
-/* ============================================
-   MONEY FORMAT - PUL FORMATI
-   ============================================ */
-.money-amount {
-    font-weight: 600;
-    font-variant-numeric: tabular-nums;
-    letter-spacing: 0.5px;
-}
-
-.money-amount.uzs {
-    color: var(--color-success);
-}
-
-.money-amount.usd {
-    color: #007aff;
-}
-
-.money-amount.eur {
-    color: #ff9500;
-}
-
-/* ============================================
-   SIDEBAR - NAVIGATION
-   ============================================ */
-
-/* ============================================
-   CHARTS - GRAFIKLAR
-   ============================================ */
-
-/* Responsive */
-@media (max-width: 768px) {
-}
-
-/* ============================================================
-           NOTIFICATION PANEL — RESPONSIVE + SCROLL
-           ============================================================ */
- 
-        .notification-wrapper {
-            position: relative;
-            display: inline-block;
-        }
- 
-        .notification-btn {
-            background: none;
-            border: none;
-            font-size: 1.2rem;
-            color: var(--text-primary);
-            position: relative;
-            padding: 8px;
-            cursor: pointer;
-        }
- 
-        #notificationBadge {
-            position: absolute;
-            top: -2px;
-            right: -4px;
-            background: #ff3b30;
-            color: white;
-            font-size: 0.6rem;
-            border-radius: 50%;
-            padding: 2px 5px;
-            min-width: 18px;
-            text-align: center;
-            display: none;
-            font-weight: 600;
-            line-height: 1.4;
-        }
- 
-        /* Panel */
-        #notificationPanel {
-            position: fixed;          /* fixed — ekrandan chiqmaydi */
-            top: 60px;
-            right: 12px;
-            left: 12px;               /* mobilda to'liq kenglik */
-            max-width: 420px;
-            margin-left: auto;        /* o'ngga yopishadi */
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 14px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.18);
-            z-index: 9999;
-            overflow: hidden;
-            display: none;
-            flex-direction: column;
-        }
- 
-        /* Panel header — fikslanadi */
-        .notif-panel-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 14px;
-            border-bottom: 1px solid var(--border-color);
-            background: var(--bg-card);
-            flex-shrink: 0;
-        }
- 
-        .notif-panel-header h4 {
-            font-size: 0.9rem;
-            font-weight: 600;
-            margin: 0;
-            color: var(--text-primary);
-        }
- 
-        #markAllRead {
-            background: none;
-            border: none;
-            color: #007aff;
-            font-size: 0.72rem;
-            cursor: pointer;
-            white-space: nowrap;
-            padding: 4px 0;
-        }
- 
-        /* Scroll bo'ladigan qism */
-        #notificationList {
-            overflow-y: auto;
-            max-height: 360px;        /* bu yerda scroll bo'ladi */
-            padding: 6px 0;
-        }
- 
-        /* Har bir xabar */
-        .notification-item {
-            padding: 10px 14px;
-            border-bottom: 1px solid var(--border-color);
-            transition: background 0.2s;
-        }
- 
-        .notification-item:last-child {
-            border-bottom: none;
-        }
- 
-        .notification-item.unread {
-            background: var(--bg-hover);
-            border-left: 3px solid #007aff;
-        }
- 
-        .notification-item-inner {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 8px;
-        }
- 
-        .notification-body {
-            flex: 1;
-            min-width: 0;             /* matn uzun bo'lsa wrap bo'ladi */
-        }
- 
-        .notification-title {
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            display: block;
-            word-break: break-word;
-            margin-bottom: 4px;
-        }
- 
-        .notification-message {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            margin: 0 0 4px 0;
-            word-break: break-word;
-            white-space: pre-wrap;    /* uzun matn pastga tushadi, height oshmaydi */
-            line-height: 1.45;
-        }
- 
-        .notification-time {
-            font-size: 0.7rem;
-            color: var(--text-muted);
-        }
- 
-        .mark-read-btn {
-            background: none;
-            border: 1px solid #007aff;
-            color: #007aff;
-            font-size: 0.68rem;
-            cursor: pointer;
-            white-space: nowrap;
-            padding: 3px 8px;
-            border-radius: 6px;
-            flex-shrink: 0;
-            align-self: flex-start;
-        }
- 
-        .notif-read-label {
-            font-size: 0.68rem;
-            color: var(--text-muted);
-            white-space: nowrap;
-            padding: 3px 0;
-            flex-shrink: 0;
-            align-self: flex-start;
-        }
- 
-        /* Katta ekranda panel o'ngdan */
-        @media (min-width: 480px) {
-            #notificationPanel {
-                position: absolute;
-                top: 45px;
-                right: 0;
-                left: auto;
-                width: 380px;
-                fixed: unset;
-            }
-        }
