@@ -63,7 +63,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // ⭐ HAR 30 SONIYADA PROFIL O'ZGARGANMI TEKSHIRISH
         profileCheckInterval = setInterval(async () => {
-            await Auth.checkAuth();
+            const result = await Auth.checkAuth();
+            if (!result || result.valid !== true) {
+                const reason = result?.reason || 'unknown';
+                if (['email_changed', 'status_changed', 'subscription_changed', 'token_invalid'].includes(reason)) {
+                    console.warn('⚠️ Profil o\'zgargan, logout...', reason);
+                }
+            }
         }, 30000);
 
         startCountdown();
