@@ -1,5 +1,7 @@
 // ============================================================
-// AUTH - ADMIN CUSTOMER (TO'LIQ TUZATILGAN)
+// AUTH - ADMIN-CUSTOMER (TO'LIQ)
+// Loyiha: Admin-Customer Frontend
+// Fayl: js/auth.js
 // ============================================================
 
 const Auth = {
@@ -13,7 +15,6 @@ const Auth = {
             console.log('📥 Login javobi:', data);
             
             if (data.success && data.token) {
-                // ⭐ IKKALA STORAGE GA SAQLASH
                 localStorage.setItem('customerToken', data.token);
                 localStorage.setItem('customerUser', JSON.stringify(data.user));
                 sessionStorage.setItem('customerToken', data.token);
@@ -23,7 +24,6 @@ const Auth = {
                 return { success: true, data };
             }
             
-            // ⭐ BLOKLANGAN YOKI OBUNA TUGAGAN USER
             if (data.action === 'contact_support') {
                 const phone = data.phone || '+998 94 022 44 92';
                 const message = data.message || 'Iltimos, yordam uchun raqamga qo\'ng\'iroq qiling.';
@@ -52,12 +52,11 @@ const Auth = {
     },
     
     // ============================================================
-    // ⭐ LOGOUT - TO'LIQ TUZATILGAN (TELEFON UCHUN)
+    // LOGOUT
     // ============================================================
     logout() {
         console.log('🔓 Logout bosildi');
         
-        // ⭐ BARCHA MA'LUMOTLARNI TOZALASH
         localStorage.removeItem('customerToken');
         localStorage.removeItem('customerUser');
         localStorage.removeItem('customerLastAuth');
@@ -69,12 +68,10 @@ const Auth = {
         sessionStorage.removeItem('customerUser');
         sessionStorage.removeItem('customerLastAuth');
         
-        // ⭐ COOKIE LARNI TOZALASH (agar mavjud bo'lsa)
         document.cookie.split(';').forEach(function(c) {
             document.cookie = c.replace(/^ +/, '').replace(/=.*/, '=;expires=' + new Date().toUTCString() + ';path=/');
         });
         
-        // ⭐ CACHE NI TOZALASH (agar service worker bo'lsa)
         if ('caches' in window) {
             caches.keys().then(function(names) {
                 for (let name of names) {
@@ -83,14 +80,11 @@ const Auth = {
             });
         }
         
-        // ⭐ FORCE REDIRECT - window.location.replace() ishlatiladi
-        // replace() history saqlamaydi, telefonlarda yaxshi ishlaydi
         const basePath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
         const target = basePath + 'index.html';
         
         console.log('🔓 Logoutdan keyin yo\'naltirish:', target);
         
-        // ⭐ BIR NECHA USULDA YO'NALTIRISH (telefonlar uchun)
         try {
             window.location.replace(target);
         } catch (e) {
@@ -142,7 +136,7 @@ const Auth = {
     },
     
     // ============================================================
-    // CHECK AUTH
+    // CHECK AUTH - PROFIL O'ZGARGANDA LOGOUT QILADI
     // ============================================================
     getLastAuthAge() {
         const last = localStorage.getItem('customerLastAuth');
@@ -153,8 +147,7 @@ const Auth = {
         const token = this.getToken();
         if (!token) return { valid: false, reason: 'no_token' };
 
-        // ⭐ 30 daqiqa cache
-        const CACHE = 30 * 60 * 1000;
+        const CACHE = 5 * 60 * 1000; // 5 daqiqa
         if (this.getLastAuthAge() < CACHE) {
             console.log('✅ Auth cache — server chaqirilmadi');
             return { valid: true, reason: null };
@@ -179,6 +172,34 @@ const Auth = {
             const user = data.user;
             if (!user) return { valid: false, reason: 'no_user' };
 
+            // ⭐ LOCALDA SAQLANGAN USER BILAN SERVERDAGI USERNI SOLISHTIRISH
+            const localUser = this.getUser();
+            if (localUser) {
+                // Email o'zgarganmi?
+                if (localUser.email !== user.email) {
+                    console.warn('⚠️ Email o\'zgargan, logout qilinmoqda...');
+                    localStorage.setItem('authMessage', 'Profilingiz o\'zgartirilgan. Iltimos, qayta kiring.');
+                    this.logout();
+                    return { valid: false, reason: 'email_changed' };
+                }
+                
+                // Status o'zgarganmi? (active -> blocked/inactive)
+                if (localUser.status !== user.status && user.status !== 'active') {
+                    console.warn('⚠️ Status o\'zgargan, logout qilinmoqda...');
+                    localStorage.setItem('authMessage', 'Hisobingiz bloklangan yoki faol emas.');
+                    this.logout();
+                    return { valid: false, reason: 'status_changed' };
+                }
+                
+                // Subscription o'zgarganmi?
+                if (localUser.subscription?.status !== user.subscription?.status) {
+                    console.warn('⚠️ Subscription o\'zgargan, logout qilinmoqda...');
+                    localStorage.setItem('authMessage', 'Obuna holatingiz o\'zgargan. Iltimos, qayta kiring.');
+                    this.logout();
+                    return { valid: false, reason: 'subscription_changed' };
+                }
+            }
+
             // Persist fresh user
             if (localStorage.getItem('customerToken')) {
                 localStorage.setItem('customerUser', JSON.stringify(user));
@@ -193,8 +214,8 @@ const Auth = {
                 return { valid: false, reason: 'inactive' };
             }
 
-            // Subscription / premium check
-            if (user.isSubscribed === false || user.subscription === 'expired') {
+            // Subscription check
+            if (user.isSubscribed === false || user.subscription?.status === 'expired' || user.subscription?.status === 'inactive') {
                 this.logout();
                 return { valid: false, reason: 'expired' };
             }
@@ -208,7 +229,7 @@ const Auth = {
 };
 
 // ============================================================
-// ⭐ AUTO-REDIRECT - TUZATILGAN
+// AUTO-REDIRECT
 // ============================================================
 document.addEventListener('DOMContentLoaded', async () => {
     const path = window.location.pathname;
@@ -218,7 +239,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (!isLoginPage) {
         if (!Auth.isAuthenticated()) {
-            // ⭐ replace ishlatiladi, telefonlar uchun
             const basePath = path.substring(0, path.lastIndexOf('/') + 1);
             window.location.replace(basePath + 'index.html');
             return;
@@ -227,7 +247,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const result = await Auth.checkAuth();
         if (!result || result.valid !== true) {
             const reason = result && result.reason ? result.reason : 'unauthorized';
-            const blockingReasons = ['inactive', 'expired', 'no_token', 'no_user'];
+            const blockingReasons = ['inactive', 'expired', 'no_token', 'no_user', 'email_changed', 'status_changed', 'subscription_changed'];
 
             if (blockingReasons.includes(reason)) {
                 const basePath = path.substring(0, path.lastIndexOf('/') + 1);
@@ -238,4 +258,4 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
-console.log('✅ auth.js yuklandi');
+console.log('✅ auth.js yuklandi (Admin-Customer)');
