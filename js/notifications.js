@@ -1,5 +1,7 @@
 // ============================================================
-// NOTIFICATIONS - ADMIN-CUSTOMER (TO'LIQ TUZATILGAN)
+// NOTIFICATIONS - ADMIN-CUSTOMER (TO'LIQ)
+// Loyiha: Admin-Customer Frontend
+// Fayl: js/notifications.js
 // ============================================================
 
 let allNotifications = [];
@@ -30,6 +32,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         await loadNotifications();
         setupListeners();
 
+        // Har 30 soniyada yangilash
         refreshInterval = setInterval(() => {
             loadNotifications();
         }, 30000);
@@ -79,25 +82,33 @@ function renderNotifications(notifications) {
 
     // ⭐ FAQAT O'ZIGA KELGAN XABARLAR - TO'G'RI FILTR
     let filtered = notifications.filter(n => {
-        // recipientId ni string ga aylantirib solishtirish
-        const recipientIdStr = n.recipientId ? String(n.recipientId) : null;
-        const userIdStr = userId ? String(userId) : null;
-        
-        // Agar recipientId mavjud bo'lsa va u user ID ga teng bo'lsa
-        if (recipientIdStr && userIdStr) {
-            const isMatch = recipientIdStr === userIdStr;
-            if (isMatch) {
-                console.log('✅ O\'z xabari:', n.title);
-            }
-            return isMatch;
+        // 1. Agar recipientId mavjud bo'lsa, faqat o'sha ID ga teng bo'lganlar
+        if (n.recipientId) {
+            const recipientIdStr = String(n.recipientId);
+            const userIdStr = String(userId);
+            return recipientIdStr === userIdStr;
         }
         
-        // Agar recipientId bo'lmasa, recipientRole bo'yicha tekshirish
-        const isRoleMatch = n.recipientRole === 'all' || n.recipientRole === 'admin_customer';
-        if (isRoleMatch) {
-            console.log('✅ Role bo\'yicha xabar:', n.title);
+        // 2. Agar recipientId bo'lmasa, recipientRole 'all' bo'lsa va user role admin_customer bo'lsa
+        if (n.recipientRole === 'all' && user?.role === 'admin_customer') {
+            return true;
         }
-        return isRoleMatch;
+        
+        // 3. Agar recipientRole 'admin_customer' bo'lsa
+        if (n.recipientRole === 'admin_customer') {
+            return true;
+        }
+        
+        return false;
+    });
+
+    // ⭐ QO'SHIMCHA - XABAR YUBORILGAN VAQTNI TEKSHIRISH (30 kundan eski bo'lmasin)
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    
+    filtered = filtered.filter(n => {
+        const notifDate = new Date(n.createdAt);
+        return notifDate >= thirtyDaysAgo;
     });
 
     console.log('📨 Filtrdan keyin:', filtered);
