@@ -178,15 +178,19 @@ const Auth = {
                 // Email o'zgarganmi?
                 if (localUser.email !== user.email) {
                     console.warn('⚠️ Email o\'zgargan, logout qilinmoqda...');
-                    localStorage.setItem('authMessage', 'Profilingiz o\'zgartirilgan. Iltimos, qayta kiring.');
+                    localStorage.setItem('authMessage', '📧 Profilingizdagi email manzil o\'zgartirilgan. Iltimos, qayta kiring.');
                     this.logout();
                     return { valid: false, reason: 'email_changed' };
                 }
                 
-                // Status o'zgarganmi? (active -> blocked/inactive)
-                if (localUser.status !== user.status && user.status !== 'active') {
+                // Status o'zgarganmi?
+                if (localUser.status !== user.status) {
                     console.warn('⚠️ Status o\'zgargan, logout qilinmoqda...');
-                    localStorage.setItem('authMessage', 'Hisobingiz bloklangan yoki faol emas.');
+                    let msg = '📌 Hisobingiz holati o\'zgargan. ';
+                    if (user.status === 'blocked') msg += '⛔ Siz bloklangansiz!';
+                    else if (user.status === 'inactive') msg += '❌ Hisobingiz faol emas.';
+                    else if (user.status === 'active') msg += '✅ Hisobingiz faollashtirilgan.';
+                    localStorage.setItem('authMessage', msg + ' Iltimos, qayta kiring.');
                     this.logout();
                     return { valid: false, reason: 'status_changed' };
                 }
@@ -194,9 +198,18 @@ const Auth = {
                 // Subscription o'zgarganmi?
                 if (localUser.subscription?.status !== user.subscription?.status) {
                     console.warn('⚠️ Subscription o\'zgargan, logout qilinmoqda...');
-                    localStorage.setItem('authMessage', 'Obuna holatingiz o\'zgargan. Iltimos, qayta kiring.');
+                    localStorage.setItem('authMessage', '💰 Obuna holatingiz o\'zgargan. Iltimos, qayta kiring.');
                     this.logout();
                     return { valid: false, reason: 'subscription_changed' };
+                }
+                
+                // Parol o'zgarganligini token yaroqliligini tekshirish orqali aniqlash
+                // Agar token yaroqsiz bo'lsa, logout qilamiz
+                if (data.message && data.message.includes('token')) {
+                    console.warn('⚠️ Token yaroqsiz, logout qilinmoqda...');
+                    localStorage.setItem('authMessage', '🔑 Parol o\'zgartirilgan yoki sessiya tugagan. Iltimos, qayta kiring.');
+                    this.logout();
+                    return { valid: false, reason: 'token_invalid' };
                 }
             }
 
@@ -247,7 +260,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const result = await Auth.checkAuth();
         if (!result || result.valid !== true) {
             const reason = result && result.reason ? result.reason : 'unauthorized';
-            const blockingReasons = ['inactive', 'expired', 'no_token', 'no_user', 'email_changed', 'status_changed', 'subscription_changed'];
+            const blockingReasons = ['inactive', 'expired', 'no_token', 'no_user', 'email_changed', 'status_changed', 'subscription_changed', 'token_invalid'];
 
             if (blockingReasons.includes(reason)) {
                 const basePath = path.substring(0, path.lastIndexOf('/') + 1);
