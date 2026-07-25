@@ -9,6 +9,26 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <link rel="stylesheet" href="css/style.css" />
+
+    <style>
+        /* ============================================================
+           TO'LOV USULI PREVIEW
+           ============================================================ */
+        #paymentMethodPreview {
+            animation: fadeIn 0.3s ease;
+        }
+        #paymentMethodPreview img {
+            border: 1px solid var(--border-color);
+            background: white;
+        }
+        #paymentMethodPreview .method-emoji {
+            font-size: 1.5rem;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
 </head>
 <body>
     <div class="app-container">
@@ -127,11 +147,12 @@
                             <th><span data-i18n="payment_amount">Summa</span></th>
                             <th><span data-i18n="payment_month">Oy</span></th>
                             <th><span data-i18n="payment_status">Holati</span></th>
+                            <th>To'lov usuli</th>
                             <th><span data-i18n="actions">Amallar</span></th>
                         </tr>
                     </thead>
                     <tbody id="studentPaymentsBody">
-                        <tr><td colspan="6" class="text-center text-muted" data-i18n="loading">Yuklanmoqda...</td></tr>
+                        <tr><td colspan="7" class="text-center text-muted" data-i18n="loading">Yuklanmoqda...</td></tr>
                     </tbody>
                 </table>
             </section>
@@ -145,11 +166,12 @@
                             <th>Maosh</th>
                             <th>Oy</th>
                             <th>Holati</th>
+                            <th>To'lov usuli</th>
                             <th>Amallar</th>
                         </tr>
                     </thead>
                     <tbody id="teacherPaymentsBody">
-                        <tr><td colspan="5" class="text-center text-muted" data-i18n="loading">Yuklanmoqda...</td></tr>
+                        <tr><td colspan="6" class="text-center text-muted" data-i18n="loading">Yuklanmoqda...</td></tr>
                     </tbody>
                 </table>
             </section>
