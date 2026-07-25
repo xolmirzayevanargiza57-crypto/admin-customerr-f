@@ -99,18 +99,21 @@ const Theme = {
     },
 
     // ============================================================
-    // HAMBURGER MENU - TO'G'RI
+    // ⭐ HAMBURGER MENU - FAQAT DASHBOARD VA BOSHQA SAHIFALAR UCHUN
     // ============================================================
     initSidebar() {
+        // ⭐ FAQAT SIDEBAR MAVJUD BO'LGAN SAHIFALARDA ISHLASHI UCHUN
         const menuToggle = document.getElementById('menuToggle');
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('sidebarOverlay');
 
+        // Agar sidebar yoki menuToggle topilmasa, hech narsa qilma (login sahifasi)
         if (!menuToggle || !sidebar) {
-            console.warn('⚠️ Sidebar yoki menuToggle topilmadi');
+            console.log('ℹ️ Sidebar topilmadi (login sahifasi yoki boshqa sahifa)');
             return;
         }
 
+        // Eski eventlarni tozalash
         const newToggle = menuToggle.cloneNode(true);
         menuToggle.parentNode.replaceChild(newToggle, menuToggle);
 
@@ -195,6 +198,7 @@ const Theme = {
 // ============================================================
 document.addEventListener('DOMContentLoaded', async () => {
 
+    // ⭐ Theme toggle
     const themeToggle = document.getElementById('themeToggle');
     if (themeToggle) {
         const newBtn = themeToggle.cloneNode(true);
@@ -202,6 +206,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         newBtn.addEventListener('click', () => Theme.toggle());
     }
 
+    // ⭐ Theme options
     document.querySelectorAll('.theme-option[data-theme]').forEach(button => {
         button.addEventListener('click', () => {
             const theme = button.dataset.theme;
@@ -211,8 +216,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     });
 
+    // ⭐ Hamburger menu - faqat sidebar mavjud bo'lsa ishlaydi
     Theme.initSidebar();
 
+    // System theme o'zgarishi
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
         if (Theme.currentTheme === 'auto') {
             document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
@@ -220,6 +227,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
+    // Hozir saqlangan themeni qo'llash
     Theme.applyTheme(Theme.currentTheme);
     await Theme.loadThemeFromServer();
 });
