@@ -1,5 +1,5 @@
 // ============================================================
-// THEME - ADMIN-CUSTOMER (TO'LIQ TUZATILGAN)
+// THEME - ADMIN-CUSTOMER (TO'LIQ)
 // Loyiha: Admin-Customer Frontend
 // Fayl: js/theme.js
 // ============================================================
@@ -99,7 +99,7 @@ const Theme = {
     },
 
     // ============================================================
-    // ⭐ HAMBURGER MENU - TO'G'RI (OCHILADI, YOPILADI, OUTSIDE CLICK)
+    // HAMBURGER MENU - TO'G'RI
     // ============================================================
     initSidebar() {
         const menuToggle = document.getElementById('menuToggle');
@@ -111,15 +111,10 @@ const Theme = {
             return;
         }
 
-        // ============================================================
-        // 1. ESKI EVENTLARNI TOZALASH
-        // ============================================================
         const newToggle = menuToggle.cloneNode(true);
         menuToggle.parentNode.replaceChild(newToggle, menuToggle);
 
-        // ============================================================
-        // 2. HAMBURGER BOSILGANDA - OCHISH/YOPISH
-        // ============================================================
+        // Hamburger bosilganda
         newToggle.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
@@ -135,9 +130,7 @@ const Theme = {
             }
         });
 
-        // ============================================================
-        // 3. OVERLAY BOSILGANDA YOPISH
-        // ============================================================
+        // Overlay bosilganda yopish
         if (overlay) {
             const newOverlay = overlay.cloneNode(true);
             overlay.parentNode.replaceChild(newOverlay, overlay);
@@ -151,15 +144,10 @@ const Theme = {
             });
         }
 
-        // ============================================================
-        // 4. EKRAN CHEGASIGA (OUTSIDE) BOSILGANDA YOPISH
-        // ============================================================
+        // Ekran chetiga bosilganda yopish
         document.addEventListener('click', function(e) {
-            // Sidebar ochiq bo'lsa
             if (sidebar.classList.contains('open')) {
                 const target = e.target;
-                
-                // Agar bosilgan joy sidebar ichida bo'lmasa VA menuToggle ichida bo'lmasa
                 if (!sidebar.contains(target) && !menuToggle.contains(target)) {
                     sidebar.classList.remove('open');
                     if (overlay) overlay.classList.remove('show');
@@ -168,9 +156,7 @@ const Theme = {
             }
         });
 
-        // ============================================================
-        // 5. ESC TUGMASI BOSILGANDA YOPISH
-        // ============================================================
+        // ESC tugmasi
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape' && sidebar.classList.contains('open')) {
                 sidebar.classList.remove('open');
@@ -179,9 +165,7 @@ const Theme = {
             }
         });
 
-        // ============================================================
-        // 6. WINDOW RESIZE DA YOPISH (MOBILE -> DESKTOP)
-        // ============================================================
+        // Window resize
         window.addEventListener('resize', function() {
             if (window.innerWidth > 768 && sidebar.classList.contains('open')) {
                 sidebar.classList.remove('open');
@@ -190,9 +174,7 @@ const Theme = {
             }
         });
 
-        // ============================================================
-        // 7. TOUCH EVENT - MOBIL UCHUN QO'SHIMCHA
-        // ============================================================
+        // Touch event - mobil
         document.addEventListener('touchstart', function(e) {
             if (sidebar.classList.contains('open')) {
                 const target = e.target;
@@ -213,9 +195,6 @@ const Theme = {
 // ============================================================
 document.addEventListener('DOMContentLoaded', async () => {
 
-    // ============================================================
-    // 1. THEME TOGGLE - 1 CLICK
-    // ============================================================
     const themeToggle = document.getElementById('themeToggle');
     if (themeToggle) {
         const newBtn = themeToggle.cloneNode(true);
@@ -223,9 +202,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         newBtn.addEventListener('click', () => Theme.toggle());
     }
 
-    // ============================================================
-    // 2. THEME OPTIONS (SETTINGS SAHIFASI)
-    // ============================================================
     document.querySelectorAll('.theme-option[data-theme]').forEach(button => {
         button.addEventListener('click', () => {
             const theme = button.dataset.theme;
@@ -235,14 +211,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     });
 
-    // ============================================================
-    // 3. HAMBURGER MENU - INIT
-    // ============================================================
     Theme.initSidebar();
 
-    // ============================================================
-    // 4. SYSTEM THEME O'ZGARISHI
-    // ============================================================
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
         if (Theme.currentTheme === 'auto') {
             document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
@@ -250,9 +220,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    // ============================================================
-    // 5. HOZIR SAQLANGAN THEMENI QO'LLASH
-    // ============================================================
     Theme.applyTheme(Theme.currentTheme);
     await Theme.loadThemeFromServer();
 });
