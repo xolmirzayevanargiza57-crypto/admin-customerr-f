@@ -1,6 +1,38 @@
 // ============================================================
-// PAYMENTS - TO'LOVLAR (TO'LIQ)
+// PAYMENTS - ADMIN CUSTOMER (TO'LIQ)
+// Loyiha: Admin-Customer Frontend
+// Fayl: js/payments.js
 // ============================================================
+
+// ============================================================
+// ⭐ TO'LOV USULI MA'LUMOTLARI
+// ============================================================
+const PAYMENT_METHODS = {
+    cash: {
+        id: 'cash',
+        name: 'Naqd pul',
+        icon: 'https://www.gazeta.uz/sp/32221828/img/tild3365-3235-4161-a437-316637323436__banknoti-uzb.png',
+        emoji: '💵'
+    },
+    click: {
+        id: 'click',
+        name: 'Click',
+        icon: 'https://click.uz/uploads/20260423/ainvdbe3fa3432d6f1baab5b4972548938571776927939.jpg',
+        emoji: '📱'
+    },
+    paynet: {
+        id: 'paynet',
+        name: 'Paynet',
+        icon: 'https://frankfurt.apollo.olxcdn.com/v1/files/qum4yr71mite1-UZ/image',
+        emoji: '💳'
+    },
+    payme: {
+        id: 'payme',
+        name: 'Payme',
+        icon: 'https://upload.wikimedia.org/wikipedia/commons/a/a9/Paymeuz_logo.png',
+        emoji: '📲'
+    }
+};
 
 let paymentsData = [];
 let studentsData = [];
@@ -73,12 +105,52 @@ function renderPayments(payments) {
         }
 
         if (type === 'teacher') {
-            return rows.map(payment => `
+            return rows.map(payment => {
+                const methodInfo = PAYMENT_METHODS[payment.paymentMethod] || PAYMENT_METHODS.cash;
+                const methodDisplay = methodInfo ? `
+                    <span style="display: inline-flex; align-items: center; gap: 4px; font-size: 0.6rem; color: var(--text-muted);">
+                        <img src="${methodInfo.icon}" style="width: 14px; height: 14px; object-fit: contain; border-radius: 2px;" onerror="this.style.display='none'">
+                        ${methodInfo.name}
+                    </span>
+                ` : '';
+                return `
+                    <tr>
+                        <td><strong><i class="fas fa-user-circle"></i> ${payment.teacherName || 'Noma\'lum'}</strong></td>
+                        <td><i class="fas fa-money-bill"></i> ${Utils.formatMoney(payment.amount, 'UZS')}</td>
+                        <td><i class="fas fa-calendar"></i> ${payment.month || '-'}</td>
+                        <td><span class="payment-status ${Utils.getStatusClass(payment.status)}">${Utils.formatStatus(payment.status)}</span></td>
+                        <td>${methodDisplay}</td>
+                        <td>
+                            <div class="actions-container">
+                                <button class="btn-secondary" onclick="editPayment('${payment._id}')" title="${I18N.t('edit')}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn-danger" onclick="deletePayment('${payment._id}')" title="${I18N.t('delete')}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        return rows.map(payment => {
+            const methodInfo = PAYMENT_METHODS[payment.paymentMethod] || PAYMENT_METHODS.cash;
+            const methodDisplay = methodInfo ? `
+                <span style="display: inline-flex; align-items: center; gap: 4px; font-size: 0.6rem; color: var(--text-muted);">
+                    <img src="${methodInfo.icon}" style="width: 14px; height: 14px; object-fit: contain; border-radius: 2px;" onerror="this.style.display='none'">
+                    ${methodInfo.name}
+                </span>
+            ` : '';
+            return `
                 <tr>
-                    <td><strong><i class="fas fa-user-circle"></i> ${payment.teacherName || 'Noma\'lum'}</strong></td>
+                    <td><strong><i class="fas fa-user-circle"></i> ${payment.studentName || 'Noma\'lum'}</strong></td>
+                    <td><i class="fas fa-user"></i> ${payment.teacherName || '-'}</td>
                     <td><i class="fas fa-money-bill"></i> ${Utils.formatMoney(payment.amount, 'UZS')}</td>
                     <td><i class="fas fa-calendar"></i> ${payment.month || '-'}</td>
                     <td><span class="payment-status ${Utils.getStatusClass(payment.status)}">${Utils.formatStatus(payment.status)}</span></td>
+                    <td>${methodDisplay}</td>
                     <td>
                         <div class="actions-container">
                             <button class="btn-secondary" onclick="editPayment('${payment._id}')" title="${I18N.t('edit')}">
@@ -90,28 +162,8 @@ function renderPayments(payments) {
                         </div>
                     </td>
                 </tr>
-            `).join('');
-        }
-
-        return rows.map(payment => `
-            <tr>
-                <td><strong><i class="fas fa-user-circle"></i> ${payment.studentName || 'Noma\'lum'}</strong></td>
-                <td><i class="fas fa-user"></i> ${payment.teacherName || '-'}</td>
-                <td><i class="fas fa-money-bill"></i> ${Utils.formatMoney(payment.amount, 'UZS')}</td>
-                <td><i class="fas fa-calendar"></i> ${payment.month || '-'}</td>
-                <td><span class="payment-status ${Utils.getStatusClass(payment.status)}">${Utils.formatStatus(payment.status)}</span></td>
-                <td>
-                    <div class="actions-container">
-                        <button class="btn-secondary" onclick="editPayment('${payment._id}')" title="${I18N.t('edit')}">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="btn-danger" onclick="deletePayment('${payment._id}')" title="${I18N.t('delete')}">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                </td>
-            </tr>
-        `).join('');
+            `;
+        }).join('');
     };
 
     if (studentBody) {
@@ -141,7 +193,7 @@ function renderPayments(payments) {
 }
 
 // ============================================================
-// TO'LOV QO'SHISH MODAL
+// ⭐ TO'LOV QO'SHISH MODAL (paymentMethod SELECT BILAN)
 // ============================================================
 function showAddPaymentModal() {
     const modal = document.createElement('div');
@@ -194,6 +246,23 @@ function showAddPaymentModal() {
                         <input type="month" id="paymentMonth" required />
                     </div>
                 </div>
+
+                <!-- ⭐ TO'LOV USULI SELECT -->
+                <div class="form-group">
+                    <label><i class="fas fa-wallet"></i> To'lov usuli</label>
+                    <div class="input-wrapper">
+                        <select id="paymentMethodSelect" required>
+                            <option value="">To'lov usulini tanlang...</option>
+                            <option value="cash">💵 Naqd pul</option>
+                            <option value="click">📱 Click</option>
+                            <option value="paynet">💳 Paynet</option>
+                            <option value="payme">📲 Payme</option>
+                        </select>
+                    </div>
+                    <!-- ⭐ TANLANGAN TO'LOV USULI RASMI -->
+                    <div id="paymentMethodPreview" style="display: none; margin-top: 8px;"></div>
+                </div>
+
                 <div class="form-group">
                     <label>${I18N.t('payment_status')}</label>
                     <div class="input-wrapper">
@@ -214,24 +283,57 @@ function showAddPaymentModal() {
     document.body.appendChild(modal);
     I18N.updateUI();
 
-    const paymentTypeSelect = document.getElementById('paymentType');
-    const studentPaymentGroup = document.getElementById('studentPaymentGroup');
+    // ⭐ TO'LOV USULI SELECT EVENT
+    const select = document.getElementById('paymentMethodSelect');
+    const previewDiv = document.getElementById('paymentMethodPreview');
+
+    if (select && previewDiv) {
+        select.addEventListener('change', function() {
+            const methodId = this.value;
+            const method = PAYMENT_METHODS[methodId];
+
+            if (method && methodId !== '') {
+                previewDiv.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 12px; padding: 10px 14px; background: var(--bg-hover); border-radius: 8px; border: 1px solid var(--border-color); margin-top: 8px; animation: fadeIn 0.3s ease;">
+                        <img src="${method.icon}" alt="${method.name}" 
+                             style="width: 40px; height: 40px; object-fit: contain; border-radius: 6px; background: white; padding: 4px;"
+                             onerror="this.style.display='none'; this.parentElement.querySelector('.method-emoji').style.display='block';">
+                        <span class="method-emoji" style="font-size: 1.5rem; display: none;">${method.emoji}</span>
+                        <div>
+                            <div style="font-weight: 600; font-size: 0.9rem; color: var(--text-primary);">${method.name}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted);">To'lov usuli tanlandi</div>
+                        </div>
+                        <span style="margin-left: auto; color: var(--color-success);"><i class="fas fa-check-circle"></i></span>
+                    </div>
+                `;
+                previewDiv.style.display = 'block';
+            } else {
+                previewDiv.innerHTML = '';
+                previewDiv.style.display = 'none';
+            }
+        });
+    }
+
     const togglePaymentType = () => {
-        if (studentPaymentGroup) {
-            studentPaymentGroup.style.display = paymentTypeSelect.value === 'student_fee' ? 'block' : 'none';
+        const paymentType = document.getElementById('paymentType');
+        const studentGroup = document.getElementById('studentPaymentGroup');
+        if (studentGroup) {
+            studentGroup.style.display = paymentType.value === 'student_fee' ? 'block' : 'none';
         }
     };
-    paymentTypeSelect.addEventListener('change', togglePaymentType);
+    document.getElementById('paymentType').addEventListener('change', togglePaymentType);
     togglePaymentType();
 
     document.getElementById('addPaymentForm').addEventListener('submit', async (e) => {
         e.preventDefault();
+
         const paymentType = document.getElementById('paymentType').value;
         const studentId = paymentType === 'student_fee' ? document.getElementById('paymentStudent').value : '';
         const teacherId = document.getElementById('paymentTeacher').value;
         const amount = parseInt(document.getElementById('paymentAmount').value) || 0;
         const month = document.getElementById('paymentMonth').value;
         const status = document.getElementById('paymentStatus').value;
+        const paymentMethod = document.getElementById('paymentMethodSelect').value;
 
         if (!teacherId || !amount || !month) {
             showError(I18N.t('all_fields_required'));
@@ -241,12 +343,26 @@ function showAddPaymentModal() {
             showError('O\'quvchi tanlanishi kerak');
             return;
         }
+        if (!paymentMethod || paymentMethod === '') {
+            showError('Iltimos, to\'lov usulini tanlang!');
+            document.getElementById('paymentMethodSelect').focus();
+            return;
+        }
 
         try {
-            const data = await API.createPayment({ studentId, teacherId, amount, month, status, paymentType });
+            const data = await API.createPayment({
+                studentId,
+                teacherId,
+                amount,
+                month,
+                status,
+                paymentType,
+                paymentMethod
+            });
             if (data.success) {
+                const methodName = PAYMENT_METHODS[paymentMethod]?.name || paymentMethod;
                 document.querySelector('.modal').remove();
-                showSuccess(I18N.t('success'));
+                showSuccess(`✅ To\'lov qo\'shildi!\n💳 To\'lov usuli: ${methodName}`);
                 await loadData();
             } else {
                 showError(data.message || I18N.t('error'));
@@ -348,16 +464,14 @@ function setupListeners() {
     });
     document.getElementById('addPaymentBtn').addEventListener('click', showAddPaymentModal);
     document.getElementById('logoutBtn').addEventListener('click', () => Auth.logout());
-
-    // Sidebar open/close is handled globally by js/theme.js.
 }
 
 function filterPayments() {
     const search = document.getElementById('searchInput').value.toLowerCase();
     const status = document.getElementById('statusFilter').value;
     let filtered = paymentsData;
-    if (search) filtered = filtered.filter(p => 
-        p.studentName?.toLowerCase().includes(search) || 
+    if (search) filtered = filtered.filter(p =>
+        p.studentName?.toLowerCase().includes(search) ||
         p.teacherName?.toLowerCase().includes(search)
     );
     if (status !== 'all') filtered = filtered.filter(p => p.status === status);
@@ -406,4 +520,4 @@ function showSuccess(msg) {
     setTimeout(() => div.remove(), 3000);
 }
 
-console.log('✅ payments.js yuklandi');
+console.log('✅ payments.js yuklandi (Admin-Customer)');
