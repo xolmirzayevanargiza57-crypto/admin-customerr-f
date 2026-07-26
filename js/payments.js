@@ -5,7 +5,7 @@
 // ============================================================
 
 // ============================================================
-// ⭐ TO'LOV USULI MA'LUMOTLARI
+// ⭐ TO'LOV USULI MA'LUMOTLARI (YANGILANGAN)
 // ============================================================
 const PAYMENT_METHODS = {
     cash: {
@@ -17,7 +17,7 @@ const PAYMENT_METHODS = {
     click: {
         id: 'click',
         name: 'Click',
-        icon: 'https://click.uz/uploads/20260423/ainvdbe3fa3432d6f1baab5b4972548938571776927939.jpg',
+        icon: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Click_uz_logo.svg/1200px-Click_uz_logo.svg.png',
         emoji: '📱'
     },
     paynet: {
@@ -31,6 +31,12 @@ const PAYMENT_METHODS = {
         name: 'Payme',
         icon: 'https://upload.wikimedia.org/wikipedia/commons/a/a9/Paymeuz_logo.png',
         emoji: '📲'
+    },
+    uzum: {
+        id: 'uzum',
+        name: 'Uzum',
+        icon: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Uzum_Logo.svg/1200px-Uzum_Logo.svg.png',
+        emoji: '🟣'
     }
 };
 
@@ -101,7 +107,7 @@ function renderPayments(payments) {
 
     const renderRows = (rows, type) => {
         if (!rows.length) {
-            return `<tr><td colspan="${type === 'student' ? 6 : 5}" class="text-center text-muted" data-i18n="no_data">Ma'lumot yo'q</td></tr>`;
+            return `<tr><td colspan="${type === 'student' ? 7 : 6}" class="text-center text-muted" data-i18n="no_data">Ma'lumot yo'q</td></tr>`;
         }
 
         if (type === 'teacher') {
@@ -257,6 +263,7 @@ function showAddPaymentModal() {
                             <option value="click">📱 Click</option>
                             <option value="paynet">💳 Paynet</option>
                             <option value="payme">📲 Payme</option>
+                            <option value="uzum">🟣 Uzum</option>
                         </select>
                     </div>
                     <!-- ⭐ TANLANGAN TO'LOV USULI RASMI -->
@@ -288,9 +295,15 @@ function showAddPaymentModal() {
     const previewDiv = document.getElementById('paymentMethodPreview');
 
     if (select && previewDiv) {
-        select.addEventListener('change', function() {
+        // Eski eventlarni tozalash
+        const newSelect = select.cloneNode(true);
+        select.parentNode.replaceChild(newSelect, select);
+        
+        newSelect.addEventListener('change', function() {
             const methodId = this.value;
             const method = PAYMENT_METHODS[methodId];
+
+            console.log('💳 Tanlangan to\'lov usuli:', methodId, method);
 
             if (method && methodId !== '') {
                 previewDiv.innerHTML = `
@@ -312,6 +325,10 @@ function showAddPaymentModal() {
                 previewDiv.style.display = 'none';
             }
         });
+        
+        if (newSelect.value && newSelect.value !== '') {
+            newSelect.dispatchEvent(new Event('change'));
+        }
     }
 
     const togglePaymentType = () => {
@@ -333,7 +350,10 @@ function showAddPaymentModal() {
         const amount = parseInt(document.getElementById('paymentAmount').value) || 0;
         const month = document.getElementById('paymentMonth').value;
         const status = document.getElementById('paymentStatus').value;
-        const paymentMethod = document.getElementById('paymentMethodSelect').value;
+        
+        // ⭐ TO'LOV USULINI OLISH
+        const paymentMethodSelect = document.getElementById('paymentMethodSelect');
+        const paymentMethod = paymentMethodSelect ? paymentMethodSelect.value : '';
 
         if (!teacherId || !amount || !month) {
             showError(I18N.t('all_fields_required'));
@@ -345,9 +365,11 @@ function showAddPaymentModal() {
         }
         if (!paymentMethod || paymentMethod === '') {
             showError('Iltimos, to\'lov usulini tanlang!');
-            document.getElementById('paymentMethodSelect').focus();
+            if (paymentMethodSelect) paymentMethodSelect.focus();
             return;
         }
+
+        console.log('💳 Tanlangan to\'lov usuli:', paymentMethod);
 
         try {
             const data = await API.createPayment({
@@ -357,7 +379,7 @@ function showAddPaymentModal() {
                 month,
                 status,
                 paymentType,
-                paymentMethod
+                paymentMethod: paymentMethod // ⭐ To'lov usuli yuboriladi
             });
             if (data.success) {
                 const methodName = PAYMENT_METHODS[paymentMethod]?.name || paymentMethod;
@@ -462,8 +484,21 @@ function setupListeners() {
         paymentTypeFilterValue = e.target.value;
         filterPayments();
     });
-    document.getElementById('addPaymentBtn').addEventListener('click', showAddPaymentModal);
-    document.getElementById('logoutBtn').addEventListener('click', () => Auth.logout());
+    
+    // ⭐ ADD PAYMENT BUTTON
+    const addBtn = document.getElementById('addPaymentBtn');
+    if (addBtn) {
+        const newAddBtn = addBtn.cloneNode(true);
+        addBtn.parentNode.replaceChild(newAddBtn, addBtn);
+        newAddBtn.addEventListener('click', showAddPaymentModal);
+    }
+    
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        const newLogoutBtn = logoutBtn.cloneNode(true);
+        logoutBtn.parentNode.replaceChild(newLogoutBtn, logoutBtn);
+        newLogoutBtn.addEventListener('click', () => Auth.logout());
+    }
 }
 
 function filterPayments() {
@@ -481,6 +516,7 @@ function filterPayments() {
 }
 
 function showError(msg) {
+    console.error('⚠️ Xatolik:', msg);
     const div = document.createElement('div');
     div.style.cssText = `
         position: fixed; top: 20px; right: 20px; z-index: 9999;
@@ -501,6 +537,7 @@ function showError(msg) {
 }
 
 function showSuccess(msg) {
+    console.log('✅ Muvaffaqiyat:', msg);
     const div = document.createElement('div');
     div.style.cssText = `
         position: fixed; top: 20px; right: 20px; z-index: 9999;
