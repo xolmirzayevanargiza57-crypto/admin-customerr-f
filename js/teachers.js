@@ -1,8 +1,20 @@
 // ============================================================
-// TEACHERS - O'QITUVCHILAR (BIR KUNDA KO'P DARS BILAN)
+// TEACHERS - ADMIN CUSTOMER (TO'LIQ)
+// Loyiha: Admin-Customer Frontend
+// Fayl: js/teachers.js
 // ============================================================
 
 let teachersData = [];
+
+// ============================================================
+// ⭐ PULNI FORMATLASH (2 000 000 so'm)
+// ============================================================
+function formatMoney(amount) {
+    if (!amount && amount !== 0) return '0 so\'m';
+    const num = typeof amount === 'string' ? parseFloat(amount) : amount;
+    if (isNaN(num)) return '0 so\'m';
+    return num.toLocaleString('uz-UZ') + ' so\'m';
+}
 
 document.addEventListener('DOMContentLoaded', async () => {
     const token = localStorage.getItem('customerToken') || sessionStorage.getItem('customerToken');
@@ -42,37 +54,45 @@ async function loadTeachers() {
 function renderTeachers(teachers) {
     const tbody = document.getElementById('teachersBody');
     if (!teachers || teachers.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="10" class="text-center text-muted" data-i18n="no_data">Ma'lumot yo'q</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="11" class="text-center text-muted" data-i18n="no_data">Ma'lumot yo'q</td></tr>`;
         I18N.updateUI();
         return;
     }
 
-    tbody.innerHTML = teachers.map(teacher => `
-        <tr>
-            <td><strong><i class="fas fa-user-circle"></i> ${teacher.fullName || 'Noma\'lum'}</strong></td>
-            <td><i class="fas fa-envelope"></i> ${teacher.email || '-'}</td>
-            <td><i class="fas fa-phone"></i> ${teacher.phone || '-'}</td>
-            <td><i class="fas fa-book"></i> ${teacher.subject || '-'}</td>
-            <td><span class="age-badge"><i class="fas fa-calendar"></i> ${Utils.calculateAge(teacher.birthDate)} yosh</span></td>
-            <td><i class="fas fa-users"></i> ${teacher.studentCount || 0}</td>
-            <td><i class="fas fa-money-bill"></i> ${Utils.formatMoney(teacher.salary || 0, 'UZS')}</td>
-            <td><i class="fas fa-clock"></i> ${teacher.lessonCount || 0} dars</td>
-            <td><span class="status-badge ${Utils.getStatusClass(teacher.status)}">${Utils.formatStatus(teacher.status)}</span></td>
-            <td>
-                <div class="actions-container">
-                    <button class="btn-view" onclick="viewTeacher('${teacher._id}')" title="${I18N.t('view')}">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                    <button class="btn-secondary" onclick="editTeacher('${teacher._id}')" title="${I18N.t('edit')}">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="btn-danger" onclick="deleteTeacher('${teacher._id}')" title="${I18N.t('delete')}">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </div>
-            </td>
-        </tr>
-    `).join('');
+    tbody.innerHTML = teachers.map(teacher => {
+        const salary = teacher.salary || 0;
+        const totalPaid = teacher.totalPaid || 0;
+        const remaining = salary - totalPaid;
+        
+        return `
+            <tr>
+                <td><strong><i class="fas fa-user-circle"></i> ${teacher.fullName || 'Noma\'lum'}</strong></td>
+                <td><i class="fas fa-envelope"></i> ${teacher.email || '-'}</td>
+                <td><i class="fas fa-phone"></i> ${teacher.phone || '-'}</td>
+                <td><i class="fas fa-book"></i> ${teacher.subject || '-'}</td>
+                <td><span class="age-badge"><i class="fas fa-calendar"></i> ${Utils.calculateAge(teacher.birthDate)} yosh</span></td>
+                <td><i class="fas fa-users"></i> ${teacher.studentCount || 0}</td>
+                <td><i class="fas fa-money-bill"></i> ${formatMoney(salary)}</td>
+                <td><i class="fas fa-check-circle" style="color: var(--color-success);"></i> ${formatMoney(totalPaid)}</td>
+                <td><i class="fas fa-exclamation-triangle" style="color: ${remaining > 0 ? 'var(--color-danger)' : 'var(--color-success)'};"></i> ${formatMoney(remaining)}</td>
+                <td><i class="fas fa-clock"></i> ${teacher.lessonCount || 0} dars</td>
+                <td><span class="status-badge ${Utils.getStatusClass(teacher.status)}">${Utils.formatStatus(teacher.status)}</span></td>
+                <td>
+                    <div class="actions-container">
+                        <button class="btn-view" onclick="viewTeacher('${teacher._id}')" title="${I18N.t('view')}">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="btn-secondary" onclick="editTeacher('${teacher._id}')" title="${I18N.t('edit')}">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn-danger" onclick="deleteTeacher('${teacher._id}')" title="${I18N.t('delete')}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join('');
     I18N.updateUI();
 }
 
@@ -81,119 +101,10 @@ function viewTeacher(id) {
 }
 
 // ============================================================
-// ⭐ DARS QATOR YARATISH (YANI 1 QATOR = 1 DARS VAQTI)
-// ============================================================
-function createLessonRow(day, lessonData = null, index = 0) {
-    const startVal = lessonData ? lessonData.startTime : '09:00';
-    const endVal   = lessonData ? lessonData.endTime   : '10:00';
-    const subjVal  = lessonData ? lessonData.subject   : '';
-    const grpVal   = lessonData ? lessonData.group     : 'A';
-    const uid = `${day.replace(/\s/g,'')}_${index}_${Date.now()}`;
-
-    return `
-        <div class="lesson-row" data-day="${day}" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:4px;background:var(--bg-hover);padding:6px 8px;border-radius:6px;">
-            <input type="time" class="lesson-start" value="${startVal}"
-                   style="padding:3px 6px;border:1px solid var(--border-color);border-radius:4px;font-size:0.72rem;width:80px;background:var(--bg-input);color:var(--text-primary);" />
-            <span style="font-size:0.7rem;color:var(--text-muted);">—</span>
-            <input type="time" class="lesson-end" value="${endVal}"
-                   style="padding:3px 6px;border:1px solid var(--border-color);border-radius:4px;font-size:0.72rem;width:80px;background:var(--bg-input);color:var(--text-primary);" />
-            <input type="text" class="lesson-subject" placeholder="Fan" value="${subjVal}"
-                   style="padding:3px 6px;border:1px solid var(--border-color);border-radius:4px;font-size:0.72rem;flex:1;min-width:80px;background:var(--bg-input);color:var(--text-primary);" />
-            <input type="text" class="lesson-group" placeholder="Guruh" value="${grpVal}"
-                   style="padding:3px 6px;border:1px solid var(--border-color);border-radius:4px;font-size:0.72rem;width:55px;background:var(--bg-input);color:var(--text-primary);" />
-            <button type="button" onclick="this.closest('.lesson-row').remove()"
-                    style="padding:3px 7px;background:#fee2e2;color:#dc2626;border:none;border-radius:4px;cursor:pointer;font-size:0.8rem;">✕</button>
-        </div>
-    `;
-}
-
-// ============================================================
-// ⭐ KUN BLOKI YARATISH
-// ============================================================
-function createDayBlock(day, existingLessons = []) {
-    const dayId = day.replace(/\s/g,'');
-    const lessonsHtml = existingLessons.length > 0
-        ? existingLessons.map((l, i) => createLessonRow(day, l, i)).join('')
-        : createLessonRow(day, null, 0);
-
-    return `
-        <div class="day-block" style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:8px;padding:10px;margin-bottom:8px;">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-                <div style="display:flex;align-items:center;gap:6px;">
-                    <input type="checkbox" class="day-check" data-day="${day}" ${existingLessons.length > 0 ? 'checked' : (day !== 'Yakshanba' ? 'checked' : '')}
-                           onchange="toggleDayBlock(this)" />
-                    <strong style="font-size:0.82rem;">${day}</strong>
-                </div>
-                <button type="button" onclick="addLessonRow('${dayId}', '${day}')"
-                        style="padding:3px 10px;background:var(--color-purple);color:#fff;border:none;border-radius:5px;font-size:0.72rem;cursor:pointer;">
-                    + Dars qo'sh
-                </button>
-            </div>
-            <div class="day-lessons" id="lessons_${dayId}" style="${(existingLessons.length === 0 && day === 'Yakshanba') ? 'display:none;' : ''}">
-                ${lessonsHtml}
-            </div>
-        </div>
-    `;
-}
-
-// ============================================================
-// KUN BLOKI TOGGLE
-// ============================================================
-function toggleDayBlock(checkbox) {
-    const day = checkbox.dataset.day;
-    const dayId = day.replace(/\s/g,'');
-    const lessonsDiv = document.getElementById(`lessons_${dayId}`);
-    if (!lessonsDiv) return;
-    if (checkbox.checked) {
-        lessonsDiv.style.display = '';
-        if (!lessonsDiv.querySelector('.lesson-row')) {
-            lessonsDiv.insertAdjacentHTML('beforeend', createLessonRow(day, null, 0));
-        }
-    } else {
-        lessonsDiv.style.display = 'none';
-    }
-}
-
-// ============================================================
-// YANGI DARS QATORI QO'SHISH
-// ============================================================
-function addLessonRow(dayId, day) {
-    const lessonsDiv = document.getElementById(`lessons_${dayId}`);
-    if (!lessonsDiv) return;
-    const existing = lessonsDiv.querySelectorAll('.lesson-row').length;
-    lessonsDiv.insertAdjacentHTML('beforeend', createLessonRow(day, null, existing));
-    // Checkbox ni check qilish
-    const checkbox = document.querySelector(`.day-check[data-day="${day}"]`);
-    if (checkbox) { checkbox.checked = true; lessonsDiv.style.display = ''; }
-}
-
-// ============================================================
-// DARSLARNI YIG'ISH (MODAL ICHIDAN)
-// ============================================================
-function collectLessons() {
-    const lessons = [];
-    document.querySelectorAll('.day-block').forEach(block => {
-        const day = block.querySelector('.day-check').dataset.day;
-        const isChecked = block.querySelector('.day-check').checked;
-        if (!isChecked) return;
-        block.querySelectorAll('.lesson-row').forEach(row => {
-            const start = row.querySelector('.lesson-start')?.value;
-            const end   = row.querySelector('.lesson-end')?.value;
-            const subj  = row.querySelector('.lesson-subject')?.value || '';
-            const grp   = row.querySelector('.lesson-group')?.value  || 'A';
-            if (start && end) {
-                lessons.push({ day, startTime: start, endTime: end, subject: subj, group: grp });
-            }
-        });
-    });
-    return lessons;
-}
-
-// ============================================================
-// O'QITUVCHI QO'SHISH MODAL
+// ⭐ O'QITUVCHI QO'SHISH MODAL (Maosh va qolgan qarz bilan)
 // ============================================================
 function showAddTeacherModal() {
-    const days = ['Dushanba','Seshanba','Chorshanba','Payshanba','Juma','Shanba','Yakshanba'];
+    const days = ['Dushanba', 'Seshanba', 'Chorshanba', 'Payshanba', 'Juma', 'Shanba', 'Yakshanba'];
     const modal = document.createElement('div');
     modal.className = 'modal show';
     modal.innerHTML = `
@@ -246,12 +157,28 @@ function showAddTeacherModal() {
                     </div>
                 </div>
                 <div class="form-group">
-                    <label><i class="fas fa-money-bill"></i> ${I18N.t('salary')}</label>
+                    <label><i class="fas fa-money-bill"></i> ${I18N.t('salary')} (so'm)</label>
                     <input type="number" id="teacherSalary" placeholder="0" value="0"
                            style="width:100%;padding:8px 12px;border:1px solid var(--border-color);border-radius:6px;background:var(--bg-input);color:var(--text-primary);" />
                 </div>
 
-                <!-- ⭐ DARS JADVALI - BIR KUNDA KO'P DARS -->
+                <!-- ⭐ MAOSH MA'LUMOTI -->
+                <div class="form-group" style="background:var(--bg-hover);padding:12px;border-radius:8px;margin-bottom:16px;">
+                    <div style="display:flex;justify-content:space-between;font-size:0.9rem;padding:4px 0;">
+                        <span>📅 Oylik maosh:</span>
+                        <span id="displayMonthlySalary" style="font-weight:600;">0 so'm</span>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;font-size:0.9rem;padding:4px 0;">
+                        <span>📊 Yillik maosh:</span>
+                        <span id="displayYearlySalary" style="font-weight:600;">0 so'm</span>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;font-size:0.9rem;padding:4px 0;border-top:1px solid var(--border-color);padding-top:8px;margin-top:4px;">
+                        <span>💰 Kunlik maosh (22 kun):</span>
+                        <span id="displayDailySalary" style="font-weight:600;">0 so'm</span>
+                    </div>
+                </div>
+
+                <!-- DARS JADVALI -->
                 <div class="form-group">
                     <label style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">
                         <i class="fas fa-calendar-alt"></i> Dars jadvali
@@ -272,18 +199,28 @@ function showAddTeacherModal() {
         </div>
     `;
     document.body.appendChild(modal);
+
+    // ⭐ Maosh o'zgarganda
+    const salaryInput = document.getElementById('teacherSalary');
+    salaryInput.addEventListener('input', function() {
+        const monthly = parseInt(this.value) || 0;
+        document.getElementById('displayMonthlySalary').textContent = formatMoney(monthly);
+        document.getElementById('displayYearlySalary').textContent = formatMoney(monthly * 12);
+        document.getElementById('displayDailySalary').textContent = formatMoney(Math.round(monthly / 22));
+    });
+
     I18N.updateUI();
 
     document.getElementById('addTeacherForm').addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        const fullName  = document.getElementById('teacherName').value.trim();
-        const email     = document.getElementById('teacherEmail').value.trim();
-        const password  = document.getElementById('teacherPassword').value;
-        const phone     = document.getElementById('teacherPhone').value.trim();
-        const subject   = document.getElementById('teacherSubject').value.trim();
+        const fullName = document.getElementById('teacherName').value.trim();
+        const email = document.getElementById('teacherEmail').value.trim();
+        const password = document.getElementById('teacherPassword').value;
+        const phone = document.getElementById('teacherPhone').value.trim();
+        const subject = document.getElementById('teacherSubject').value.trim();
         const birthDate = document.getElementById('teacherBirthDate').value;
-        const salary    = parseInt(document.getElementById('teacherSalary').value) || 0;
+        const salary = parseInt(document.getElementById('teacherSalary').value) || 0;
 
         if (!fullName || !email || !password) { showError(I18N.t('all_fields_required')); return; }
         if (password.length < 6) { showError('Parol kamida 6 ta belgi bo\'lishi kerak!'); return; }
@@ -299,7 +236,7 @@ function showAddTeacherModal() {
             if (teacherData.success) {
                 const teacherId = teacherData.data._id;
                 for (const lesson of lessons) {
-                    try { await API.createTeacherLesson({ teacherId, ...lesson }); } catch(err) { console.error(err); }
+                    try { await API.createTeacherLesson({ teacherId, ...lesson }); } catch (err) { console.error(err); }
                 }
                 modal.remove();
                 showSuccess(`O'qituvchi qo'shildi! ${lessons.length} ta dars saqlandi.`);
@@ -316,6 +253,99 @@ function showAddTeacherModal() {
             submitBtn.innerHTML = '<i class="fas fa-save"></i> ' + I18N.t('save');
         }
     });
+}
+
+// ============================================================
+// YORDAMCHI FUNKSIYALAR (Day block, lesson row, collect)
+// ============================================================
+function createDayBlock(day, existingLessons = []) {
+    const dayId = day.replace(/\s/g, '');
+    const lessonsHtml = existingLessons.length > 0
+        ? existingLessons.map((l, i) => createLessonRow(day, l, i)).join('')
+        : createLessonRow(day, null, 0);
+
+    return `
+        <div class="day-block" style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:8px;padding:10px;margin-bottom:8px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+                <div style="display:flex;align-items:center;gap:6px;">
+                    <input type="checkbox" class="day-check" data-day="${day}" ${existingLessons.length > 0 ? 'checked' : (day !== 'Yakshanba' ? 'checked' : '')}
+                           onchange="toggleDayBlock(this)" />
+                    <strong style="font-size:0.82rem;">${day}</strong>
+                </div>
+                <button type="button" onclick="addLessonRow('${dayId}', '${day}')"
+                        style="padding:3px 10px;background:var(--color-purple);color:#fff;border:none;border-radius:5px;font-size:0.72rem;cursor:pointer;">
+                    + Dars qo'sh
+                </button>
+            </div>
+            <div class="day-lessons" id="lessons_${dayId}" style="${(existingLessons.length === 0 && day === 'Yakshanba') ? 'display:none;' : ''}">
+                ${lessonsHtml}
+            </div>
+        </div>
+    `;
+}
+
+function createLessonRow(day, lessonData = null, index = 0) {
+    const startVal = lessonData ? lessonData.startTime : '09:00';
+    const endVal = lessonData ? lessonData.endTime : '10:00';
+    const subjVal = lessonData ? lessonData.subject : '';
+    const grpVal = lessonData ? lessonData.group : 'A';
+
+    return `
+        <div class="lesson-row" data-day="${day}" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:4px;background:var(--bg-hover);padding:6px 8px;border-radius:6px;">
+            <input type="time" class="lesson-start" value="${startVal}"
+                   style="padding:3px 6px;border:1px solid var(--border-color);border-radius:4px;font-size:0.72rem;width:80px;background:var(--bg-input);color:var(--text-primary);" />
+            <span style="font-size:0.7rem;color:var(--text-muted);">—</span>
+            <input type="time" class="lesson-end" value="${endVal}"
+                   style="padding:3px 6px;border:1px solid var(--border-color);border-radius:4px;font-size:0.72rem;width:80px;background:var(--bg-input);color:var(--text-primary);" />
+            <input type="text" class="lesson-subject" placeholder="Fan" value="${subjVal}"
+                   style="padding:3px 6px;border:1px solid var(--border-color);border-radius:4px;font-size:0.72rem;flex:1;min-width:80px;background:var(--bg-input);color:var(--text-primary);" />
+            <input type="text" class="lesson-group" placeholder="Guruh" value="${grpVal}"
+                   style="padding:3px 6px;border:1px solid var(--border-color);border-radius:4px;font-size:0.72rem;width:55px;background:var(--bg-input);color:var(--text-primary);" />
+            <button type="button" onclick="this.closest('.lesson-row').remove()"
+                    style="padding:3px 7px;background:#fee2e2;color:#dc2626;border:none;border-radius:4px;cursor:pointer;font-size:0.8rem;">✕</button>
+        </div>
+    `;
+}
+
+function toggleDayBlock(checkbox) {
+    const day = checkbox.dataset.day;
+    const dayId = day.replace(/\s/g, '');
+    const lessonsDiv = document.getElementById(`lessons_${dayId}`);
+    if (!lessonsDiv) return;
+    if (checkbox.checked) {
+        lessonsDiv.style.display = '';
+        if (!lessonsDiv.querySelector('.lesson-row')) {
+            lessonsDiv.insertAdjacentHTML('beforeend', createLessonRow(day, null, 0));
+        }
+    } else {
+        lessonsDiv.style.display = 'none';
+    }
+}
+
+function addLessonRow(dayId, day) {
+    const lessonsDiv = document.getElementById(`lessons_${dayId}`);
+    if (!lessonsDiv) return;
+    lessonsDiv.insertAdjacentHTML('beforeend', createLessonRow(day, null, lessonsDiv.querySelectorAll('.lesson-row').length));
+    const checkbox = document.querySelector(`.day-check[data-day="${day}"]`);
+    if (checkbox) { checkbox.checked = true; lessonsDiv.style.display = ''; }
+}
+
+function collectLessons() {
+    const lessons = [];
+    document.querySelectorAll('.day-block').forEach(block => {
+        const day = block.querySelector('.day-check').dataset.day;
+        if (!block.querySelector('.day-check').checked) return;
+        block.querySelectorAll('.lesson-row').forEach(row => {
+            const start = row.querySelector('.lesson-start')?.value;
+            const end = row.querySelector('.lesson-end')?.value;
+            const subj = row.querySelector('.lesson-subject')?.value || '';
+            const grp = row.querySelector('.lesson-group')?.value || 'A';
+            if (start && end) {
+                lessons.push({ day, startTime: start, endTime: end, subject: subj, group: grp });
+            }
+        });
+    });
+    return lessons;
 }
 
 function togglePassword(inputId, button) {
@@ -339,11 +369,14 @@ async function editTeacher(id) {
         if (lessonsRes.success) existingLessons = lessonsRes.data || [];
     } catch (error) { console.error('Darslarni yuklash xatosi:', error); }
 
-    // Darslarni kunlarga guruhlash
-    const days = ['Dushanba','Seshanba','Chorshanba','Payshanba','Juma','Shanba','Yakshanba'];
+    const days = ['Dushanba', 'Seshanba', 'Chorshanba', 'Payshanba', 'Juma', 'Shanba', 'Yakshanba'];
     const lessonsByDay = {};
     days.forEach(d => { lessonsByDay[d] = []; });
     existingLessons.forEach(l => { if (lessonsByDay[l.day]) lessonsByDay[l.day].push(l); });
+
+    const salary = teacher.salary || 0;
+    const totalPaid = teacher.totalPaid || 0;
+    const remaining = salary - totalPaid;
 
     const modal = document.createElement('div');
     modal.className = 'modal show';
@@ -369,38 +402,55 @@ async function editTeacher(id) {
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
                     <div class="form-group">
                         <label>${I18N.t('phone')}</label>
-                        <input type="text" id="editTeacherPhone" value="${teacher.phone||''}"
+                        <input type="text" id="editTeacherPhone" value="${teacher.phone || ''}"
                                style="width:100%;padding:8px 12px;border:1px solid var(--border-color);border-radius:6px;background:var(--bg-input);color:var(--text-primary);" />
                     </div>
                     <div class="form-group">
                         <label>${I18N.t('teacher_subject')}</label>
-                        <input type="text" id="editTeacherSubject" value="${teacher.subject||''}"
+                        <input type="text" id="editTeacherSubject" value="${teacher.subject || ''}"
                                style="width:100%;padding:8px 12px;border:1px solid var(--border-color);border-radius:6px;background:var(--bg-input);color:var(--text-primary);" />
                     </div>
                 </div>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
                     <div class="form-group">
                         <label>${I18N.t('birth_date')}</label>
-                        <input type="date" id="editTeacherBirthDate" value="${teacher.birthDate||''}"
+                        <input type="date" id="editTeacherBirthDate" value="${teacher.birthDate || ''}"
                                style="width:100%;padding:8px 12px;border:1px solid var(--border-color);border-radius:6px;background:var(--bg-input);color:var(--text-primary);" />
                     </div>
                     <div class="form-group">
-                        <label><i class="fas fa-money-bill"></i> ${I18N.t('salary')}</label>
-                        <input type="number" id="editTeacherSalary" value="${teacher.salary||0}"
+                        <label><i class="fas fa-money-bill"></i> ${I18N.t('salary')} (so'm)</label>
+                        <input type="number" id="editTeacherSalary" value="${teacher.salary || 0}"
                                style="width:100%;padding:8px 12px;border:1px solid var(--border-color);border-radius:6px;background:var(--bg-input);color:var(--text-primary);" />
                     </div>
                 </div>
+
+                <!-- ⭐ MAOSH MA'LUMOTI -->
+                <div class="form-group" style="background:var(--bg-hover);padding:12px;border-radius:8px;margin-bottom:16px;">
+                    <div style="display:flex;justify-content:space-between;font-size:0.9rem;padding:4px 0;">
+                        <span>📅 Oylik maosh:</span>
+                        <span style="font-weight:600;">${formatMoney(salary)}</span>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;font-size:0.9rem;padding:4px 0;">
+                        <span>✅ To'langan:</span>
+                        <span style="font-weight:600;color:var(--color-success);">${formatMoney(totalPaid)}</span>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;font-size:0.9rem;padding:4px 0;border-top:1px solid var(--border-color);padding-top:8px;margin-top:4px;">
+                        <span>⚠️ Qolgan qarz:</span>
+                        <span style="font-weight:600;color:${remaining > 0 ? 'var(--color-danger)' : 'var(--color-success)'};">${formatMoney(remaining)}</span>
+                    </div>
+                </div>
+
                 <div class="form-group">
                     <label>${I18N.t('status')}</label>
                     <select id="editTeacherStatus"
                             style="width:100%;padding:8px 12px;border:1px solid var(--border-color);border-radius:6px;background:var(--bg-input);color:var(--text-primary);">
-                        <option value="active"   ${teacher.status==='active'   ?'selected':''}>Faol</option>
-                        <option value="inactive" ${teacher.status==='inactive' ?'selected':''}>Faol emas</option>
-                        <option value="blocked"  ${teacher.status==='blocked'  ?'selected':''}>Bloklangan</option>
+                        <option value="active" ${teacher.status === 'active' ? 'selected' : ''}>Faol</option>
+                        <option value="inactive" ${teacher.status === 'inactive' ? 'selected' : ''}>Faol emas</option>
+                        <option value="blocked" ${teacher.status === 'blocked' ? 'selected' : ''}>Bloklangan</option>
                     </select>
                 </div>
 
-                <!-- ⭐ DARS JADVALI - BIR KUNDA KO'P DARS -->
+                <!-- DARS JADVALI -->
                 <div class="form-group">
                     <label style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">
                         <i class="fas fa-calendar-alt"></i> Dars jadvali
@@ -426,13 +476,13 @@ async function editTeacher(id) {
     document.getElementById('editTeacherForm').addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        const fullName  = document.getElementById('editTeacherName').value.trim();
-        const email     = document.getElementById('editTeacherEmail').value.trim();
-        const phone     = document.getElementById('editTeacherPhone').value.trim();
-        const subject   = document.getElementById('editTeacherSubject').value.trim();
+        const fullName = document.getElementById('editTeacherName').value.trim();
+        const email = document.getElementById('editTeacherEmail').value.trim();
+        const phone = document.getElementById('editTeacherPhone').value.trim();
+        const subject = document.getElementById('editTeacherSubject').value.trim();
         const birthDate = document.getElementById('editTeacherBirthDate').value;
-        const salary    = parseInt(document.getElementById('editTeacherSalary').value) || 0;
-        const status    = document.getElementById('editTeacherStatus').value;
+        const salary = parseInt(document.getElementById('editTeacherSalary').value) || 0;
+        const status = document.getElementById('editTeacherStatus').value;
 
         if (!fullName || !email) { showError(I18N.t('all_fields_required')); return; }
 
@@ -445,13 +495,11 @@ async function editTeacher(id) {
         try {
             const teacherData = await API.updateTeacher(id, { fullName, email, phone, subject, birthDate, salary, status });
             if (teacherData.success) {
-                // Eski darslarni o'chirish
                 for (const lesson of existingLessons) {
-                    try { await API.deleteTeacherLesson(lesson._id); } catch(err) { console.error(err); }
+                    try { await API.deleteTeacherLesson(lesson._id); } catch (err) { console.error(err); }
                 }
-                // Yangi darslarni qo'shish
                 for (const lesson of lessons) {
-                    try { await API.createTeacherLesson({ teacherId: id, ...lesson }); } catch(err) { console.error(err); }
+                    try { await API.createTeacherLesson({ teacherId: id, ...lesson }); } catch (err) { console.error(err); }
                 }
                 modal.remove();
                 showSuccess(`O'qituvchi yangilandi! ${lessons.length} ta dars saqlandi.`);
@@ -498,15 +546,25 @@ function filterTeachers() {
 }
 
 // ============================================================
-// ⭐ EVENT LISTENERLAR - BIR MARTA ULASH
+// EVENT LISTENERLAR
 // ============================================================
 function setupListeners() {
     document.getElementById('searchInput').addEventListener('input', filterTeachers);
     document.getElementById('statusFilter').addEventListener('change', filterTeachers);
-    document.getElementById('addTeacherBtn').addEventListener('click', showAddTeacherModal);
-    document.getElementById('logoutBtn').addEventListener('click', () => Auth.logout());
-
-    // Sidebar open/close is handled globally by js/theme.js.
+    
+    const addBtn = document.getElementById('addTeacherBtn');
+    if (addBtn) {
+        const newBtn = addBtn.cloneNode(true);
+        addBtn.parentNode.replaceChild(newBtn, addBtn);
+        newBtn.addEventListener('click', showAddTeacherModal);
+    }
+    
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        const newBtn = logoutBtn.cloneNode(true);
+        logoutBtn.parentNode.replaceChild(newBtn, logoutBtn);
+        newBtn.addEventListener('click', () => Auth.logout());
+    }
 }
 
 function showError(msg) {
@@ -525,4 +583,4 @@ function showSuccess(msg) {
     setTimeout(() => div.remove(), 3000);
 }
 
-console.log('✅ teachers.js yuklandi');
+console.log('✅ teachers.js yuklandi (Admin-Customer)');
