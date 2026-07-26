@@ -9,6 +9,9 @@ let lastDashboardStats = null;
 let refreshInterval = null;
 let countdownInterval = null;
 let profileCheckInterval = null;
+let notificationCheckInterval = null;
+let lastUnreadCount = 0;
+let notificationSound = null;
 
 // ============================================================
 // SAHIFA YUKLANGANDA
@@ -53,6 +56,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
         }
 
+        // ⭐ XABAR BADGE NI YANGILASH (BIRINCHI MARTA)
+        await updateNotificationBadge();
+
         // Dashboard statistikasini yuklash
         await loadDashboardStats();
 
@@ -61,7 +67,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             loadDashboardStats();
         }, 60000);
 
-        // ⭐ HAR 30 SONIYADA PROFIL O'ZGARGANMI TEKSHIRISH
+        // ⭐ HAR 5 SONIYADA XABAR BADGE NI YANGILASH (REAL TIME)
+        notificationCheckInterval = setInterval(() => {
+            updateNotificationBadge();
+        }, 5000);
+
+        // HAR 30 SONIYADA PROFIL O'ZGARGANMI TEKSHIRISH
         profileCheckInterval = setInterval(async () => {
             const result = await Auth.checkAuth();
             if (!result || result.valid !== true) {
@@ -80,6 +91,117 @@ document.addEventListener('DOMContentLoaded', async () => {
         showError('Dashboard yuklashda xatolik: ' + error.message);
     }
 });
+
+// ============================================================
+// ⭐ XABAR BADGE NI YANGILASH
+// ============================================================
+async function updateNotificationBadge() {
+    try {
+        const token = Auth.getToken();
+        if (!token) {
+            console.log('⚠️ Token topilmadi, badge yangilanmadi');
+            return;
+        }
+
+        const response = await API.getNotifications();
+        console.log('📨 Badge uchun xabarlar:', response);
+
+        if (response.success && response.data) {
+            // ⭐ FAQAT O'ZIGA KELGAN XABARLARNI FILTRLASH
+            const user = Auth.getUser();
+            const userId = user?._id;
+            
+            const myNotifications = response.data.filter(n => {
+                if (n.recipientId) {
+                    return String(n.recipientId) === String(userId);
+                }
+                return n.recipientRole === 'all' || n.recipientRole === 'admin_customer';
+            });
+            
+            const unreadCount = myNotifications.filter(n => !n.isRead).length;
+            
+            console.log('🔔 O\'qilmagan xabarlar soni:', unreadCount);
+
+            // ⭐ HEADER DAGI BADGE
+            const badge = document.getElementById('notificationBadge');
+            if (badge) {
+                if (unreadCount > 0) {
+                    badge.style.display = 'block';
+                    badge.textContent = unreadCount > 99 ? '99+' : unreadCount;
+                    // Qizil rangda animatsiya
+                    badge.style.animation = 'none';
+                    setTimeout(() => {
+                        badge.style.animation = 'badgePulse 0.5s ease';
+                    }, 10);
+                } else {
+                    badge.style.display = 'none';
+                }
+            }
+
+            // ⭐ SIDEBAR DAGI BADGE
+            const sidebarBadge = document.getElementById('sidebarBadge');
+            if (sidebarBadge) {
+                if (unreadCount > 0) {
+                    sidebarBadge.style.display = 'inline';
+                    sidebarBadge.textContent = unreadCount > 99 ? '99+' : unreadCount;
+                } else {
+                    sidebarBadge.style.display = 'none';
+                }
+            }
+
+            // ⭐ YANGI XABAR KELGANDA OVOZ CHIQARISH
+            if (unreadCount > lastUnreadCount && lastUnreadCount > 0) {
+                playNotificationSound();
+            }
+            lastUnreadCount = unreadCount;
+        }
+    } catch (error) {
+        console.error('❌ Badge yangilash xatosi:', error);
+    }
+}
+
+// ============================================================
+// ⭐ XABAR OVOZI
+// ============================================================
+function playNotificationSound() {
+    try {
+        // Oddiy beep sound yaratish
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        oscillator.frequency.value = 800;
+        oscillator.type = 'sine';
+        gainNode.gain.value = 0.3;
+        
+        oscillator.start();
+        setTimeout(() => {
+            oscillator.stop();
+        }, 200);
+        
+        // Ikkinchi beep
+        setTimeout(() => {
+            const osc2 = audioContext.createOscillator();
+            const gain2 = audioContext.createGain();
+            osc2.connect(gain2);
+            gain2.connect(audioContext.destination);
+            osc2.frequency.value = 1000;
+            osc2.type = 'sine';
+            gain2.gain.value = 0.3;
+            osc2.start();
+            setTimeout(() => {
+                osc2.stop();
+            }, 150);
+        }, 250);
+        
+        console.log('🔔 Yangi xabar ovoz chiqardi!');
+    } catch (error) {
+        console.log('⚠️ Ovoz chiqarish xatosi:', error);
+    }
+}
 
 // ============================================================
 // DASHBOARD STATISTIKASINI YUKLASH
@@ -363,6 +485,21 @@ window.addEventListener('beforeunload', function() {
         clearInterval(profileCheckInterval);
         profileCheckInterval = null;
     }
+    if (notificationCheckInterval) {
+        clearInterval(notificationCheckInterval);
+        notificationCheckInterval = null;
+    }
 });
+
+// ⭐ BADGE PULSE ANIMATSIYASI
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes badgePulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.3); }
+        100% { transform: scale(1); }
+    }
+`;
+document.head.appendChild(style);
 
 console.log('✅ dashboard.js yuklandi (Admin-Customer)');
