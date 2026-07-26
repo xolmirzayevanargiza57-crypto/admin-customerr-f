@@ -32,10 +32,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         await loadNotifications();
         setupListeners();
 
-        // Har 30 soniyada yangilash
+        // ⭐ HAR 5 SONIYADA XABARLARNI YANGILASH (REAL TIME)
         refreshInterval = setInterval(() => {
             loadNotifications();
-        }, 30000);
+        }, 5000);
 
         console.log('✅ Notifications sahifasi yuklandi!');
     } catch (error) {
@@ -78,40 +78,28 @@ function renderNotifications(notifications) {
     const userId = user?._id;
 
     console.log('👤 Current userId:', userId);
-    console.log('📨 Barcha xabarlar:', notifications);
+    console.log('📨 Barcha xabarlar soni:', notifications.length);
 
     // ⭐ FAQAT O'ZIGA KELGAN XABARLAR - TO'G'RI FILTR
     let filtered = notifications.filter(n => {
-        // 1. Agar recipientId mavjud bo'lsa, faqat o'sha ID ga teng bo'lganlar
-        if (n.recipientId) {
-            const recipientIdStr = String(n.recipientId);
-            const userIdStr = String(userId);
+        const recipientIdStr = n.recipientId ? String(n.recipientId) : null;
+        const userIdStr = userId ? String(userId) : null;
+        
+        if (recipientIdStr && userIdStr) {
             return recipientIdStr === userIdStr;
         }
-        
-        // 2. Agar recipientId bo'lmasa, recipientRole 'all' bo'lsa va user role admin_customer bo'lsa
-        if (n.recipientRole === 'all' && user?.role === 'admin_customer') {
-            return true;
-        }
-        
-        // 3. Agar recipientRole 'admin_customer' bo'lsa
-        if (n.recipientRole === 'admin_customer') {
-            return true;
-        }
-        
-        return false;
+        return n.recipientRole === 'all' || n.recipientRole === 'admin_customer';
     });
 
-    // ⭐ QO'SHIMCHA - XABAR YUBORILGAN VAQTNI TEKSHIRISH (30 kundan eski bo'lmasin)
+    // ⭐ SO'NGI 30 KUNLIK XABARLAR
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-    
     filtered = filtered.filter(n => {
         const notifDate = new Date(n.createdAt);
         return notifDate >= thirtyDaysAgo;
     });
 
-    console.log('📨 Filtrdan keyin:', filtered);
+    console.log('📨 Filtrdan keyin:', filtered.length);
 
     // ⭐ FILTRLASH
     const filteredByDate = filterByDate(filtered, currentFilter);
@@ -164,7 +152,7 @@ function renderNotifications(notifications) {
         grouped[dateKey].forEach(notif => {
             const isUnread = !notif.isRead;
             const sentByName = notif.sentByName || 'Admin';
-            const formattedDate = formatDateTime(notif.createdAt);
+            const formattedDate = formatDateTimeFull(notif.createdAt);
             const isSentByMe = notif.sentBy === user?._id;
 
             html += `
@@ -205,6 +193,29 @@ function renderNotifications(notifications) {
             await markAsRead(id);
         });
     });
+}
+
+// ============================================================
+// ⭐ VAQTNI FORMATLASH (TOSHKENT VAQTI BILAN)
+// ============================================================
+function formatDateTimeFull(date) {
+    if (!date) return 'Noma\'lum vaqt';
+    try {
+        const d = new Date(date);
+        if (isNaN(d.getTime())) return 'Noma\'lum vaqt';
+        return d.toLocaleString('uz-UZ', {
+            timeZone: 'Asia/Tashkent',
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false
+        });
+    } catch (error) {
+        return 'Noma\'lum vaqt';
+    }
 }
 
 // ============================================================
@@ -272,29 +283,6 @@ async function markAllAsRead() {
     } catch (error) {
         console.error('❌ Xatolik:', error);
         showError('Xatolik yuz berdi: ' + error.message);
-    }
-}
-
-// ============================================================
-// VAQTNI FORMATLASH
-// ============================================================
-function formatDateTime(date) {
-    if (!date) return 'Noma\'lum vaqt';
-    try {
-        const d = new Date(date);
-        if (isNaN(d.getTime())) return 'Noma\'lum vaqt';
-        return d.toLocaleString('uz-UZ', {
-            timeZone: 'Asia/Tashkent',
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-            hour12: false
-        });
-    } catch (error) {
-        return 'Noma\'lum vaqt';
     }
 }
 
