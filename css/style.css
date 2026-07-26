@@ -2346,12 +2346,14 @@ body {
     overflow-y: auto;
     max-height: 360px;
     padding: 6px 0;
+    margin-top: 6px;
 }
 
 .notification-item {
     padding: 10px 14px;
     border-bottom: 1px solid var(--border-color);
     transition: background 0.2s;
+    margin-top: 6px;
 }
 
 .notification-item:last-child {
@@ -2765,4 +2767,41 @@ body {
         flex-direction: column;
         text-align: center;
     }
+}
+
+/* ============================================================
+   NOTIFICATION BADGE ANIMATION
+   ============================================================ */
+@keyframes badgePulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.4); }
+    100% { transform: scale(1); }
+}
+
+#notificationBadge {
+    animation: none;
+}
+
+.notification-link {
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.notification-link:hover {
+    background: var(--bg-hover) !important;
+    transform: scale(1.05);
+}
+
+/* Sidebar badge */
+.sidebar-badge {
+    margin-left: auto;
+    background: #ff3b30;
+    color: white;
+    font-size: 0.55rem;
+    padding: 2px 8px;
+    border-radius: 10px;
+    display: none;
+    font-weight: 600;
+    min-width: 18px;
+    text-align: center;
 }
