@@ -1,10 +1,22 @@
 // ============================================================
-// STUDENTS - O'QUVCHILAR (BIR KUNDA KO'P FAN + SOAT BILAN)
+// STUDENTS - ADMIN CUSTOMER (TO'LIQ)
+// Loyiha: Admin-Customer Frontend
+// Fayl: js/students.js
 // ============================================================
 
 let studentsData = [];
 let teachersData = [];
 let subjectsData = [];
+
+// ============================================================
+// ⭐ PULNI FORMATLASH (2 000 000 so'm)
+// ============================================================
+function formatMoney(amount) {
+    if (!amount && amount !== 0) return '0 so\'m';
+    const num = typeof amount === 'string' ? parseFloat(amount) : amount;
+    if (isNaN(num)) return '0 so\'m';
+    return num.toLocaleString('uz-UZ') + ' so\'m';
+}
 
 document.addEventListener('DOMContentLoaded', async () => {
     const token = localStorage.getItem('customerToken') || sessionStorage.getItem('customerToken');
@@ -21,17 +33,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 // ============================================================
-// MA'LUMOTLARNI YUKLASH
+// MA'LUMOTLARNI YUKLASH (TEZLASHTIRILGAN)
 // ============================================================
 async function loadData() {
     try {
-        const teachersRes = await API.getTeachers();
+        const [teachersRes, subjectsRes, studentsRes] = await Promise.all([
+            API.getTeachers(),
+            API.getSubjects(),
+            API.getStudents()
+        ]);
+
         if (teachersRes.success) teachersData = teachersRes.data || [];
-
-        const subjectsRes = await API.getSubjects();
         if (subjectsRes.success) subjectsData = subjectsRes.data || [];
-
-        const studentsRes = await API.getStudents();
         if (studentsRes.success) {
             studentsData = studentsRes.data || [];
             renderStudents(studentsData);
@@ -50,13 +63,17 @@ async function loadData() {
 function renderStudents(students) {
     const tbody = document.getElementById('studentsBody');
     if (!students || students.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="10" class="text-center text-muted" data-i18n="no_data">Ma'lumot yo'q</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="11" class="text-center text-muted" data-i18n="no_data">Ma'lumot yo'q</td></tr>`;
         I18N.updateUI();
         return;
     }
 
     tbody.innerHTML = students.map(student => {
         const subjectCount = (student.subjects && student.subjects.length) || 0;
+        const monthlyPayment = student.monthlyPayment || 0;
+        const totalPaid = student.totalPaid || 0;
+        const remaining = monthlyPayment - totalPaid;
+        
         return `
             <tr>
                 <td><strong><i class="fas fa-user-circle"></i> ${student.fullName || 'Noma\'lum'}</strong></td>
@@ -65,7 +82,9 @@ function renderStudents(students) {
                 <td><i class="fas fa-user"></i> ${student.teacherName || '-'}</td>
                 <td><span class="age-badge"><i class="fas fa-calendar"></i> ${Utils.calculateAge(student.birthDate)} yosh</span></td>
                 <td><i class="fas fa-star"></i> ${student.totalXP || 0}</td>
-                <td><i class="fas fa-money-bill"></i> ${Utils.formatMoney(student.monthlyPayment || 0, 'UZS')}</td>
+                <td><i class="fas fa-money-bill"></i> ${formatMoney(monthlyPayment)}</td>
+                <td><i class="fas fa-check-circle" style="color: var(--color-success);"></i> ${formatMoney(totalPaid)}</td>
+                <td><i class="fas fa-exclamation-triangle" style="color: ${remaining > 0 ? 'var(--color-danger)' : 'var(--color-success)'};"></i> ${formatMoney(remaining)}</td>
                 <td><i class="fas fa-book"></i> ${subjectCount} ta fan</td>
                 <td><span class="status-badge ${Utils.getStatusClass(student.status)}">${Utils.formatStatus(student.status)}</span></td>
                 <td>
@@ -92,58 +111,7 @@ function viewStudent(id) {
 }
 
 // ============================================================
-// ⭐ O'QUVCHI DARS QATORI YARATISH (FAN + SOAT)
-// ============================================================
-function createStudentLessonRow(data = null, index = 0) {
-    const day    = data ? data.day    : '';
-    const start  = data ? data.start  : '09:00';
-    const end    = data ? data.end    : '10:00';
-    const subjId = data ? data.subjectId : '';
-
-    const days = ['Dushanba','Seshanba','Chorshanba','Payshanba','Juma','Shanba','Yakshanba'];
-    const dayOptions = days.map(d => `<option value="${d}" ${d===day?'selected':''}>${d}</option>`).join('');
-    const subjOptions = subjectsData.map(s => `<option value="${s._id}" ${s._id===subjId?'selected':''}>${s.name}</option>`).join('');
-
-    return `
-        <div class="student-lesson-row" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:6px;background:var(--bg-hover);padding:8px;border-radius:6px;">
-            <select class="sched-day" style="padding:4px 6px;border:1px solid var(--border-color);border-radius:4px;font-size:0.75rem;background:var(--bg-input);color:var(--text-primary);">
-                <option value="">Kun...</option>
-                ${dayOptions}
-            </select>
-            <input type="time" class="sched-start" value="${start}"
-                   style="padding:4px 6px;border:1px solid var(--border-color);border-radius:4px;font-size:0.75rem;width:80px;background:var(--bg-input);color:var(--text-primary);" />
-            <span style="font-size:0.7rem;color:var(--text-muted);">—</span>
-            <input type="time" class="sched-end" value="${end}"
-                   style="padding:4px 6px;border:1px solid var(--border-color);border-radius:4px;font-size:0.75rem;width:80px;background:var(--bg-input);color:var(--text-primary);" />
-            <select class="sched-subject" style="padding:4px 6px;border:1px solid var(--border-color);border-radius:4px;font-size:0.75rem;flex:1;min-width:100px;background:var(--bg-input);color:var(--text-primary);">
-                <option value="">Fan tanlang...</option>
-                ${subjOptions}
-            </select>
-            <button type="button" onclick="this.closest('.student-lesson-row').remove()"
-                    style="padding:4px 8px;background:#fee2e2;color:#dc2626;border:none;border-radius:4px;cursor:pointer;font-size:0.8rem;">✕</button>
-        </div>
-    `;
-}
-
-// ============================================================
-// DARS JADVALINI YIG'ISH
-// ============================================================
-function collectStudentSchedule(containerSelector = '.student-lesson-row') {
-    const schedule = [];
-    document.querySelectorAll(containerSelector).forEach(row => {
-        const day   = row.querySelector('.sched-day')?.value;
-        const start = row.querySelector('.sched-start')?.value;
-        const end   = row.querySelector('.sched-end')?.value;
-        const subj  = row.querySelector('.sched-subject')?.value;
-        if (day && start && end) {
-            schedule.push({ day, start, end, subjectId: subj || null });
-        }
-    });
-    return schedule;
-}
-
-// ============================================================
-// O'QUVCHI QO'SHISH MODAL
+// ⭐ O'QUVCHI QO'SHISH MODAL (OYlik to'lov va qolgan qarz bilan)
 // ============================================================
 function showAddStudentModal() {
     const modal = document.createElement('div');
@@ -202,7 +170,7 @@ function showAddStudentModal() {
                 </div>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
                     <div class="form-group">
-                        <label>${I18N.t('monthly_payment')}</label>
+                        <label>${I18N.t('monthly_payment')} (so'm)</label>
                         <input type="number" id="studentMonthlyPayment" placeholder="0" value="0"
                                style="width:100%;padding:8px 12px;border:1px solid var(--border-color);border-radius:6px;background:var(--bg-input);color:var(--text-primary);" />
                     </div>
@@ -218,7 +186,19 @@ function showAddStudentModal() {
                     </div>
                 </div>
 
-                <!-- ⭐ DARS JADVALI - KUN + SOAT + FAN -->
+                <!-- ⭐ TO'LOV MA'LUMOTI -->
+                <div class="form-group" style="background:var(--bg-hover);padding:12px;border-radius:8px;margin-bottom:16px;">
+                    <div style="display:flex;justify-content:space-between;font-size:0.9rem;padding:4px 0;">
+                        <span>📅 Oylik to'lov:</span>
+                        <span id="displayMonthlyPayment" style="font-weight:600;">0 so'm</span>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;font-size:0.9rem;padding:4px 0;">
+                        <span>📊 Yillik to'lov:</span>
+                        <span id="displayYearlyPayment" style="font-weight:600;">0 so'm</span>
+                    </div>
+                </div>
+
+                <!-- DARS JADVALI -->
                 <div class="form-group">
                     <label style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
                         <span><i class="fas fa-calendar-alt"></i> Dars jadvali</span>
@@ -230,9 +210,6 @@ function showAddStudentModal() {
                     <div id="studentLessonsContainer">
                         <!-- Bitta bo'sh qator -->
                     </div>
-                    <p style="font-size:0.7rem;color:var(--text-muted);margin-top:4px;">
-                        <i class="fas fa-info-circle"></i> Bir kunda bir nechta fanga borishi mumkin
-                    </p>
                 </div>
 
                 <div class="modal-footer" style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px;">
@@ -246,11 +223,18 @@ function showAddStudentModal() {
     `;
     document.body.appendChild(modal);
 
+    // ⭐ Oylik to'lov o'zgarganda
+    const monthlyInput = document.getElementById('studentMonthlyPayment');
+    monthlyInput.addEventListener('input', function() {
+        const monthly = parseInt(this.value) || 0;
+        document.getElementById('displayMonthlyPayment').textContent = formatMoney(monthly);
+        document.getElementById('displayYearlyPayment').textContent = formatMoney(monthly * 12);
+    });
+
     // Bitta bo'sh qator qo'shish
     const container = modal.querySelector('#studentLessonsContainer');
     container.insertAdjacentHTML('beforeend', createStudentLessonRow());
 
-    // "Dars qo'sh" tugmasi
     modal.querySelector('#addStudentLessonBtn').addEventListener('click', () => {
         container.insertAdjacentHTML('beforeend', createStudentLessonRow());
     });
@@ -260,25 +244,24 @@ function showAddStudentModal() {
     modal.querySelector('#addStudentForm').addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        const fullName       = modal.querySelector('#studentName').value.trim();
-        const email          = modal.querySelector('#studentEmail').value.trim();
-        const password       = modal.querySelector('#studentPassword').value;
-        const phone          = modal.querySelector('#studentPhone').value.trim();
-        const teacherId      = modal.querySelector('#studentTeacher').value;
-        const birthDate      = modal.querySelector('#studentBirthDate').value;
+        const fullName = modal.querySelector('#studentName').value.trim();
+        const email = modal.querySelector('#studentEmail').value.trim();
+        const password = modal.querySelector('#studentPassword').value;
+        const phone = modal.querySelector('#studentPhone').value.trim();
+        const teacherId = modal.querySelector('#studentTeacher').value;
+        const birthDate = modal.querySelector('#studentBirthDate').value;
         const monthlyPayment = parseInt(modal.querySelector('#studentMonthlyPayment').value) || 0;
-        const group          = modal.querySelector('#studentGroup').value;
+        const group = modal.querySelector('#studentGroup').value;
 
         if (!fullName || !password || !teacherId) { showError(I18N.t('all_fields_required')); return; }
 
-        // Dars jadvalini yig'ish
         const schedule = [];
         modal.querySelectorAll('.student-lesson-row').forEach(row => {
-            const day   = row.querySelector('.sched-day')?.value;
+            const day = row.querySelector('.sched-day')?.value;
             const start = row.querySelector('.sched-start')?.value;
-            const end   = row.querySelector('.sched-end')?.value;
-            const subj  = row.querySelector('.sched-subject')?.value;
-            if (day && start && end) schedule.push({ day, start, end, subjectId: subj||null });
+            const end = row.querySelector('.sched-end')?.value;
+            const subj = row.querySelector('.sched-subject')?.value;
+            if (day && start && end) schedule.push({ day, start, end, subjectId: subj || null });
         });
 
         const submitBtn = e.target.querySelector('[type="submit"]');
@@ -288,17 +271,14 @@ function showAddStudentModal() {
         try {
             const studentData = await API.createStudent({
                 fullName, email, phone, password, teacherId,
-                birthDate, monthlyPayment, group,
-                schedule  // ⭐ jadval ham yuboriladi
+                birthDate, monthlyPayment, group, schedule
             });
 
             if (studentData.success) {
                 const studentId = studentData.data._id;
-
-                // ⭐ Har bir dars jadval yozuvida fan subjectId bo'lsa StudentSubject ham qo'shamiz
                 const uniqueSubjectIds = [...new Set(schedule.filter(s => s.subjectId).map(s => s.subjectId))];
                 for (const subjectId of uniqueSubjectIds) {
-                    try { await API.createStudentSubject({ studentId, subjectId }); } catch(err) { console.error(err); }
+                    try { await API.createStudentSubject({ studentId, subjectId }); } catch (err) { console.error(err); }
                 }
 
                 modal.remove();
@@ -318,6 +298,37 @@ function showAddStudentModal() {
     });
 }
 
+function createStudentLessonRow(data = null, index = 0) {
+    const day = data ? data.day : '';
+    const start = data ? data.start : '09:00';
+    const end = data ? data.end : '10:00';
+    const subjId = data ? data.subjectId : '';
+
+    const days = ['Dushanba', 'Seshanba', 'Chorshanba', 'Payshanba', 'Juma', 'Shanba', 'Yakshanba'];
+    const dayOptions = days.map(d => `<option value="${d}" ${d === day ? 'selected' : ''}>${d}</option>`).join('');
+    const subjOptions = subjectsData.map(s => `<option value="${s._id}" ${s._id === subjId ? 'selected' : ''}>${s.name}</option>`).join('');
+
+    return `
+        <div class="student-lesson-row" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:6px;background:var(--bg-hover);padding:8px;border-radius:6px;">
+            <select class="sched-day" style="padding:4px 6px;border:1px solid var(--border-color);border-radius:4px;font-size:0.75rem;background:var(--bg-input);color:var(--text-primary);">
+                <option value="">Kun...</option>
+                ${dayOptions}
+            </select>
+            <input type="time" class="sched-start" value="${start}"
+                   style="padding:4px 6px;border:1px solid var(--border-color);border-radius:4px;font-size:0.75rem;width:80px;background:var(--bg-input);color:var(--text-primary);" />
+            <span style="font-size:0.7rem;color:var(--text-muted);">—</span>
+            <input type="time" class="sched-end" value="${end}"
+                   style="padding:4px 6px;border:1px solid var(--border-color);border-radius:4px;font-size:0.75rem;width:80px;background:var(--bg-input);color:var(--text-primary);" />
+            <select class="sched-subject" style="padding:4px 6px;border:1px solid var(--border-color);border-radius:4px;font-size:0.75rem;flex:1;min-width:100px;background:var(--bg-input);color:var(--text-primary);">
+                <option value="">Fan tanlang...</option>
+                ${subjOptions}
+            </select>
+            <button type="button" onclick="this.closest('.student-lesson-row').remove()"
+                    style="padding:4px 8px;background:#fee2e2;color:#dc2626;border:none;border-radius:4px;cursor:pointer;font-size:0.8rem;">✕</button>
+        </div>
+    `;
+}
+
 function togglePassword(inputId, button) {
     const input = document.getElementById(inputId);
     if (!input) return;
@@ -333,15 +344,16 @@ async function editStudent(id) {
     const student = studentsData.find(s => s._id === id);
     if (!student) { showError(I18N.t('error')); return; }
 
-    // Mavjud fanlar
     let existingSubjects = [];
     try {
         const res = await API.getStudentSubjects({ studentId: id });
         if (res.success) existingSubjects = res.data || [];
     } catch (error) { console.error(error); }
 
-    // Mavjud dars jadvali (student.schedule yoki bo'sh)
     const existingSchedule = student.schedule || [];
+    const monthlyPayment = student.monthlyPayment || 0;
+    const totalPaid = student.totalPaid || 0;
+    const remaining = monthlyPayment - totalPaid;
 
     const modal = document.createElement('div');
     modal.className = 'modal show';
@@ -360,33 +372,33 @@ async function editStudent(id) {
                     </div>
                     <div class="form-group">
                         <label>${I18N.t('email')}</label>
-                        <input type="email" id="editStudentEmail" value="${student.email||''}"
+                        <input type="email" id="editStudentEmail" value="${student.email || ''}"
                                style="width:100%;padding:8px 12px;border:1px solid var(--border-color);border-radius:6px;background:var(--bg-input);color:var(--text-primary);" />
                     </div>
                 </div>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
                     <div class="form-group">
                         <label>${I18N.t('phone')}</label>
-                        <input type="text" id="editStudentPhone" value="${student.phone||''}"
+                        <input type="text" id="editStudentPhone" value="${student.phone || ''}"
                                style="width:100%;padding:8px 12px;border:1px solid var(--border-color);border-radius:6px;background:var(--bg-input);color:var(--text-primary);" />
                     </div>
                     <div class="form-group">
                         <label>${I18N.t('student_teacher')} *</label>
                         <select id="editStudentTeacher" required
                                 style="width:100%;padding:8px 12px;border:1px solid var(--border-color);border-radius:6px;background:var(--bg-input);color:var(--text-primary);">
-                            ${teachersData.map(t => `<option value="${t._id}" ${t._id===student.teacherId?'selected':''}>${t.fullName}</option>`).join('')}
+                            ${teachersData.map(t => `<option value="${t._id}" ${t._id === student.teacherId ? 'selected' : ''}>${t.fullName}</option>`).join('')}
                         </select>
                     </div>
                 </div>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
                     <div class="form-group">
                         <label>${I18N.t('birth_date')}</label>
-                        <input type="date" id="editStudentBirthDate" value="${student.birthDate||''}"
+                        <input type="date" id="editStudentBirthDate" value="${student.birthDate || ''}"
                                style="width:100%;padding:8px 12px;border:1px solid var(--border-color);border-radius:6px;background:var(--bg-input);color:var(--text-primary);" />
                     </div>
                     <div class="form-group">
-                        <label>${I18N.t('monthly_payment')}</label>
-                        <input type="number" id="editStudentMonthlyPayment" value="${student.monthlyPayment||0}"
+                        <label>${I18N.t('monthly_payment')} (so'm)</label>
+                        <input type="number" id="editStudentMonthlyPayment" value="${student.monthlyPayment || 0}"
                                style="width:100%;padding:8px 12px;border:1px solid var(--border-color);border-radius:6px;background:var(--bg-input);color:var(--text-primary);" />
                     </div>
                 </div>
@@ -395,23 +407,39 @@ async function editStudent(id) {
                         <label>${I18N.t('group')}</label>
                         <select id="editStudentGroup"
                                 style="width:100%;padding:8px 12px;border:1px solid var(--border-color);border-radius:6px;background:var(--bg-input);color:var(--text-primary);">
-                            <option value="A" ${student.group==='A'?'selected':''}>A</option>
-                            <option value="B" ${student.group==='B'?'selected':''}>B</option>
-                            <option value="C" ${student.group==='C'?'selected':''}>C</option>
-                            <option value="D" ${student.group==='D'?'selected':''}>D</option>
+                            <option value="A" ${student.group === 'A' ? 'selected' : ''}>A</option>
+                            <option value="B" ${student.group === 'B' ? 'selected' : ''}>B</option>
+                            <option value="C" ${student.group === 'C' ? 'selected' : ''}>C</option>
+                            <option value="D" ${student.group === 'D' ? 'selected' : ''}>D</option>
                         </select>
                     </div>
                     <div class="form-group">
                         <label>${I18N.t('status')}</label>
                         <select id="editStudentStatus"
                                 style="width:100%;padding:8px 12px;border:1px solid var(--border-color);border-radius:6px;background:var(--bg-input);color:var(--text-primary);">
-                            <option value="active"   ${student.status==='active'  ?'selected':''}>Faol</option>
-                            <option value="inactive" ${student.status==='inactive'?'selected':''}>Faol emas</option>
+                            <option value="active" ${student.status === 'active' ? 'selected' : ''}>Faol</option>
+                            <option value="inactive" ${student.status === 'inactive' ? 'selected' : ''}>Faol emas</option>
                         </select>
                     </div>
                 </div>
 
-                <!-- ⭐ DARS JADVALI -->
+                <!-- ⭐ TO'LOV MA'LUMOTI -->
+                <div class="form-group" style="background:var(--bg-hover);padding:12px;border-radius:8px;margin-bottom:16px;">
+                    <div style="display:flex;justify-content:space-between;font-size:0.9rem;padding:4px 0;">
+                        <span>📅 Oylik to'lov:</span>
+                        <span style="font-weight:600;">${formatMoney(monthlyPayment)}</span>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;font-size:0.9rem;padding:4px 0;">
+                        <span>✅ To'langan:</span>
+                        <span style="font-weight:600;color:var(--color-success);">${formatMoney(totalPaid)}</span>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;font-size:0.9rem;padding:4px 0;border-top:1px solid var(--border-color);padding-top:8px;margin-top:4px;">
+                        <span>⚠️ Qolgan qarz:</span>
+                        <span style="font-weight:600;color:${remaining > 0 ? 'var(--color-danger)' : 'var(--color-success)'};">${formatMoney(remaining)}</span>
+                    </div>
+                </div>
+
+                <!-- DARS JADVALI -->
                 <div class="form-group">
                     <label style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
                         <span><i class="fas fa-calendar-alt"></i> Dars jadvali</span>
@@ -422,13 +450,10 @@ async function editStudent(id) {
                     </label>
                     <div id="editStudentLessonsContainer">
                         ${existingSchedule.length > 0
-                            ? existingSchedule.map((s,i) => createStudentLessonRow(s, i)).join('')
+                            ? existingSchedule.map((s, i) => createStudentLessonRow(s, i)).join('')
                             : createStudentLessonRow()
                         }
                     </div>
-                    <p style="font-size:0.7rem;color:var(--text-muted);margin-top:4px;">
-                        <i class="fas fa-info-circle"></i> Bir kunda bir nechta fanga borishi mumkin
-                    </p>
                 </div>
 
                 <div class="modal-footer" style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px;">
@@ -452,25 +477,24 @@ async function editStudent(id) {
     modal.querySelector('#editStudentForm').addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        const fullName       = modal.querySelector('#editStudentName').value.trim();
-        const email          = modal.querySelector('#editStudentEmail').value.trim();
-        const phone          = modal.querySelector('#editStudentPhone').value.trim();
-        const teacherId      = modal.querySelector('#editStudentTeacher').value;
-        const birthDate      = modal.querySelector('#editStudentBirthDate').value;
+        const fullName = modal.querySelector('#editStudentName').value.trim();
+        const email = modal.querySelector('#editStudentEmail').value.trim();
+        const phone = modal.querySelector('#editStudentPhone').value.trim();
+        const teacherId = modal.querySelector('#editStudentTeacher').value;
+        const birthDate = modal.querySelector('#editStudentBirthDate').value;
         const monthlyPayment = parseInt(modal.querySelector('#editStudentMonthlyPayment').value) || 0;
-        const group          = modal.querySelector('#editStudentGroup').value;
-        const status         = modal.querySelector('#editStudentStatus').value;
+        const group = modal.querySelector('#editStudentGroup').value;
+        const status = modal.querySelector('#editStudentStatus').value;
 
         if (!fullName || !teacherId) { showError(I18N.t('all_fields_required')); return; }
 
-        // Dars jadvalini yig'ish
         const schedule = [];
         modal.querySelectorAll('.student-lesson-row').forEach(row => {
-            const day   = row.querySelector('.sched-day')?.value;
+            const day = row.querySelector('.sched-day')?.value;
             const start = row.querySelector('.sched-start')?.value;
-            const end   = row.querySelector('.sched-end')?.value;
-            const subj  = row.querySelector('.sched-subject')?.value;
-            if (day && start && end) schedule.push({ day, start, end, subjectId: subj||null });
+            const end = row.querySelector('.sched-end')?.value;
+            const subj = row.querySelector('.sched-subject')?.value;
+            if (day && start && end) schedule.push({ day, start, end, subjectId: subj || null });
         });
 
         const submitBtn = e.target.querySelector('[type="submit"]');
@@ -484,13 +508,12 @@ async function editStudent(id) {
             });
 
             if (studentData.success) {
-                // Eski fanlarni o'chirish va yangilarini qo'shish
                 for (const ss of existingSubjects) {
-                    try { await API.deleteStudentSubject(ss._id); } catch(err) { console.error(err); }
+                    try { await API.deleteStudentSubject(ss._id); } catch (err) { console.error(err); }
                 }
                 const uniqueSubjectIds = [...new Set(schedule.filter(s => s.subjectId).map(s => s.subjectId))];
                 for (const subjectId of uniqueSubjectIds) {
-                    try { await API.createStudentSubject({ studentId: id, subjectId }); } catch(err) { console.error(err); }
+                    try { await API.createStudentSubject({ studentId: id, subjectId }); } catch (err) { console.error(err); }
                 }
 
                 modal.remove();
@@ -532,21 +555,31 @@ function filterStudents() {
     const search = document.getElementById('searchInput').value.toLowerCase();
     const status = document.getElementById('statusFilter').value;
     let filtered = studentsData;
-    if (search) filtered = filtered.filter(s => s.fullName.toLowerCase().includes(search) || (s.email||'').toLowerCase().includes(search));
+    if (search) filtered = filtered.filter(s => s.fullName.toLowerCase().includes(search) || (s.email || '').toLowerCase().includes(search));
     if (status !== 'all') filtered = filtered.filter(s => s.status === status);
     renderStudents(filtered);
 }
 
 // ============================================================
-// ⭐ EVENT LISTENERLAR - BIR MARTA ULASH
+// EVENT LISTENERLAR
 // ============================================================
 function setupListeners() {
     document.getElementById('searchInput').addEventListener('input', filterStudents);
     document.getElementById('statusFilter').addEventListener('change', filterStudents);
-    document.getElementById('addStudentBtn').addEventListener('click', showAddStudentModal);
-    document.getElementById('logoutBtn').addEventListener('click', () => Auth.logout());
-
-    // Sidebar open/close is handled globally by js/theme.js.
+    
+    const addBtn = document.getElementById('addStudentBtn');
+    if (addBtn) {
+        const newBtn = addBtn.cloneNode(true);
+        addBtn.parentNode.replaceChild(newBtn, addBtn);
+        newBtn.addEventListener('click', showAddStudentModal);
+    }
+    
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        const newBtn = logoutBtn.cloneNode(true);
+        logoutBtn.parentNode.replaceChild(newBtn, logoutBtn);
+        newBtn.addEventListener('click', () => Auth.logout());
+    }
 }
 
 function showError(msg) {
@@ -565,4 +598,4 @@ function showSuccess(msg) {
     setTimeout(() => div.remove(), 3000);
 }
 
-console.log('✅ students.js yuklandi');
+console.log('✅ students.js yuklandi (Admin-Customer)');
