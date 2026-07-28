@@ -2,15 +2,12 @@
 // PAYMENTS - ADMIN CUSTOMER (TO'LIQ TUZATILGAN)
 // ============================================================
 
-// ============================================================
-// ⭐ TO'LOV USULI MA'LUMOTLARI (TO'LIQ)
-// ============================================================
 const PAYMENT_METHODS = {
     cash: {
         id: 'cash',
         name: 'Naqd pul',
         icon: 'https://www.gazeta.uz/sp/32221828/img/tild3365-3235-4161-a437-316637323436__banknoti-uzb.png',
-        keywords: ['naqd', 'cash', 'pul', 'qog\'oz'],
+        keywords: ['naqd', 'cash', 'pul', "qog'oz"],
         emoji: '💵'
     },
     click: {
@@ -87,7 +84,7 @@ const PAYMENT_METHODS = {
         id: 'xazna',
         name: 'Xazna Bank',
         icon: 'https://jet-back.bank.uz/uploads/article_blocks/d88f203848c154c40be0e793c10fb9a5.webp',
-        keywords: ['xazna', 'xasna', 'xazna bank', 'g\'azna', 'gazna'],
+        keywords: ['xazna', 'xasna', 'xazna bank', "g'azna", 'gazna'],
         emoji: '🏦'
     },
     anjir: {
@@ -150,82 +147,56 @@ const PAYMENT_METHODS = {
         id: 'other',
         name: 'Boshqa',
         icon: 'https://png.pngtree.com/png-clipart/20211017/original/pngtree-credit-card-vector-illustration-png-image_6857353.png',
-        keywords: ['karta', 'card', 'bank', 'to\'lov'],
+        keywords: ['karta', 'card', 'bank', "to'lov"],
         emoji: '💳'
     }
 };
 
 // ============================================================
-// ⭐ TO'LOV USULINI MATN ORQALI AVTOMATIK ANIQLASH
+// TO'LOV USULINI MATN ORQALI AVTOMATIK ANIQLASH
 // ============================================================
 function detectPaymentMethod(text) {
     if (!text) return PAYMENT_METHODS.other;
     const lowerText = text.toLowerCase().trim();
-    
-    if (lowerText.includes('uzum')) {
-        return PAYMENT_METHODS.uzum;
-    }
-    if (lowerText.includes('tezpay') || lowerText.includes('tez pay')) {
-        return PAYMENT_METHODS.tezpay;
-    }
-    if (lowerText.includes('apple pay') || lowerText.includes('applepay') || lowerText.includes('apple')) {
-        return PAYMENT_METHODS.applepay;
-    }
-    if (lowerText.includes('hamkor') || lowerText.includes('hamkorbank')) {
-        return PAYMENT_METHODS.hamkorbank;
-    }
-    if (lowerText.includes('xalq')) {
-        return PAYMENT_METHODS.xalqbanki;
-    }
-    if (lowerText.includes('paypal') || lowerText.includes('pay pal')) {
-        return PAYMENT_METHODS.paypal;
-    }
-    if (lowerText.includes('mastercard') || lowerText.includes('master card') || lowerText.includes('master')) {
-        return PAYMENT_METHODS.mastercard;
-    }
-    if (lowerText.includes('american') || lowerText.includes('americanexpress') || lowerText.includes('amex')) {
-        return PAYMENT_METHODS.americanexpress;
-    }
-    if (lowerText.includes('click')) {
-        return PAYMENT_METHODS.click;
-    }
-    if (lowerText.includes('uzcard') || lowerText.includes('uz card')) {
-        return PAYMENT_METHODS.uzcard;
-    }
-    if (lowerText.includes('xazna') || lowerText.includes('g\'azna') || lowerText.includes('gazna')) {
-        return PAYMENT_METHODS.xazna;
-    }
-    if (lowerText.includes('pay') && !lowerText.includes('paypal') && !lowerText.includes('payme') && !lowerText.includes('paynet')) {
-        return PAYMENT_METHODS.applepay;
-    }
-    
+
+    if (lowerText.includes('uzum')) return PAYMENT_METHODS.uzum;
+    if (lowerText.includes('tezpay') || lowerText.includes('tez pay')) return PAYMENT_METHODS.tezpay;
+    if (lowerText.includes('apple pay') || lowerText.includes('applepay') || lowerText.includes('apple')) return PAYMENT_METHODS.applepay;
+    if (lowerText.includes('hamkor') || lowerText.includes('hamkorbank')) return PAYMENT_METHODS.hamkorbank;
+    if (lowerText.includes('xalq')) return PAYMENT_METHODS.xalqbanki;
+    if (lowerText.includes('paypal') || lowerText.includes('pay pal')) return PAYMENT_METHODS.paypal;
+    if (lowerText.includes('mastercard') || lowerText.includes('master card') || lowerText.includes('master')) return PAYMENT_METHODS.mastercard;
+    if (lowerText.includes('american') || lowerText.includes('americanexpress') || lowerText.includes('amex')) return PAYMENT_METHODS.americanexpress;
+    if (lowerText.includes('click')) return PAYMENT_METHODS.click;
+    if (lowerText.includes('uzcard') || lowerText.includes('uz card')) return PAYMENT_METHODS.uzcard;
+    if (lowerText.includes('xazna') || lowerText.includes("g'azna") || lowerText.includes('gazna')) return PAYMENT_METHODS.xazna;
+    if (lowerText.includes('pay') && !lowerText.includes('paypal') && !lowerText.includes('payme') && !lowerText.includes('paynet')) return PAYMENT_METHODS.applepay;
+
     for (const [key, method] of Object.entries(PAYMENT_METHODS)) {
         if (key === 'other') continue;
-        if (method.keywords && method.keywords.some(kw => lowerText.includes(kw))) {
-            return method;
-        }
+        if (method.keywords && method.keywords.some(kw => lowerText.includes(kw))) return method;
     }
     return PAYMENT_METHODS.other;
 }
 
 // ============================================================
-// ⭐ PULNI FORMATLASH
+// PULNI FORMATLASH
 // ============================================================
 function formatMoney(amount) {
-    if (!amount && amount !== 0) return '0 so\'m';
+    if (!amount && amount !== 0) return "0 so'm";
     const num = typeof amount === 'string' ? parseFloat(amount) : amount;
-    if (isNaN(num)) return '0 so\'m';
-    return num.toLocaleString('uz-UZ') + ' so\'m';
+    if (isNaN(num)) return "0 so'm";
+    return num.toLocaleString('uz-UZ') + " so'm";
 }
 
 // ============================================================
-// ⭐ VAQTNI FORMATLASH (TOSHKENT VAQTI BILAN)
+// VAQTNI FORMATLASH (TOSHKENT VAQTI)
 // ============================================================
 function formatDateTimeFull(date) {
-    if (!date) return 'Noma\'lum vaqt';
+    if (!date) return "Noma'lum vaqt";
     try {
         const d = new Date(date);
-        if (isNaN(d.getTime())) return 'Noma\'lum vaqt';
+        if (isNaN(d.getTime())) return "Noma'lum vaqt";
         return d.toLocaleString('uz-UZ', {
             timeZone: 'Asia/Tashkent',
             year: 'numeric',
@@ -237,7 +208,7 @@ function formatDateTimeFull(date) {
             hour12: false
         });
     } catch (error) {
-        return 'Noma\'lum vaqt';
+        return "Noma'lum vaqt";
     }
 }
 
@@ -277,13 +248,13 @@ async function loadData() {
             renderPayments([]);
         }
     } catch (error) {
-        console.error('❌ Ma\'lumotlarni yuklash xatosi:', error);
+        console.error("Ma'lumotlarni yuklash xatosi:", error);
         showError(I18N.t('network_error'));
     }
 }
 
 // ============================================================
-// ⭐ TO'LOVLARNI RENDER QILISH (RASM BILAN)
+// TO'LOVLARNI RENDER QILISH
 // ============================================================
 function renderPayments(payments) {
     const studentBody = document.getElementById('studentPaymentsBody');
@@ -309,19 +280,19 @@ function renderPayments(payments) {
         return rows.map(payment => {
             const methodInfo = PAYMENT_METHODS[payment.paymentMethod] || PAYMENT_METHODS.cash;
             const methodDisplay = methodInfo ? `
-                <span style="display: inline-flex; align-items: center; gap: 4px; font-size: 0.6rem; color: var(--text-muted);">
-                    <img src="${methodInfo.icon}" style="width: 16px; height: 16px; object-fit: contain; border-radius: 2px;" onerror="this.style.display='none'">
+                <span style="display:inline-flex;align-items:center;gap:4px;font-size:0.6rem;color:var(--text-muted);">
+                    <img src="${methodInfo.icon}" style="width:16px;height:16px;object-fit:contain;border-radius:2px;" onerror="this.style.display='none'">
                     ${methodInfo.name}
                 </span>
             ` : '';
-            
-            const studentName = payment.studentName || 'Noma\'lum';
-            const teacherName = payment.teacherName || 'Noma\'lum';
+
+            const studentName = payment.studentName || "Noma'lum";
+            const teacherName = payment.teacherName || "Noma'lum";
             const amount = payment.amount || 0;
             const month = payment.month || '-';
             const status = payment.status || 'unpaid';
             const createdAt = payment.createdAt ? formatDateTimeFull(payment.createdAt) : '-';
-            
+
             if (type === 'teacher') {
                 return `
                     <tr>
@@ -344,7 +315,7 @@ function renderPayments(payments) {
                     </tr>
                 `;
             }
-            
+
             return `
                 <tr>
                     <td><strong>${studentName}</strong></td>
@@ -372,27 +343,27 @@ function renderPayments(payments) {
     if (studentBody) studentBody.innerHTML = renderRows(studentPayments, 'student');
     if (teacherBody) teacherBody.innerHTML = renderRows(teacherPayments, 'teacher');
 
-    const studentPaid = studentPayments.filter(item => item.status === 'paid').reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
-    const studentExpected = studentPayments.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
-    const studentPending = studentPayments.filter(item => item.status !== 'paid').length;
-    const teacherPaid = teacherPayments.filter(item => item.status === 'paid').reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
-    const teacherExpected = teacherPayments.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
-    const teacherPending = teacherPayments.filter(item => item.status !== 'paid').length;
+    const studentPaid = studentPayments.filter(p => p.status === 'paid').reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
+    const studentExpected = studentPayments.reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
+    const studentPending = studentPayments.filter(p => p.status !== 'paid').length;
+    const teacherPaid = teacherPayments.filter(p => p.status === 'paid').reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
+    const teacherExpected = teacherPayments.reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
+    const teacherPending = teacherPayments.filter(p => p.status !== 'paid').length;
 
     if (studentFeeExpected) studentFeeExpected.textContent = formatMoney(studentExpected);
     if (studentFeePaid) studentFeePaid.textContent = formatMoney(studentPaid);
     if (studentFeePending) studentFeePending.textContent = `${studentPending} ta qolgan`;
-    if (studentFeeStatus) studentFeeStatus.textContent = studentPayments.length ? `${studentPayments.length} ta yozuv` : 'Ma\'lumot yo\'q';
+    if (studentFeeStatus) studentFeeStatus.textContent = studentPayments.length ? `${studentPayments.length} ta yozuv` : "Ma'lumot yo'q";
     if (teacherSalaryExpected) teacherSalaryExpected.textContent = formatMoney(teacherExpected);
     if (teacherSalaryPaid) teacherSalaryPaid.textContent = formatMoney(teacherPaid);
     if (teacherSalaryPending) teacherSalaryPending.textContent = `${teacherPending} ta qolgan`;
-    if (teacherSalaryStatus) teacherSalaryStatus.textContent = teacherPayments.length ? `${teacherPayments.length} ta yozuv` : 'Ma\'lumot yo\'q';
+    if (teacherSalaryStatus) teacherSalaryStatus.textContent = teacherPayments.length ? `${teacherPayments.length} ta yozuv` : "Ma'lumot yo'q";
 
     I18N.updateUI();
 }
 
 // ============================================================
-// ⭐ TO'LOV QO'SHISH MODAL (ADMIN-CUSTOMER)
+// TO'LOV QO'SHISH MODAL
 // ============================================================
 function showAddPaymentModal() {
     const modal = document.createElement('div');
@@ -443,8 +414,6 @@ function showAddPaymentModal() {
                         <input type="month" id="paymentMonth" required />
                     </div>
                 </div>
-                
-                <!-- ⭐ TO'LOV USULI SELECT -->
                 <div class="form-group">
                     <label>To'lov usuli</label>
                     <div class="input-wrapper">
@@ -473,9 +442,8 @@ function showAddPaymentModal() {
                             <option value="other">💳 Boshqa</option>
                         </select>
                     </div>
-                    <div id="paymentMethodPreview" style="display: none; margin-top: 8px;"></div>
+                    <div id="paymentMethodPreview" style="display:none;margin-top:8px;"></div>
                 </div>
-
                 <div class="form-group">
                     <label>Holati</label>
                     <div class="input-wrapper">
@@ -486,7 +454,6 @@ function showAddPaymentModal() {
                         </select>
                     </div>
                 </div>
-                
                 <div class="form-group">
                     <label>Izoh (ixtiyoriy)</label>
                     <div class="input-wrapper">
@@ -494,7 +461,6 @@ function showAddPaymentModal() {
                     </div>
                     <small class="text-muted">💡 Izohga to'lov usulini yozsangiz, avtomatik aniqlanadi</small>
                 </div>
-
                 <div class="modal-footer">
                     <button type="button" class="btn-secondary" onclick="this.closest('.modal').remove()" style="width:auto;padding:8px 20px;font-size:0.8rem;">Bekor qilish</button>
                     <button type="submit" class="btn-primary" style="width:auto;padding:8px 20px;font-size:0.8rem;"><i class="fas fa-save"></i> Saqlash</button>
@@ -505,15 +471,12 @@ function showAddPaymentModal() {
     document.body.appendChild(modal);
     I18N.updateUI();
 
-    // ⭐ TO'LOV USULI SELECT - RASM PREVIEW
     initPaymentMethodSelect();
 
-    // ⭐ Izoh orqali avtomatik aniqlash
     const noteInput = document.getElementById('paymentNote');
     if (noteInput) {
         noteInput.addEventListener('input', function() {
-            const text = this.value;
-            const detected = detectPaymentMethod(text);
+            const detected = detectPaymentMethod(this.value);
             if (detected && detected.id !== 'other') {
                 const selectEl = document.getElementById('paymentMethodSelect');
                 if (selectEl) {
@@ -525,10 +488,10 @@ function showAddPaymentModal() {
     }
 
     const togglePaymentType = () => {
-        const paymentType = document.getElementById('paymentType');
+        const pt = document.getElementById('paymentType');
         const studentGroup = document.getElementById('studentPaymentGroup');
         if (studentGroup) {
-            studentGroup.style.display = paymentType.value === 'student_fee' ? 'block' : 'none';
+            studentGroup.style.display = pt.value === 'student_fee' ? 'block' : 'none';
         }
     };
     document.getElementById('paymentType').addEventListener('change', togglePaymentType);
@@ -553,15 +516,15 @@ function showAddPaymentModal() {
         }
 
         if (!teacherId || !amount || !month) {
-            showError('Barcha maydonlarni to'ldiring!');
+            showError("Barcha maydonlarni to'ldiring!");
             return;
         }
         if (paymentType === 'student_fee' && !studentId) {
-            showError('O\'quvchi tanlanishi kerak');
+            showError("O'quvchi tanlanishi kerak");
             return;
         }
         if (!paymentMethod || paymentMethod === '') {
-            showError('Iltimos, to\'lov usulini tanlang yoki izohda yozing!');
+            showError("Iltimos, to'lov usulini tanlang yoki izohda yozing!");
             if (paymentMethodSelect) paymentMethodSelect.focus();
             return;
         }
@@ -573,36 +536,36 @@ function showAddPaymentModal() {
             if (data.success) {
                 const methodName = PAYMENT_METHODS[paymentMethod]?.name || paymentMethod;
                 document.querySelector('.modal').remove();
-                showSuccess(`✅ To'lov qo'shildi!\n💳 To'lov usuli: ${methodName}`);
+                showSuccess(`To'lov qo'shildi! To'lov usuli: ${methodName}`);
                 await loadData();
             } else {
                 showError(data.message || 'Xatolik yuz berdi!');
             }
         } catch (error) {
-            console.error('❌ To\'lov yaratish xatosi:', error);
+            console.error("To'lov yaratish xatosi:", error);
             showError('Tarmoq xatosi!');
         }
     });
 }
 
 // ============================================================
-// ⭐ TO'LOV USULI SELECT VA RASM PREVIEW (ADMIN-CUSTOMER)
+// TO'LOV USULI SELECT VA RASM PREVIEW
 // ============================================================
 function initPaymentMethodSelect() {
     const select = document.getElementById('paymentMethodSelect');
     const previewDiv = document.getElementById('paymentMethodPreview');
     if (!select || !previewDiv) return;
-    
+
     const newSelect = select.cloneNode(true);
     select.parentNode.replaceChild(newSelect, select);
-    
+
     newSelect.addEventListener('change', function() {
         const methodId = this.value;
         const method = PAYMENT_METHODS[methodId];
         if (method && methodId !== '') {
             previewDiv.innerHTML = `
                 <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--bg-hover);border-radius:8px;border:1px solid var(--border-color);margin-top:8px;">
-                    <img src="${method.icon}" style="width:40px;height:40px;object-fit:contain;border-radius:6px;background:white;padding:4px;" 
+                    <img src="${method.icon}" style="width:40px;height:40px;object-fit:contain;border-radius:6px;background:white;padding:4px;"
                          onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
                     <div style="font-size:0.9rem;font-weight:600;display:none;" class="fallback-text">${method.name}</div>
                     <div>
@@ -621,12 +584,12 @@ function initPaymentMethodSelect() {
 }
 
 // ============================================================
-// TO'LOV TAHRIRLASH (ADMIN-CUSTOMER)
+// TO'LOV TAHRIRLASH
 // ============================================================
 async function editPayment(id) {
     const payment = paymentsData.find(p => p._id === id);
     if (!payment) {
-        showError('To\'lov topilmadi!');
+        showError("To'lov topilmadi!");
         return;
     }
 
@@ -662,44 +625,43 @@ async function editPayment(id) {
     document.getElementById('editPaymentForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const status = document.getElementById('editPaymentStatus').value;
-
         try {
             const data = await API.updatePayment(id, { status });
             if (data.success) {
                 document.querySelector('.modal').remove();
-                showSuccess('To\'lov holati yangilandi!');
+                showSuccess("To'lov holati yangilandi!");
                 await loadData();
             } else {
                 showError(data.message || 'Xatolik yuz berdi!');
             }
         } catch (error) {
-            console.error('❌ To\'lov yangilash xatosi:', error);
+            console.error("To'lov yangilash xatosi:", error);
             showError('Tarmoq xatosi!');
         }
     });
 }
 
 // ============================================================
-// TO'LOV O'CHIRISH (ADMIN-CUSTOMER)
+// TO'LOV O'CHIRISH
 // ============================================================
 async function deletePayment(id) {
-    if (!confirm('Haqiqatan ham bu to\'lovni o\'chirmoqchimisiz?')) return;
+    if (!confirm("Haqiqatan ham bu to'lovni o'chirmoqchimisiz?")) return;
     try {
         const data = await API.deletePayment(id);
         if (data.success) {
-            showSuccess('To\'lov o\'chirildi!');
+            showSuccess("To'lov o'chirildi!");
             await loadData();
         } else {
             showError(data.message || 'Xatolik yuz berdi!');
         }
     } catch (error) {
-        console.error('❌ To\'lov o\'chirish xatosi:', error);
+        console.error("To'lov o'chirish xatosi:", error);
         showError('Tarmoq xatosi!');
     }
 }
 
 // ============================================================
-// FILTER (ADMIN-CUSTOMER)
+// FILTER
 // ============================================================
 function filterPayments() {
     const search = document.getElementById('searchInput').value.toLowerCase();
@@ -713,7 +675,7 @@ function filterPayments() {
 }
 
 // ============================================================
-// EVENT LISTENERLAR (ADMIN-CUSTOMER)
+// EVENT LISTENERLAR
 // ============================================================
 function setupListeners() {
     document.getElementById('searchInput').addEventListener('input', filterPayments);
@@ -722,14 +684,14 @@ function setupListeners() {
         paymentTypeFilterValue = e.target.value;
         filterPayments();
     });
-    
+
     const addBtn = document.getElementById('addPaymentBtn');
     if (addBtn) {
         const newBtn = addBtn.cloneNode(true);
         addBtn.parentNode.replaceChild(newBtn, addBtn);
         newBtn.addEventListener('click', showAddPaymentModal);
     }
-    
+
     const logoutBtn = document.getElementById('logoutBtn');
     if (logoutBtn) {
         const newBtn = logoutBtn.cloneNode(true);
@@ -738,6 +700,9 @@ function setupListeners() {
     }
 }
 
+// ============================================================
+// XABAR FUNKSIYALARI
+// ============================================================
 function showError(msg) {
     const div = document.createElement('div');
     div.style.cssText = `position:fixed;top:20px;right:20px;z-index:9999;padding:14px 18px;background:#fef2f2;border:1px solid #fecaca;border-radius:10px;color:#dc2626;max-width:400px;box-shadow:0 10px 40px rgba(0,0,0,0.1);display:flex;align-items:center;gap:10px;font-size:0.85rem;`;
@@ -754,4 +719,4 @@ function showSuccess(msg) {
     setTimeout(() => div.remove(), 3000);
 }
 
-console.log('✅ payments.js yuklandi (Admin-Customer)');
+console.log("payments.js yuklandi (Admin-Customer)");
