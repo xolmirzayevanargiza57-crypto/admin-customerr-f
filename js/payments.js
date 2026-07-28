@@ -1,7 +1,5 @@
 // ============================================================
 // PAYMENTS - ADMIN CUSTOMER (TO'LIQ)
-// Loyiha: Admin-Customer Frontend
-// Fayl: js/payments.js
 // ============================================================
 
 // ============================================================
@@ -99,6 +97,49 @@ const PAYMENT_METHODS = {
         keywords: ['anjir', 'anjir pay', 'anjir bank'],
         emoji: '🍐'
     },
+    // ⭐ YANGI QO'SHILGAN TO'LOV USULLARI
+    hamkorbank: {
+        id: 'hamkorbank',
+        name: 'Hamkor Bank',
+        icon: 'https://img.hhcdn.ru/employer-logo-original-round/6939937.png',
+        keywords: ['hamkor', 'hamkorbank', 'hamkor bank'],
+        emoji: '🏛️'
+    },
+    xalqbanki: {
+        id: 'xalqbanki',
+        name: 'Xalq Banki',
+        icon: 'https://api.onmap.uz/storage/01HYXMSPSC7T0458S4YZV2XJRK.svg',
+        keywords: ['xalq', 'xalqbanki', 'xalq banki', 'xalq bank'],
+        emoji: '🏛️'
+    },
+    paypal: {
+        id: 'paypal',
+        name: 'PayPal',
+        icon: 'https://smartpress.by/upload/iblock/85f/dn546q6c891cflormfosv72ixoo1l4gv/paypal.jpg',
+        keywords: ['paypal', 'pay pal'],
+        emoji: '💳'
+    },
+    mastercard: {
+        id: 'mastercard',
+        name: 'MasterCard',
+        icon: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/MasterCard_Logo.svg/960px-MasterCard_Logo.svg.png',
+        keywords: ['mastercard', 'master card', 'master'],
+        emoji: '💳'
+    },
+    americanexpress: {
+        id: 'americanexpress',
+        name: 'American Express',
+        icon: 'https://live.staticflickr.com/65535/48649342553_8e0daf6313_b.jpg',
+        keywords: ['american', 'americanexpress', 'american express', 'amex'],
+        emoji: '💳'
+    },
+    pay: {
+        id: 'pay',
+        name: 'Pay',
+        icon: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/PayPal_logo_2014.svg/800px-PayPal_logo_2014.svg.png',
+        keywords: ['pay', 'to\'lov', 'payment'],
+        emoji: '💳'
+    },
     other: {
         id: 'other',
         name: 'Boshqa',
@@ -109,11 +150,31 @@ const PAYMENT_METHODS = {
 };
 
 // ============================================================
-// ⭐ TO'LOV USULINI AVTOMATIK ANIQLASH
+// ⭐ TO'LOV USULINI MATN ORQALI AVTOMATIK ANIQLASH
 // ============================================================
 function detectPaymentMethod(text) {
     if (!text) return PAYMENT_METHODS.other;
     const lowerText = text.toLowerCase().trim();
+    
+    if (lowerText.includes('hamkor') || lowerText.includes('hamkorbank')) {
+        return PAYMENT_METHODS.hamkorbank;
+    }
+    if (lowerText.includes('xalq')) {
+        return PAYMENT_METHODS.xalqbanki;
+    }
+    if (lowerText.includes('paypal') || lowerText.includes('pay pal')) {
+        return PAYMENT_METHODS.paypal;
+    }
+    if (lowerText.includes('mastercard') || lowerText.includes('master card') || lowerText.includes('master')) {
+        return PAYMENT_METHODS.mastercard;
+    }
+    if (lowerText.includes('american') || lowerText.includes('americanexpress') || lowerText.includes('amex')) {
+        return PAYMENT_METHODS.americanexpress;
+    }
+    if (lowerText.includes('pay') && !lowerText.includes('paypal') && !lowerText.includes('payme')) {
+        return PAYMENT_METHODS.pay;
+    }
+    
     for (const [key, method] of Object.entries(PAYMENT_METHODS)) {
         if (key === 'other') continue;
         if (method.keywords && method.keywords.some(kw => lowerText.includes(kw))) {
@@ -349,6 +410,12 @@ function showAddPaymentModal() {
                             <option value="anorbank">🍊 Anorbank</option>
                             <option value="xazna">🏦 Xazna</option>
                             <option value="anjir">🍐 Anjir Pay</option>
+                            <option value="hamkorbank">🏛️ Hamkor Bank</option>
+                            <option value="xalqbanki">🏛️ Xalq Banki</option>
+                            <option value="paypal">💳 PayPal</option>
+                            <option value="mastercard">💳 MasterCard</option>
+                            <option value="americanexpress">💳 American Express</option>
+                            <option value="pay">💳 Pay</option>
                             <option value="other">💳 Boshqa</option>
                         </select>
                     </div>
@@ -417,7 +484,6 @@ function showAddPaymentModal() {
             const text = this.value;
             const detected = detectPaymentMethod(text);
             if (detected && detected.id !== 'other') {
-                // Select ni yangilash
                 const selectEl = document.getElementById('paymentMethodSelect');
                 if (selectEl) {
                     selectEl.value = detected.id;
@@ -450,7 +516,6 @@ function showAddPaymentModal() {
         let paymentMethod = paymentMethodSelect ? paymentMethodSelect.value : '';
         const note = document.getElementById('paymentNote').value.trim();
 
-        // Agar select dan kelmasa, matn orqali aniqlash
         if (!paymentMethod || paymentMethod === 'other' || paymentMethod === '') {
             const detected = detectPaymentMethod(note);
             paymentMethod = detected.id;
