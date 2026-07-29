@@ -66,7 +66,6 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(
         fetch(event.request)
             .then((response) => {
-                // Cachega saqlash
                 const responseClone = response.clone();
                 caches.open(CACHE_NAME).then((cache) => {
                     cache.put(event.request, responseClone);
@@ -74,14 +73,13 @@ self.addEventListener('fetch', (event) => {
                 return response;
             })
             .catch(() => {
-                // Offline bo'lsa cachedan olish
                 return caches.match(event.request);
             })
     );
 });
 
 // ============================================================
-// ⭐ PUSH NOTIFICATION - ASOSIY FUNKSIYA
+// ⭐ PUSH NOTIFICATION - BRAUZER YOPIQ BO'LSA HAM ISHLAYDI
 // ============================================================
 self.addEventListener('push', (event) => {
     console.log('🔔 Push notification received:', event);
@@ -141,13 +139,11 @@ self.addEventListener('notificationclick', (event) => {
     event.waitUntil(
         clients.matchAll({ type: 'window', includeUncontrolled: true })
             .then((clientList) => {
-                // Agar ochiq oyna bo'lsa, uni fokusla
                 for (const client of clientList) {
                     if (client.url.includes(url) && 'focus' in client) {
                         return client.focus();
                     }
                 }
-                // Yo'q bo'lsa yangi oyna och
                 if (clients.openWindow) {
                     return clients.openWindow(url);
                 }
@@ -167,7 +163,6 @@ self.addEventListener('sync', (event) => {
 
 async function syncNotifications() {
     try {
-        // Offline bo'lgan vaqtda yuborilmagan xabarlarni qayta yuborish
         const cache = await caches.open('pending-notifications');
         const requests = await cache.keys();
         
@@ -182,3 +177,5 @@ async function syncNotifications() {
         console.error('❌ Sync error:', error);
     }
 }
+
+console.log('✅ Service Worker loaded successfully');
