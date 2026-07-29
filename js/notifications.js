@@ -1,5 +1,5 @@
 // ============================================================
-// NOTIFICATIONS - ADMIN-CUSTOMER (TO'LIQ)
+// NOTIFICATIONS - ADMIN-CUSTOMER (TO'LIQ TUZATILGAN)
 // Loyiha: Admin-Customer Frontend
 // Fayl: js/notifications.js
 // ============================================================
@@ -9,7 +9,7 @@ let currentFilter = 'all';
 let refreshInterval = null;
 
 // ============================================================
-// SAHIFA YUKLANGANDA
+// SAHIFA YUKLANGANDA (Admin-Customer)
 // ============================================================
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('🚀 Notifications sahifasi yuklanmoqda...');
@@ -32,10 +32,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         await loadNotifications();
         setupListeners();
 
-        // ⭐ HAR 5 SONIYADA XABARLARNI YANGILASH (REAL TIME)
+        // ⭐ HAR 3 SONIYADA XABARLARNI YANGILASH (REAL TIME)
+        if (refreshInterval) {
+            clearInterval(refreshInterval);
+            refreshInterval = null;
+        }
         refreshInterval = setInterval(() => {
             loadNotifications();
-        }, 5000);
+        }, 3000);
 
         console.log('✅ Notifications sahifasi yuklandi!');
     } catch (error) {
@@ -45,7 +49,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 // ============================================================
-// XABARLARNI YUKLASH
+// XABARLARNI YUKLASH (Admin-Customer)
 // ============================================================
 async function loadNotifications() {
     try {
@@ -68,7 +72,7 @@ async function loadNotifications() {
 }
 
 // ============================================================
-// XABARLARNI KO'RSATISH (FAQAT O'ZIGA KELGANLAR)
+// ⭐ XABARLARNI KO'RSATISH (FAQAT O'ZIGA KELGANLAR - Admin-Customer)
 // ============================================================
 function renderNotifications(notifications) {
     const container = document.getElementById('notificationsList');
@@ -85,9 +89,11 @@ function renderNotifications(notifications) {
         const recipientIdStr = n.recipientId ? String(n.recipientId) : null;
         const userIdStr = userId ? String(userId) : null;
         
+        // Agar recipientId mavjud bo'lsa, faqat o'ziga kelganlar
         if (recipientIdStr && userIdStr) {
             return recipientIdStr === userIdStr;
         }
+        // recipientId bo'lmasa, recipientRole tekshiriladi
         return n.recipientRole === 'all' || n.recipientRole === 'admin_customer';
     });
 
@@ -99,7 +105,7 @@ function renderNotifications(notifications) {
         return notifDate >= thirtyDaysAgo;
     });
 
-    console.log('📨 Filtrdan keyin:', filtered.length);
+    console.log('📨 Filtrdan keyin (o\'zimga kelganlar):', filtered.length);
 
     // ⭐ FILTRLASH
     const filteredByDate = filterByDate(filtered, currentFilter);
@@ -186,7 +192,7 @@ function renderNotifications(notifications) {
 
     container.innerHTML = html;
 
-    // ⭐ O'qilgan deb belgilash
+    // ⭐ O'qilgan deb belgilash (Admin-Customer)
     document.querySelectorAll('.btn-read').forEach(btn => {
         btn.addEventListener('click', async function() {
             const id = this.dataset.id;
@@ -196,7 +202,7 @@ function renderNotifications(notifications) {
 }
 
 // ============================================================
-// ⭐ VAQTNI FORMATLASH (TOSHKENT VAQTI BILAN)
+// ⭐ VAQTNI FORMATLASH (TOSHKENT VAQTI BILAN - Admin-Customer)
 // ============================================================
 function formatDateTimeFull(date) {
     if (!date) return 'Noma\'lum vaqt';
@@ -219,7 +225,7 @@ function formatDateTimeFull(date) {
 }
 
 // ============================================================
-// KUN BO'YICHA FILTRLASH
+// KUN BO'YICHA FILTRLASH (Admin-Customer)
 // ============================================================
 function filterByDate(notifications, filter) {
     const now = new Date();
@@ -251,7 +257,7 @@ function filterByDate(notifications, filter) {
 }
 
 // ============================================================
-// XABARNI O'QILGAN DEB BELGILASH
+// XABARNI O'QILGAN DEB BELGILASH (Admin-Customer)
 // ============================================================
 async function markAsRead(id) {
     try {
@@ -269,7 +275,7 @@ async function markAsRead(id) {
 }
 
 // ============================================================
-// BARCHA XABARLARNI O'QILGAN DEB BELGILASH
+// BARCHA XABARLARNI O'QILGAN DEB BELGILASH (Admin-Customer)
 // ============================================================
 async function markAllAsRead() {
     try {
@@ -287,7 +293,7 @@ async function markAllAsRead() {
 }
 
 // ============================================================
-// FILTER TUGMALARI
+// FILTER TUGMALARI (Admin-Customer)
 // ============================================================
 function updateFilterButtons() {
     document.querySelectorAll('.filter-pill').forEach(btn => {
@@ -300,7 +306,7 @@ function updateFilterButtons() {
 }
 
 // ============================================================
-// EVENT LISTENERLAR
+// EVENT LISTENERLAR (Admin-Customer)
 // ============================================================
 function setupListeners() {
     // Logout
@@ -356,7 +362,7 @@ function setupListeners() {
 }
 
 // ============================================================
-// XATOLIK VA MUVAFFAQIYAT XABARLARI
+// XATOLIK VA MUVAFFAQIYAT XABARLARI (Admin-Customer)
 // ============================================================
 function showError(msg) {
     console.error('⚠️ Xatolik:', msg);
@@ -403,7 +409,7 @@ function showSuccess(msg) {
 }
 
 // ============================================================
-// CLEANUP
+// CLEANUP (Admin-Customer)
 // ============================================================
 window.addEventListener('beforeunload', function() {
     if (refreshInterval) {
