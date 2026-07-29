@@ -1,5 +1,5 @@
 // ============================================================
-// DASHBOARD - ADMIN-CUSTOMER (TO'LIQ)
+// DASHBOARD - ADMIN-CUSTOMER (TO'LIQ TUZATILGAN)
 // Loyiha: Admin-Customer Frontend
 // Fayl: js/dashboard.js
 // ============================================================
@@ -67,10 +67,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             loadDashboardStats();
         }, 60000);
 
-        // ⭐ HAR 5 SONIYADA XABAR BADGE NI YANGILASH (REAL TIME)
+        // ⭐ HAR 3 SONIYADA XABAR BADGE NI YANGILASH (REAL TIME - ABADIY ISHLAYDI)
+        if (notificationCheckInterval) {
+            clearInterval(notificationCheckInterval);
+            notificationCheckInterval = null;
+        }
         notificationCheckInterval = setInterval(() => {
             updateNotificationBadge();
-        }, 5000);
+        }, 3000);
 
         // HAR 30 SONIYADA PROFIL O'ZGARGANMI TEKSHIRISH
         profileCheckInterval = setInterval(async () => {
@@ -93,7 +97,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 // ============================================================
-// ⭐ XABAR BADGE NI YANGILASH
+// ⭐ XABAR BADGE NI YANGILASH (ABADIY ISHLAYDI - Admin-Customer)
 // ============================================================
 async function updateNotificationBadge() {
     try {
@@ -111,16 +115,20 @@ async function updateNotificationBadge() {
             const user = Auth.getUser();
             const userId = user?._id;
             
+            // ⭐ TO'G'RI FILTR: FAQAT O'ZIGA KELGAN XABARLAR
             const myNotifications = response.data.filter(n => {
+                // Agar recipientId mavjud bo'lsa, faqat o'ziga kelganlar
                 if (n.recipientId) {
                     return String(n.recipientId) === String(userId);
                 }
+                // recipientId bo'lmasa, recipientRole tekshiriladi
                 return n.recipientRole === 'all' || n.recipientRole === 'admin_customer';
             });
             
+            // ⭐ O'QILMAGAN XABARLAR SONI
             const unreadCount = myNotifications.filter(n => !n.isRead).length;
             
-            console.log('🔔 O\'qilmagan xabarlar soni:', unreadCount);
+            console.log(`🔔 O'qilmagan xabarlar soni: ${unreadCount} (Jami: ${myNotifications.length})`);
 
             // ⭐ HEADER DAGI BADGE
             const badge = document.getElementById('notificationBadge');
@@ -149,10 +157,14 @@ async function updateNotificationBadge() {
                 }
             }
 
-            // ⭐ YANGI XABAR KELGANDA OVOZ CHIQARISH
+            // ⭐ YANGI XABAR KELGANDA OVOZ CHIQARISH VA XABAR KO'RSATISH
             if (unreadCount > lastUnreadCount && lastUnreadCount > 0) {
                 playNotificationSound();
+                // Yangi xabar kelganligi haqida xabar ko'rsatish
+                showNotificationToast(`🔔 ${unreadCount - lastUnreadCount} ta yangi xabar keldi!`);
             }
+            
+            // ⭐ LAST UNREAD COUNT NI YANGILASH (MUHIM!)
             lastUnreadCount = unreadCount;
         }
     } catch (error) {
@@ -161,11 +173,69 @@ async function updateNotificationBadge() {
 }
 
 // ============================================================
-// ⭐ XABAR OVOZI
+// ⭐ XABAR TOAST (OGOHLANTIRISH)
+// ============================================================
+function showNotificationToast(message) {
+    const existingToast = document.querySelector('.notification-toast');
+    if (existingToast) {
+        existingToast.remove();
+    }
+
+    const toast = document.createElement('div');
+    toast.className = 'notification-toast';
+    toast.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 99999;
+        background: #007aff;
+        color: white;
+        padding: 16px 24px;
+        border-radius: 12px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        font-size: 0.95rem;
+        max-width: 400px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        animation: slideDown 0.5s ease;
+        cursor: pointer;
+        font-family: 'Inter', sans-serif;
+    `;
+    toast.innerHTML = `
+        <i class="fas fa-bell" style="font-size: 1.2rem;"></i>
+        <span>${message}</span>
+        <button onclick="this.parentElement.remove()" style="background:none;border:none;color:white;font-size:1.2rem;cursor:pointer;margin-left:auto;">×</button>
+    `;
+    
+    // Toast ga bosganda notifications sahifasiga o'tish
+    toast.addEventListener('click', function(e) {
+        if (e.target.tagName !== 'BUTTON') {
+            window.location.href = 'notifications.html';
+        }
+    });
+
+    document.body.appendChild(toast);
+
+    // 5 soniyadan keyin o'chirish
+    setTimeout(() => {
+        if (toast.parentElement) {
+            toast.style.opacity = '0';
+            toast.style.transition = 'opacity 0.5s';
+            setTimeout(() => {
+                if (toast.parentElement) {
+                    toast.remove();
+                }
+            }, 500);
+        }
+    }, 5000);
+}
+
+// ============================================================
+// ⭐ XABAR OVOZI (Admin-Customer)
 // ============================================================
 function playNotificationSound() {
     try {
-        // Oddiy beep sound yaratish
         const audioContext = new (window.AudioContext || window.webkitAudioContext)();
         const oscillator = audioContext.createOscillator();
         const gainNode = audioContext.createGain();
@@ -182,7 +252,6 @@ function playNotificationSound() {
             oscillator.stop();
         }, 200);
         
-        // Ikkinchi beep
         setTimeout(() => {
             const osc2 = audioContext.createOscillator();
             const gain2 = audioContext.createGain();
@@ -204,7 +273,7 @@ function playNotificationSound() {
 }
 
 // ============================================================
-// DASHBOARD STATISTIKASINI YUKLASH
+// DASHBOARD STATISTIKASINI YUKLASH (Admin-Customer)
 // ============================================================
 async function loadDashboardStats() {
     try {
@@ -329,7 +398,7 @@ async function loadDashboardStats() {
 }
 
 // ============================================================
-// COUNTDOWN - REAL TIME
+// COUNTDOWN - REAL TIME (Admin-Customer)
 // ============================================================
 function startCountdown() {
     if (countdownInterval) {
@@ -398,7 +467,7 @@ function updateCountdown() {
 }
 
 // ============================================================
-// VAQTNI FORMATLASH
+// VAQTNI FORMATLASH (Admin-Customer)
 // ============================================================
 function formatDateTime(date) {
     if (!date) return 'Noma\'lum vaqt';
@@ -421,7 +490,7 @@ function formatDateTime(date) {
 }
 
 // ============================================================
-// XATOLIK VA MUVAFFAQIYAT XABARLARI
+// XATOLIK VA MUVAFFAQIYAT XABARLARI (Admin-Customer)
 // ============================================================
 function showError(msg) {
     console.error('⚠️ Xatolik:', msg);
@@ -470,7 +539,7 @@ function showSuccess(msg) {
 }
 
 // ============================================================
-// CLEANUP
+// CLEANUP (Admin-Customer)
 // ============================================================
 window.addEventListener('beforeunload', function() {
     if (refreshInterval) {
@@ -491,13 +560,18 @@ window.addEventListener('beforeunload', function() {
     }
 });
 
-// ⭐ BADGE PULSE ANIMATSIYASI
+// ⭐ BADGE PULSE ANIMATSIYASI (Admin-Customer)
 const style = document.createElement('style');
 style.textContent = `
     @keyframes badgePulse {
         0% { transform: scale(1); }
         50% { transform: scale(1.3); }
         100% { transform: scale(1); }
+    }
+    
+    @keyframes slideDown {
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
     }
 `;
 document.head.appendChild(style);
