@@ -30,6 +30,9 @@
     <link rel="stylesheet" href="css/theme.css" />
 
     <style>
+        /* ============================================================
+           BADGE PULSE ANIMATION
+           ============================================================ */
         @keyframes badgePulse {
             0% { transform: scale(1); }
             50% { transform: scale(1.3); }
@@ -55,6 +58,7 @@
             transform: scale(1.05);
         }
 
+        /* Sidebar badge */
         .sidebar-badge {
             margin-left: auto;
             background: #ff3b30;
@@ -68,6 +72,7 @@
             text-align: center;
         }
 
+        /* Notification Toast */
         .notification-toast {
             position: fixed;
             top: 20px;
@@ -101,7 +106,7 @@
             background: #1a2a4a;
         }
 
-        /* ⭐ PERMISSION REQUEST OVERLAY */
+        /* ⭐ PERMISSION OVERLAY */
         .permission-overlay {
             position: fixed;
             top: 0;
@@ -186,7 +191,9 @@
 </head>
 <body>
     <div class="app-container">
-        <!-- Sidebar -->
+        <!-- ============================================================
+             SIDEBAR
+             ============================================================ -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-brand">
                 <div class="brand-icon"><i class="fas fa-crown"></i></div>
@@ -237,8 +244,11 @@
 
         <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-        <!-- Main Content -->
+        <!-- ============================================================
+             MAIN CONTENT
+             ============================================================ -->
         <main class="main-content">
+            <!-- HEADER -->
             <header class="top-header">
                 <div class="header-left">
                     <button id="menuToggle" class="menu-toggle"><i class="fas fa-bars"></i></button>
@@ -264,7 +274,7 @@
                 </div>
             </header>
 
-            <!-- Stats Cards -->
+            <!-- STATS CARDS -->
             <section class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-icon blue"><i class="fas fa-chalkboard-teacher"></i></div>
@@ -297,7 +307,7 @@
                 </div>
             </section>
 
-            <!-- Attendance Cards -->
+            <!-- ATTENDANCE CARDS -->
             <section class="attendance-cards">
                 <div class="stat-card present-card">
                     <div class="stat-icon green"><i class="fas fa-check-circle"></i></div>
@@ -322,7 +332,7 @@
                 </div>
             </section>
 
-            <!-- Subscription Card -->
+            <!-- SUBSCRIPTION CARD -->
             <section class="subscription-card">
                 <div class="sub-item">
                     <span class="label"><i class="fas fa-circle"></i> Holati</span>
@@ -375,7 +385,9 @@
         <i class="fas fa-sun sun"></i>
     </button>
 
-    <!-- ⭐ FIREBASE SDK -->
+    <!-- ============================================================
+         ⭐ FIREBASE SDK (Admin-Customer)
+         ============================================================ -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js"></script>
 
@@ -389,41 +401,43 @@
     <script src="js/utils.js"></script>
     <script src="js/dashboard.js"></script>
 
-    <!-- ⭐ FIREBASE PUSH NOTIFICATIONS -->
+    <!-- ============================================================
+         ⭐ FIREBASE CONFIG (Admin-Customer)
+         ============================================================ -->
     <script>
         // ============================================================
         // FIREBASE CONFIG - ADMIN CUSTOMER
         // ============================================================
-        const FIREBASE_CONFIG = {
-            apiKey: "AIzaSyBkHn6FkZg1gZ2gZ3gZ4gZ5gZ6gZ7gZ8gZ9",
-            authDomain: "admin-customer.firebaseapp.com",
-            projectId: "admin-customer",
-            storageBucket: "admin-customer.appspot.com",
-            messagingSenderId: "103953800507",
-            appId: "1:103953800507:web:abc123def456"
+        const firebaseConfig = {
+            apiKey: "AIzaSyAA8_hFbuDAvuhJY0DWW-EHTeuzzTcbmcY",
+            authDomain: "admin-customer-812db.firebaseapp.com",
+            projectId: "admin-customer-812db",
+            storageBucket: "admin-customer-812db.firebasestorage.app",
+            messagingSenderId: "588435331581",
+            appId: "1:588435331581:web:e2cdc95626c0d55ef1a194",
+            measurementId: "G-F5L5QV1EQ4"
         };
 
-        // ⭐ FIREBASE INIT
-        firebase.initializeApp(FIREBASE_CONFIG);
+        // ⭐ Firebase ni ishga tushirish
+        firebase.initializeApp(firebaseConfig);
         const messaging = firebase.messaging();
+
+        console.log('✅ Firebase initialized (Admin-Customer)');
 
         // ============================================================
         // ⭐ PERMISSION SO'RASH
         // ============================================================
         function requestNotificationPermission() {
-            console.log('🔔 Notification ruxsat so\'ralmoqda...');
+            console.log('🔔 Notification ruxsat so\'ralmoqda... (Admin-Customer)');
 
-            // ⭐ Overlay ni ko'rsatish
             const overlay = document.getElementById('permissionOverlay');
             if (overlay) overlay.classList.add('show');
 
-            // ⭐ Ruxsat berish tugmasi
             document.getElementById('enableNotificationsBtn').addEventListener('click', function() {
                 overlay.classList.remove('show');
                 enableNotifications();
             });
 
-            // ⭐ Hozir emas tugmasi
             document.getElementById('skipNotificationsBtn').addEventListener('click', function() {
                 overlay.classList.remove('show');
                 console.log('⏳ Notification ruxsat keyinroq so\'raladi');
@@ -432,11 +446,11 @@
         }
 
         // ============================================================
-        // ⭐ NOTIFICATION LARNI YOQISH
+        // ⭐ NOTIFICATION LARNI YOQISH (Admin-Customer)
         // ============================================================
         async function enableNotifications() {
             try {
-                console.log('🔔 Notification yoqilmoqda...');
+                console.log('🔔 Notification yoqilmoqda... (Admin-Customer)');
 
                 // ⭐ 1. Service Worker ro'yxatdan o'tkazish
                 const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
@@ -472,7 +486,7 @@
 
                         const data = await response.json();
                         if (data.success) {
-                            console.log('✅ Push subscription saved to server');
+                            console.log('✅ Push subscription saved to server (Admin-Customer)');
                             localStorage.setItem('fcm_token', token);
                             localStorage.setItem('notifications_enabled', 'true');
                             showSuccess('🔔 Bildirishnomalar yoqildi!');
@@ -484,7 +498,7 @@
 
                 // ⭐ 4. Foreground da xabarlarni eshitish
                 messaging.onMessage(function(payload) {
-                    console.log('🔔 Foreground message received:', payload);
+                    console.log('🔔 Foreground message received (Admin-Customer):', payload);
                     showNotificationToast(
                         payload.notification?.title || 'Yangi xabar',
                         payload.notification?.body || 'Admin Main dan yangi xabar keldi'
@@ -502,7 +516,7 @@
         }
 
         // ============================================================
-        // ⭐ TOAST XABAR
+        // ⭐ TOAST XABAR (Admin-Customer)
         // ============================================================
         function showNotificationToast(title, message) {
             const existing = document.querySelector('.notification-toast');
@@ -537,7 +551,26 @@
         }
 
         // ============================================================
-        // ⭐ SAHIFA YUKLANGANDA
+        // ⭐ XATOLIK VA MUVAFFAQIYAT (Admin-Customer)
+        // ============================================================
+        function showError(msg) {
+            var div = document.createElement('div');
+            div.style.cssText = 'position:fixed;top:20px;right:20px;z-index:99999;padding:14px 18px;background:#fef2f2;border:1px solid #fecaca;border-radius:10px;color:#dc2626;max-width:400px;box-shadow:0 10px 40px rgba(0,0,0,0.1);display:flex;align-items:center;gap:10px;font-size:0.85rem;';
+            div.innerHTML = '<i class="fas fa-exclamation-circle"></i><span>' + msg + '</span><button onclick="this.parentElement.remove()" style="margin-left:auto;background:none;border:none;color:#dc2626;cursor:pointer;font-size:1.1rem;">×</button>';
+            document.body.appendChild(div);
+            setTimeout(function() { if (div.parentElement) div.remove(); }, 5000);
+        }
+
+        function showSuccess(msg) {
+            var div = document.createElement('div');
+            div.style.cssText = 'position:fixed;top:20px;right:20px;z-index:99999;padding:14px 18px;background:#ecfdf5;border:1px solid #a7f3d0;border-radius:10px;color:#065f46;max-width:400px;box-shadow:0 10px 40px rgba(0,0,0,0.1);display:flex;align-items:center;gap:10px;font-size:0.85rem;';
+            div.innerHTML = '<i class="fas fa-check-circle"></i><span>' + msg + '</span><button onclick="this.parentElement.remove()" style="margin-left:auto;background:none;border:none;color:#065f46;cursor:pointer;font-size:1.1rem;">×</button>';
+            document.body.appendChild(div);
+            setTimeout(function() { if (div.parentElement) div.remove(); }, 3000);
+        }
+
+        // ============================================================
+        // ⭐ SAHIFA YUKLANGANDA (Admin-Customer)
         // ============================================================
         document.addEventListener('DOMContentLoaded', function() {
             // ⭐ Auth bo'lmasa login sahifasiga o'tish
@@ -559,24 +592,7 @@
             }
         });
 
-        // ⭐ Xatolik va muvaffaqiyat xabarlari
-        function showError(msg) {
-            var div = document.createElement('div');
-            div.style.cssText = 'position:fixed;top:20px;right:20px;z-index:99999;padding:14px 18px;background:#fef2f2;border:1px solid #fecaca;border-radius:10px;color:#dc2626;max-width:400px;box-shadow:0 10px 40px rgba(0,0,0,0.1);display:flex;align-items:center;gap:10px;font-size:0.85rem;';
-            div.innerHTML = '<i class="fas fa-exclamation-circle"></i><span>' + msg + '</span><button onclick="this.parentElement.remove()" style="margin-left:auto;background:none;border:none;color:#dc2626;cursor:pointer;font-size:1.1rem;">×</button>';
-            document.body.appendChild(div);
-            setTimeout(function() { if (div.parentElement) div.remove(); }, 5000);
-        }
-
-        function showSuccess(msg) {
-            var div = document.createElement('div');
-            div.style.cssText = 'position:fixed;top:20px;right:20px;z-index:99999;padding:14px 18px;background:#ecfdf5;border:1px solid #a7f3d0;border-radius:10px;color:#065f46;max-width:400px;box-shadow:0 10px 40px rgba(0,0,0,0.1);display:flex;align-items:center;gap:10px;font-size:0.85rem;';
-            div.innerHTML = '<i class="fas fa-check-circle"></i><span>' + msg + '</span><button onclick="this.parentElement.remove()" style="margin-left:auto;background:none;border:none;color:#065f46;cursor:pointer;font-size:1.1rem;">×</button>';
-            document.body.appendChild(div);
-            setTimeout(function() { if (div.parentElement) div.remove(); }, 3000);
-        }
-
-        console.log('✅ Firebase Push Notifications loaded');
+        console.log('✅ Firebase Push Notifications loaded (Admin-Customer)');
     </script>
 </body>
 </html>
