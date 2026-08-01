@@ -100,6 +100,88 @@
         [data-theme="dark"] .notification-toast {
             background: #1a2a4a;
         }
+
+        /* ⭐ PERMISSION REQUEST OVERLAY */
+        .permission-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(8px);
+            z-index: 99999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .permission-overlay.show {
+            display: flex;
+        }
+
+        .permission-modal {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 32px;
+            max-width: 420px;
+            width: 100%;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: modalSlideIn 0.5s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from { opacity: 0; transform: scale(0.9) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .permission-modal .icon {
+            font-size: 4rem;
+            margin-bottom: 16px;
+        }
+
+        .permission-modal h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .permission-modal p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .permission-modal .btn-primary {
+            width: auto;
+            padding: 12px 32px;
+            font-size: 0.95rem;
+        }
+
+        .permission-modal .btn-secondary {
+            width: auto;
+            padding: 12px 32px;
+            font-size: 0.95rem;
+            margin-top: 8px;
+        }
+
+        .permission-modal .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-direction: column;
+        }
+
+        @media (min-width: 480px) {
+            .permission-modal .btn-group {
+                flex-direction: row;
+                justify-content: center;
+            }
+        }
     </style>
 </head>
 <body>
@@ -137,6 +219,10 @@
                 </a>
                 <a href="all.html" class="nav-link">
                     <i class="fas fa-th-list"></i> <span data-i18n="all">Barchasi</span>
+                </a>
+                <a href="notifications.html" class="nav-link">
+                    <i class="fas fa-bell"></i> <span data-i18n="notifications">Bildirishnomalar</span>
+                    <span id="sidebarBadge" class="sidebar-badge" style="display:none;">0</span>
                 </a>
                 <a href="settings.html" class="nav-link">
                     <i class="fas fa-cog"></i> <span data-i18n="settings">Sozlamalar</span>
@@ -258,11 +344,40 @@
         </main>
     </div>
 
+    <!-- ⭐ PERMISSION OVERLAY -->
+    <div class="permission-overlay" id="permissionOverlay">
+        <div class="permission-modal">
+            <div class="icon">🔔</div>
+            <h3>Bildirishnomalarni yoqish</h3>
+            <p>
+                Admin Customer dan yangi xabarlar, to'lovlar va davomat haqida 
+                <strong>real-time</strong> bildirishnomalarni olish uchun ruxsat bering.
+                <br /><br />
+                📱 Telefon <strong>lock screen</strong> da ham xabarlar keladi!
+            </p>
+            <div class="btn-group">
+                <button class="btn-primary" id="enableNotificationsBtn">
+                    <i class="fas fa-bell"></i> Ruxsat berish
+                </button>
+                <button class="btn-secondary" id="skipNotificationsBtn">
+                    Hozir emas
+                </button>
+            </div>
+            <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 12px;">
+                Keyinroq sozlamalardan yoqishingiz mumkin
+            </p>
+        </div>
+    </div>
+
     <!-- Theme Toggle -->
     <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
         <i class="fas fa-moon moon"></i>
         <i class="fas fa-sun sun"></i>
     </button>
+
+    <!-- ⭐ FIREBASE SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js"></script>
 
     <script>
         window.__API_BASE_URL__ = 'https://admin-customerr.onrender.com';
@@ -274,84 +389,194 @@
     <script src="js/utils.js"></script>
     <script src="js/dashboard.js"></script>
 
-    <!-- ⭐ PUSH NOTIFICATIONS SUBSCRIPTION (ADMIN-CUSTOMER) -->
+    <!-- ⭐ FIREBASE PUSH NOTIFICATIONS -->
     <script>
-        // VAPID PUBLIC KEY
-        const VAPID_PUBLIC_KEY = 'BGVIxfi_Mo7-TtKGYXtpLjzDlMBNmA9StNv_44QGhFjtUO-p5GU9Fjj1-mWgh8ScgAq2cM6PSLCFcYlmVI_xlpk';
+        // ============================================================
+        // FIREBASE CONFIG - ADMIN CUSTOMER
+        // ============================================================
+        const FIREBASE_CONFIG = {
+            apiKey: "AIzaSyBkHn6FkZg1gZ2gZ3gZ4gZ5gZ6gZ7gZ8gZ9",
+            authDomain: "admin-customer.firebaseapp.com",
+            projectId: "admin-customer",
+            storageBucket: "admin-customer.appspot.com",
+            messagingSenderId: "103953800507",
+            appId: "1:103953800507:web:abc123def456"
+        };
 
-        async function registerServiceWorker() {
+        // ⭐ FIREBASE INIT
+        firebase.initializeApp(FIREBASE_CONFIG);
+        const messaging = firebase.messaging();
+
+        // ============================================================
+        // ⭐ PERMISSION SO'RASH
+        // ============================================================
+        function requestNotificationPermission() {
+            console.log('🔔 Notification ruxsat so\'ralmoqda...');
+
+            // ⭐ Overlay ni ko'rsatish
+            const overlay = document.getElementById('permissionOverlay');
+            if (overlay) overlay.classList.add('show');
+
+            // ⭐ Ruxsat berish tugmasi
+            document.getElementById('enableNotificationsBtn').addEventListener('click', function() {
+                overlay.classList.remove('show');
+                enableNotifications();
+            });
+
+            // ⭐ Hozir emas tugmasi
+            document.getElementById('skipNotificationsBtn').addEventListener('click', function() {
+                overlay.classList.remove('show');
+                console.log('⏳ Notification ruxsat keyinroq so\'raladi');
+                localStorage.setItem('notifications_skipped', 'true');
+            });
+        }
+
+        // ============================================================
+        // ⭐ NOTIFICATION LARNI YOQISH
+        // ============================================================
+        async function enableNotifications() {
             try {
-                console.log('🔧 Service Worker ro\'yxatdan o\'tkazilmoqda...');
+                console.log('🔔 Notification yoqilmoqda...');
 
-                if (!('serviceWorker' in navigator)) {
-                    console.warn('⚠️ Service Worker qo\'llab-quvvatlanmaydi');
-                    return;
-                }
-
-                if (!('PushManager' in window)) {
-                    console.warn('⚠️ Push Manager qo\'llab-quvvatlanmaydi');
-                    return;
-                }
-
-                const registration = await navigator.serviceWorker.register('/sw.js', {
-                    scope: '/'
-                });
+                // ⭐ 1. Service Worker ro'yxatdan o'tkazish
+                const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
                 console.log('✅ Service Worker registered:', registration);
 
-                const subscription = await registration.pushManager.subscribe({
-                    userVisibleOnly: true,
-                    applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
-                });
-                console.log('✅ Push subscription:', subscription);
-
-                const token = localStorage.getItem('customerToken') || sessionStorage.getItem('customerToken');
-                if (!token) {
-                    console.warn('⚠️ Token topilmadi, subscription saqlanmadi');
-                    return;
-                }
-
-                const response = await fetch('https://admin-customerr.onrender.com/api/notifications/subscribe', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify({ subscription })
+                // ⭐ 2. FCM token olish
+                const token = await messaging.getToken({
+                    vapidKey: 'BGVIxfi_Mo7-TtKGYXtpLjzDlMBNmA9StNv_44QGhFjtUO-p5GU9Fjj1-mWgh8ScgAq2cM6PSLCFcYlmVI_xlpk'
                 });
 
-                const data = await response.json();
-                if (data.success) {
-                    console.log('✅ Push subscription saved to server');
-                    localStorage.setItem('push-subscription', JSON.stringify(subscription));
-                } else {
-                    console.error('❌ Failed to save subscription:', data.message);
+                console.log('✅ FCM Token:', token);
+
+                if (token) {
+                    // ⭐ 3. Token ni backendga yuborish
+                    const userToken = localStorage.getItem('customerToken') || sessionStorage.getItem('customerToken');
+                    if (userToken) {
+                        const response = await fetch('https://admin-customerr.onrender.com/api/push/subscribe', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': 'Bearer ' + userToken
+                            },
+                            body: JSON.stringify({
+                                subscription: {
+                                    endpoint: token,
+                                    keys: {
+                                        p256dh: token,
+                                        auth: token
+                                    }
+                                }
+                            })
+                        });
+
+                        const data = await response.json();
+                        if (data.success) {
+                            console.log('✅ Push subscription saved to server');
+                            localStorage.setItem('fcm_token', token);
+                            localStorage.setItem('notifications_enabled', 'true');
+                            showSuccess('🔔 Bildirishnomalar yoqildi!');
+                        } else {
+                            console.error('❌ Failed to save subscription:', data.message);
+                        }
+                    }
                 }
+
+                // ⭐ 4. Foreground da xabarlarni eshitish
+                messaging.onMessage(function(payload) {
+                    console.log('🔔 Foreground message received:', payload);
+                    showNotificationToast(
+                        payload.notification?.title || 'Yangi xabar',
+                        payload.notification?.body || 'Admin Main dan yangi xabar keldi'
+                    );
+                });
 
             } catch (error) {
-                console.error('❌ Push registration error:', error);
+                console.error('❌ Notification enable error:', error);
+                if (error.code === 'messaging/permission-blocked') {
+                    alert('⚠️ Bildirishnomalar bloklangan! Iltimos, brauzer sozlamalaridan yoqing.');
+                } else {
+                    showError('Bildirishnomalarni yoqishda xatolik: ' + error.message);
+                }
             }
         }
 
-        function urlBase64ToUint8Array(base64String) {
-            const padding = '='.repeat((4 - base64String.length % 4) % 4);
-            const base64 = (base64String + padding)
-                .replace(/-/g, '+')
-                .replace(/_/g, '/');
+        // ============================================================
+        // ⭐ TOAST XABAR
+        // ============================================================
+        function showNotificationToast(title, message) {
+            const existing = document.querySelector('.notification-toast');
+            if (existing) existing.remove();
 
-            const rawData = window.atob(base64);
-            const outputArray = new Uint8Array(rawData.length);
+            const toast = document.createElement('div');
+            toast.className = 'notification-toast';
+            toast.innerHTML = `
+                <i class="fas fa-bell" style="font-size: 1.2rem;"></i>
+                <div>
+                    <strong>${title}</strong>
+                    <p style="margin: 0; font-size: 0.85rem; opacity: 0.9;">${message}</p>
+                </div>
+                <button onclick="this.parentElement.remove()">×</button>
+            `;
+            toast.addEventListener('click', function(e) {
+                if (e.target.tagName !== 'BUTTON') {
+                    window.location.href = '/notifications.html';
+                }
+            });
+            document.body.appendChild(toast);
 
-            for (let i = 0; i < rawData.length; ++i) {
-                outputArray[i] = rawData.charCodeAt(i);
+            setTimeout(function() {
+                if (toast.parentElement) {
+                    toast.style.opacity = '0';
+                    toast.style.transition = 'opacity 0.5s';
+                    setTimeout(function() {
+                        if (toast.parentElement) toast.remove();
+                    }, 500);
+                }
+            }, 8000);
+        }
+
+        // ============================================================
+        // ⭐ SAHIFA YUKLANGANDA
+        // ============================================================
+        document.addEventListener('DOMContentLoaded', function() {
+            // ⭐ Auth bo'lmasa login sahifasiga o'tish
+            var token = localStorage.getItem('customerToken') || sessionStorage.getItem('customerToken');
+            if (!token) return;
+
+            // ⭐ Notification ruxsat so'rash
+            var notificationsEnabled = localStorage.getItem('notifications_enabled');
+            var notificationsSkipped = localStorage.getItem('notifications_skipped');
+
+            if (notificationsEnabled !== 'true' && notificationsSkipped !== 'true') {
+                // ⭐ 3 soniyadan keyin ruxsat so'rash
+                setTimeout(function() {
+                    requestNotificationPermission();
+                }, 3000);
+            } else if (notificationsEnabled === 'true') {
+                // ⭐ Agar allaqachon yoqilgan bo'lsa, token ni yangilash
+                enableNotifications();
             }
-            return outputArray;
+        });
+
+        // ⭐ Xatolik va muvaffaqiyat xabarlari
+        function showError(msg) {
+            var div = document.createElement('div');
+            div.style.cssText = 'position:fixed;top:20px;right:20px;z-index:99999;padding:14px 18px;background:#fef2f2;border:1px solid #fecaca;border-radius:10px;color:#dc2626;max-width:400px;box-shadow:0 10px 40px rgba(0,0,0,0.1);display:flex;align-items:center;gap:10px;font-size:0.85rem;';
+            div.innerHTML = '<i class="fas fa-exclamation-circle"></i><span>' + msg + '</span><button onclick="this.parentElement.remove()" style="margin-left:auto;background:none;border:none;color:#dc2626;cursor:pointer;font-size:1.1rem;">×</button>';
+            document.body.appendChild(div);
+            setTimeout(function() { if (div.parentElement) div.remove(); }, 5000);
         }
 
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', registerServiceWorker);
-        } else {
-            registerServiceWorker();
+        function showSuccess(msg) {
+            var div = document.createElement('div');
+            div.style.cssText = 'position:fixed;top:20px;right:20px;z-index:99999;padding:14px 18px;background:#ecfdf5;border:1px solid #a7f3d0;border-radius:10px;color:#065f46;max-width:400px;box-shadow:0 10px 40px rgba(0,0,0,0.1);display:flex;align-items:center;gap:10px;font-size:0.85rem;';
+            div.innerHTML = '<i class="fas fa-check-circle"></i><span>' + msg + '</span><button onclick="this.parentElement.remove()" style="margin-left:auto;background:none;border:none;color:#065f46;cursor:pointer;font-size:1.1rem;">×</button>';
+            document.body.appendChild(div);
+            setTimeout(function() { if (div.parentElement) div.remove(); }, 3000);
         }
+
+        console.log('✅ Firebase Push Notifications loaded');
     </script>
 </body>
 </html>
