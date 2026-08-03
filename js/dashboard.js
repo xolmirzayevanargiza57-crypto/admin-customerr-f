@@ -1,5 +1,5 @@
 // ============================================================
-// DASHBOARD - ADMIN-CUSTOMER (TO'LIQ TUZATILGAN)
+// DASHBOARD - ADMIN-CUSTOMER (TO'LIQ)
 // Loyiha: Admin-Customer Frontend
 // Fayl: js/dashboard.js
 // ============================================================
@@ -12,6 +12,105 @@ let profileCheckInterval = null;
 let notificationCheckInterval = null;
 let lastUnreadCount = 0;
 let audioContext = null;
+let soundEnabled = true;
+
+// ============================================================
+// ⭐ OVOZ YARATISH (100% ISHLASH UCHUN)
+// ============================================================
+function createNotificationSound() {
+    try {
+        // ⭐ 1. AudioContext ni yaratish (agar mavjud bo'lmasa)
+        if (!audioContext) {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        
+        // ⭐ 2. Agar suspended bo'lsa, resume qilish
+        if (audioContext.state === 'suspended') {
+            audioContext.resume();
+        }
+        
+        // ⭐ 3. Agar closed bo'lsa, qayta yaratish
+        if (audioContext.state === 'closed') {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        
+        // ⭐ 4. Ovoz yaratish
+        var now = audioContext.currentTime;
+        
+        // 1-OVOZ: 880 Hz (ding)
+        var osc1 = audioContext.createOscillator();
+        var gain1 = audioContext.createGain();
+        osc1.connect(gain1);
+        gain1.connect(audioContext.destination);
+        osc1.frequency.value = 880;
+        osc1.type = 'sine';
+        gain1.gain.setValueAtTime(0.25, now);
+        gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+        osc1.start(now);
+        osc1.stop(now + 0.2);
+        
+        // 2-OVOZ: 1100 Hz (ding) - 150ms keyin
+        var osc2 = audioContext.createOscillator();
+        var gain2 = audioContext.createGain();
+        osc2.connect(gain2);
+        gain2.connect(audioContext.destination);
+        osc2.frequency.value = 1100;
+        osc2.type = 'sine';
+        gain2.gain.setValueAtTime(0.2, now + 0.15);
+        gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+        osc2.start(now + 0.15);
+        osc2.stop(now + 0.35);
+        
+        console.log('🔔 Ovoz chiqdi!');
+        return true;
+    } catch (error) {
+        console.warn('⚠️ Ovoz xatosi:', error);
+        return false;
+    }
+}
+
+// ============================================================
+// ⭐ OVOZ O'YNATISH (USER INTERACTION BILAN)
+// ============================================================
+function playNotificationSound() {
+    // ⭐ Agar ovoz o'chirilgan bo'lsa
+    if (!soundEnabled) return;
+    
+    // ⭐ Birinchi urinish
+    if (createNotificationSound()) return;
+    
+    // ⭐ Agar birinchi urinish muvaffaqiyatsiz bo'lsa, qayta urinish
+    setTimeout(function() {
+        createNotificationSound();
+    }, 100);
+    
+    // ⭐ Agar hali ham ishlamasa, user interaction orqali
+    setTimeout(function() {
+        if (audioContext && audioContext.state === 'suspended') {
+            audioContext.resume().then(function() {
+                createNotificationSound();
+            }).catch(function(e) {
+                console.warn('⚠️ Resume xatosi:', e);
+            });
+        }
+    }, 200);
+}
+
+// ============================================================
+// ⭐ OVOZNI ISHGA TUSHIRISH (user interaction bilan)
+// ============================================================
+function initAudio() {
+    if (audioContext) return;
+    try {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioContext.state === 'suspended') {
+            audioContext.resume();
+        }
+        console.log('✅ AudioContext tayyor');
+    } catch (e) {
+        console.warn('⚠️ AudioContext xatosi:', e);
+    }
+}
 
 // ============================================================
 // SAHIFA YUKLANGANDA (Admin-Customer)
@@ -53,17 +152,21 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
 
-        // ⭐ AUDIO CONTEXT NI TAYYORLASH (user interaction bilan)
-        document.addEventListener('click', function() {
-            if (!audioContext) {
-                try {
-                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                    console.log('✅ AudioContext tayyor');
-                } catch (e) {
-                    console.warn('⚠️ AudioContext xatosi:', e);
-                }
-            }
-        }, { once: true });
+        // ⭐ AUDIO CONTEXT NI TAYYORLASH (har qanday user interaction da)
+        var initAudioOnce = function() {
+            initAudio();
+            document.removeEventListener('click', initAudioOnce);
+            document.removeEventListener('touchstart', initAudioOnce);
+            document.removeEventListener('keydown', initAudioOnce);
+        };
+        document.addEventListener('click', initAudioOnce);
+        document.addEventListener('touchstart', initAudioOnce);
+        document.addEventListener('keydown', initAudioOnce);
+        
+        // ⭐ Agar 5 soniyadan keyin ham ishga tushmagan bo'lsa, majburlab ishga tushirish
+        setTimeout(function() {
+            initAudio();
+        }, 5000);
 
         // ⭐ XABAR BADGE NI YANGILASH
         updateNotificationBadge();
@@ -76,7 +179,7 @@ document.addEventListener('DOMContentLoaded', function() {
             loadDashboardStats();
         }, 60000);
 
-        // ⭐ HAR 3 SONIYADA XABAR BADGE NI YANGILASH (real-time)
+        // ⭐ HAR 3 SONIYADA XABAR BADGE NI YANGILASH
         notificationCheckInterval = setInterval(function() {
             updateNotificationBadge();
         }, 3000);
@@ -97,7 +200,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // ============================================================
-// ⭐ XABAR BADGE NI YANGILASH (Admin-Customer) - TUZATILGAN
+// ⭐ XABAR BADGE NI YANGILASH (Admin-Customer)
 // ============================================================
 async function updateNotificationBadge() {
     try {
@@ -112,20 +215,17 @@ async function updateNotificationBadge() {
             
             // ⭐ FAQAT O'ZIGA KELGAN XABARLAR
             var myNotifications = response.data.filter(function(n) {
-                // Agar recipientId mavjud bo'lsa, faqat o'ziga kelganlar
                 if (n.recipientId) {
                     return String(n.recipientId) === String(userId);
                 }
-                // recipientId bo'lmasa, recipientRole tekshiriladi
                 return n.recipientRole === 'all' || n.recipientRole === 'admin_customer';
             });
             
-            // ⭐ O'QILMAGAN XABARLAR SONI
             var unreadCount = myNotifications.filter(function(n) { return !n.isRead; }).length;
             
-            console.log('🔔 O\'qilmagan xabarlar soni:', unreadCount, '(Jami:', myNotifications.length, ')');
+            console.log('🔔 O\'qilmagan xabarlar:', unreadCount);
 
-            // ⭐ HEADER DAGI BADGE
+            // ⭐ HEADER BADGE
             var badge = document.getElementById('notificationBadge');
             if (badge) {
                 if (unreadCount > 0) {
@@ -140,7 +240,7 @@ async function updateNotificationBadge() {
                 }
             }
 
-            // ⭐ SIDEBAR DAGI BADGE
+            // ⭐ SIDEBAR BADGE
             var sidebarBadge = document.getElementById('sidebarBadge');
             if (sidebarBadge) {
                 if (unreadCount > 0) {
@@ -151,67 +251,22 @@ async function updateNotificationBadge() {
                 }
             }
 
-            // ⭐ YANGI XABAR KELGANDA OVOZ CHIQARISH (faqat unreadCount oshsa)
+            // ⭐ YANGI XABAR KELGANDA OVOZ
             if (unreadCount > lastUnreadCount && lastUnreadCount > 0) {
+                // ⭐ OVOZNI ISHGA TUSHIRISH (avval audioContext ni tekshirib)
+                if (!audioContext || audioContext.state === 'closed') {
+                    initAudio();
+                }
                 playNotificationSound();
+                
                 var diff = unreadCount - lastUnreadCount;
                 showNotificationToast('🔔 ' + diff + ' ta yangi xabar keldi!');
             }
             
-            // ⭐ LAST UNREAD COUNT NI YANGILASH
             lastUnreadCount = unreadCount;
         }
     } catch (error) {
         console.error('❌ Badge yangilash xatosi:', error);
-    }
-}
-
-// ============================================================
-// ⭐ XABAR OVOZI - Web Audio API (Admin-Customer) - TUZATILGAN
-// ============================================================
-function playNotificationSound() {
-    try {
-        // ⭐ AudioContext mavjud bo'lmasa yaratish
-        if (!audioContext) {
-            audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        }
-        
-        // ⭐ Agar audioContext suspended holatda bo'lsa, resume qilish
-        if (audioContext.state === 'suspended') {
-            audioContext.resume();
-        }
-        
-        // ⭐ 1-OVOZ: Qisqa "ding" (800 Hz)
-        var oscillator1 = audioContext.createOscillator();
-        var gain1 = audioContext.createGain();
-        oscillator1.connect(gain1);
-        gain1.connect(audioContext.destination);
-        oscillator1.frequency.value = 880;
-        oscillator1.type = 'sine';
-        gain1.gain.setValueAtTime(0.3, audioContext.currentTime);
-        oscillator1.start(audioContext.currentTime);
-        oscillator1.stop(audioContext.currentTime + 0.15);
-        
-        // ⭐ 2-OVOZ: Balandroq "ding" (1100 Hz)
-        setTimeout(function() {
-            try {
-                var oscillator2 = audioContext.createOscillator();
-                var gain2 = audioContext.createGain();
-                oscillator2.connect(gain2);
-                gain2.connect(audioContext.destination);
-                oscillator2.frequency.value = 1100;
-                oscillator2.type = 'sine';
-                gain2.gain.setValueAtTime(0.25, audioContext.currentTime);
-                oscillator2.start(audioContext.currentTime);
-                oscillator2.stop(audioContext.currentTime + 0.15);
-            } catch (e) {
-                console.warn('⚠️ 2-ovoz xatosi:', e);
-            }
-        }, 200);
-        
-        console.log('🔔 Ovoz chiqdi! (Web Audio)');
-    } catch (error) {
-        console.warn('⚠️ Ovoz chiqarish xatosi:', error);
     }
 }
 
@@ -350,14 +405,14 @@ async function loadDashboardStats() {
             }
         }
 
-        console.log('✅ Dashboard statistikasi yuklandi! (Admin-Customer)');
+        console.log('✅ Dashboard statistikasi yuklandi!');
     } catch (error) {
         console.error('❌ Statistikani yuklash xatosi:', error);
     }
 }
 
 // ============================================================
-// COUNTDOWN - REAL TIME (Admin-Customer)
+// COUNTDOWN - REAL TIME
 // ============================================================
 function startCountdown() {
     if (countdownInterval) {
@@ -413,7 +468,7 @@ function updateCountdown() {
 }
 
 // ============================================================
-// VAQTNI FORMATLASH (Admin-Customer)
+// VAQTNI FORMATLASH
 // ============================================================
 function formatDateTime(date) {
     if (!date) return 'Noma\'lum vaqt';
@@ -436,7 +491,7 @@ function formatDateTime(date) {
 }
 
 // ============================================================
-// XATOLIK VA MUVAFFAQIYAT XABARLARI (Admin-Customer)
+// XATOLIK VA MUVAFFAQIYAT XABARLARI
 // ============================================================
 function showError(msg) {
     console.error('⚠️ Xatolik:', msg);
@@ -457,7 +512,7 @@ function showSuccess(msg) {
 }
 
 // ============================================================
-// CLEANUP (Admin-Customer)
+// CLEANUP
 // ============================================================
 window.addEventListener('beforeunload', function() {
     if (refreshInterval) {
