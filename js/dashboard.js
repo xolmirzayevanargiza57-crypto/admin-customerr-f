@@ -1,5 +1,5 @@
 // ============================================================
-// DASHBOARD - ADMIN-CUSTOMER (TO'LIQ TUZATILGAN)
+// DASHBOARD - ADMIN-CUSTOMER (TO'LIQ)
 // Loyiha: Admin-Customer Frontend
 // Fayl: js/dashboard.js
 // ============================================================
@@ -11,41 +11,37 @@ let countdownInterval = null;
 let profileCheckInterval = null;
 let notificationCheckInterval = null;
 let lastUnreadCount = 0;
-let notificationSound = null;
 
 // ============================================================
-// SAHIFA YUKLANGANDA
+// SAHIFA YUKLANGANDA (Admin-Customer)
 // ============================================================
-document.addEventListener('DOMContentLoaded', async () => {
-    if (dashboardLoaded) {
-        console.log('⚠️ Dashboard allaqachon yuklangan');
-        return;
-    }
+document.addEventListener('DOMContentLoaded', function() {
+    if (dashboardLoaded) return;
     dashboardLoaded = true;
 
-    console.log('🚀 Dashboard yuklanmoqda...');
+    console.log('🚀 Dashboard yuklanmoqda... (Admin-Customer)');
 
     try {
-        const token = localStorage.getItem('customerToken') || sessionStorage.getItem('customerToken');
+        var token = localStorage.getItem('customerToken') || sessionStorage.getItem('customerToken');
         if (!token) {
             window.location.replace('index.html');
             return;
         }
 
-        const user = Auth.getUser();
+        var user = Auth.getUser();
         if (user) {
-            const nameEl = document.getElementById('userName');
-            const initialEl = document.getElementById('userInitial');
-            const schoolEl = document.getElementById('schoolName');
+            var nameEl = document.getElementById('userName');
+            var initialEl = document.getElementById('userInitial');
+            var schoolEl = document.getElementById('schoolName');
             if (nameEl) nameEl.textContent = Auth.getUserName();
             if (initialEl) initialEl.textContent = Auth.getUserInitial();
             if (schoolEl) schoolEl.textContent = user.schoolName || 'Nurli Ta\'lim Markazi';
         }
 
-        // LOGOUT TUGMASI
-        const logoutBtn = document.getElementById('logoutBtn');
+        // ⭐ LOGOUT TUGMASI
+        var logoutBtn = document.getElementById('logoutBtn');
         if (logoutBtn) {
-            const newLogoutBtn = logoutBtn.cloneNode(true);
+            var newLogoutBtn = logoutBtn.cloneNode(true);
             logoutBtn.parentNode.replaceChild(newLogoutBtn, logoutBtn);
             newLogoutBtn.addEventListener('click', function(e) {
                 e.preventDefault();
@@ -56,40 +52,31 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
         }
 
-        // ⭐ XABAR BADGE NI YANGILASH (BIRINCHI MARTA)
-        await updateNotificationBadge();
+        // ⭐ XABAR BADGE NI YANGILASH
+        updateNotificationBadge();
 
-        // Dashboard statistikasini yuklash
-        await loadDashboardStats();
+        // ⭐ DASHBOARD STATISTIKASINI YUKLASH
+        loadDashboardStats();
 
-        // HAR 60 SONIYADA YANGILASH
-        refreshInterval = setInterval(() => {
+        // ⭐ HAR 60 SONIYADA YANGILASH
+        refreshInterval = setInterval(function() {
             loadDashboardStats();
         }, 60000);
 
-        // ⭐ HAR 3 SONIYADA XABAR BADGE NI YANGILASH (REAL TIME - ABADIY ISHLAYDI)
-        if (notificationCheckInterval) {
-            clearInterval(notificationCheckInterval);
-            notificationCheckInterval = null;
-        }
-        notificationCheckInterval = setInterval(() => {
+        // ⭐ HAR 5 SONIYADA XABAR BADGE NI YANGILASH
+        notificationCheckInterval = setInterval(function() {
             updateNotificationBadge();
-        }, 3000);
+        }, 5000);
 
-        // HAR 30 SONIYADA PROFIL O'ZGARGANMI TEKSHIRISH
-        profileCheckInterval = setInterval(async () => {
-            const result = await Auth.checkAuth();
-            if (!result || result.valid !== true) {
-                const reason = result?.reason || 'unknown';
-                if (['email_changed', 'status_changed', 'subscription_changed', 'token_invalid'].includes(reason)) {
-                    console.warn('⚠️ Profil o\'zgargan, logout...', reason);
-                }
-            }
+        // ⭐ HAR 30 SONIYADA PROFIL O'ZGARGANMI TEKSHIRISH
+        profileCheckInterval = setInterval(async function() {
+            await Auth.checkAuth();
         }, 30000);
 
+        // ⭐ COUNTDOWN
         startCountdown();
 
-        console.log('✅ Dashboard yuklandi!');
+        console.log('✅ Dashboard yuklandi! (Admin-Customer)');
     } catch (error) {
         console.error('❌ Dashboard yuklash xatosi:', error);
         showError('Dashboard yuklashda xatolik: ' + error.message);
@@ -97,48 +84,37 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 // ============================================================
-// ⭐ XABAR BADGE NI YANGILASH (ABADIY ISHLAYDI - Admin-Customer)
+// ⭐ XABAR BADGE NI YANGILASH (Admin-Customer)
 // ============================================================
 async function updateNotificationBadge() {
     try {
-        const token = Auth.getToken();
-        if (!token) {
-            console.log('⚠️ Token topilmadi, badge yangilanmadi');
-            return;
-        }
+        var token = Auth.getToken();
+        if (!token) return;
 
-        const response = await API.getNotifications();
-        console.log('📨 Badge uchun xabarlar:', response);
-
+        var response = await API.getNotifications();
+        
         if (response.success && response.data) {
-            // ⭐ FAQAT O'ZIGA KELGAN XABARLARNI FILTRLASH
-            const user = Auth.getUser();
-            const userId = user?._id;
+            var user = Auth.getUser();
+            var userId = user?._id;
             
-            // ⭐ TO'G'RI FILTR: FAQAT O'ZIGA KELGAN XABARLAR
-            const myNotifications = response.data.filter(n => {
-                // Agar recipientId mavjud bo'lsa, faqat o'ziga kelganlar
+            // ⭐ FAQAT O'ZIGA KELGAN XABARLAR
+            var myNotifications = response.data.filter(function(n) {
                 if (n.recipientId) {
                     return String(n.recipientId) === String(userId);
                 }
-                // recipientId bo'lmasa, recipientRole tekshiriladi
                 return n.recipientRole === 'all' || n.recipientRole === 'admin_customer';
             });
             
-            // ⭐ O'QILMAGAN XABARLAR SONI
-            const unreadCount = myNotifications.filter(n => !n.isRead).length;
-            
-            console.log(`🔔 O'qilmagan xabarlar soni: ${unreadCount} (Jami: ${myNotifications.length})`);
+            var unreadCount = myNotifications.filter(function(n) { return !n.isRead; }).length;
 
             // ⭐ HEADER DAGI BADGE
-            const badge = document.getElementById('notificationBadge');
+            var badge = document.getElementById('notificationBadge');
             if (badge) {
                 if (unreadCount > 0) {
                     badge.style.display = 'block';
                     badge.textContent = unreadCount > 99 ? '99+' : unreadCount;
-                    // Qizil rangda animatsiya
                     badge.style.animation = 'none';
-                    setTimeout(() => {
+                    setTimeout(function() {
                         badge.style.animation = 'badgePulse 0.5s ease';
                     }, 10);
                 } else {
@@ -147,7 +123,7 @@ async function updateNotificationBadge() {
             }
 
             // ⭐ SIDEBAR DAGI BADGE
-            const sidebarBadge = document.getElementById('sidebarBadge');
+            var sidebarBadge = document.getElementById('sidebarBadge');
             if (sidebarBadge) {
                 if (unreadCount > 0) {
                     sidebarBadge.style.display = 'inline';
@@ -157,14 +133,12 @@ async function updateNotificationBadge() {
                 }
             }
 
-            // ⭐ YANGI XABAR KELGANDA OVOZ CHIQARISH VA XABAR KO'RSATISH
+            // ⭐ YANGI XABAR KELGANDA OVOZ VA TOAST
             if (unreadCount > lastUnreadCount && lastUnreadCount > 0) {
                 playNotificationSound();
-                // Yangi xabar kelganligi haqida xabar ko'rsatish
-                showNotificationToast(`🔔 ${unreadCount - lastUnreadCount} ta yangi xabar keldi!`);
+                showNotificationToast('🔔 ' + (unreadCount - lastUnreadCount) + ' ta yangi xabar keldi!');
             }
             
-            // ⭐ LAST UNREAD COUNT NI YANGILASH (MUHIM!)
             lastUnreadCount = unreadCount;
         }
     } catch (error) {
@@ -173,72 +147,13 @@ async function updateNotificationBadge() {
 }
 
 // ============================================================
-// ⭐ XABAR TOAST (OGOHLANTIRISH)
-// ============================================================
-function showNotificationToast(message) {
-    const existingToast = document.querySelector('.notification-toast');
-    if (existingToast) {
-        existingToast.remove();
-    }
-
-    const toast = document.createElement('div');
-    toast.className = 'notification-toast';
-    toast.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        z-index: 99999;
-        background: #007aff;
-        color: white;
-        padding: 16px 24px;
-        border-radius: 12px;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-        font-size: 0.95rem;
-        max-width: 400px;
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        animation: slideDown 0.5s ease;
-        cursor: pointer;
-        font-family: 'Inter', sans-serif;
-    `;
-    toast.innerHTML = `
-        <i class="fas fa-bell" style="font-size: 1.2rem;"></i>
-        <span>${message}</span>
-        <button onclick="this.parentElement.remove()" style="background:none;border:none;color:white;font-size:1.2rem;cursor:pointer;margin-left:auto;">×</button>
-    `;
-    
-    // Toast ga bosganda notifications sahifasiga o'tish
-    toast.addEventListener('click', function(e) {
-        if (e.target.tagName !== 'BUTTON') {
-            window.location.href = 'notifications.html';
-        }
-    });
-
-    document.body.appendChild(toast);
-
-    // 5 soniyadan keyin o'chirish
-    setTimeout(() => {
-        if (toast.parentElement) {
-            toast.style.opacity = '0';
-            toast.style.transition = 'opacity 0.5s';
-            setTimeout(() => {
-                if (toast.parentElement) {
-                    toast.remove();
-                }
-            }, 500);
-        }
-    }, 5000);
-}
-
-// ============================================================
 // ⭐ XABAR OVOZI (Admin-Customer)
 // ============================================================
 function playNotificationSound() {
     try {
-        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        const oscillator = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
+        var audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        var oscillator = audioContext.createOscillator();
+        var gainNode = audioContext.createGain();
         
         oscillator.connect(gainNode);
         gainNode.connect(audioContext.destination);
@@ -248,28 +163,59 @@ function playNotificationSound() {
         gainNode.gain.value = 0.3;
         
         oscillator.start();
-        setTimeout(() => {
+        setTimeout(function() {
             oscillator.stop();
         }, 200);
         
-        setTimeout(() => {
-            const osc2 = audioContext.createOscillator();
-            const gain2 = audioContext.createGain();
+        setTimeout(function() {
+            var osc2 = audioContext.createOscillator();
+            var gain2 = audioContext.createGain();
             osc2.connect(gain2);
             gain2.connect(audioContext.destination);
             osc2.frequency.value = 1000;
             osc2.type = 'sine';
             gain2.gain.value = 0.3;
             osc2.start();
-            setTimeout(() => {
+            setTimeout(function() {
                 osc2.stop();
             }, 150);
         }, 250);
-        
-        console.log('🔔 Yangi xabar ovoz chiqardi!');
     } catch (error) {
         console.log('⚠️ Ovoz chiqarish xatosi:', error);
     }
+}
+
+// ============================================================
+// ⭐ TOAST XABAR (Admin-Customer)
+// ============================================================
+function showNotificationToast(message) {
+    var existing = document.querySelector('.notification-toast');
+    if (existing) existing.remove();
+
+    var toast = document.createElement('div');
+    toast.className = 'notification-toast';
+    toast.innerHTML = `
+        <i class="fas fa-bell" style="font-size: 1.2rem;"></i>
+        <span>${message}</span>
+        <button onclick="this.parentElement.remove()">×</button>
+    `;
+    toast.addEventListener('click', function(e) {
+        if (e.target.tagName !== 'BUTTON') {
+            window.location.href = 'notifications.html';
+        }
+    });
+
+    document.body.appendChild(toast);
+
+    setTimeout(function() {
+        if (toast.parentElement) {
+            toast.style.opacity = '0';
+            toast.style.transition = 'opacity 0.5s';
+            setTimeout(function() {
+                if (toast.parentElement) toast.remove();
+            }, 500);
+        }
+    }, 5000);
 }
 
 // ============================================================
@@ -277,9 +223,7 @@ function playNotificationSound() {
 // ============================================================
 async function loadDashboardStats() {
     try {
-        console.log('📊 Statistika yuklanmoqda...');
-        const data = await API.getDashboardStats();
-        console.log('📊 Statistika javobi:', data);
+        var data = await API.getDashboardStats();
 
         if (!data.success) {
             if (data.status === 401 || data.status === 403) {
@@ -287,15 +231,13 @@ async function loadDashboardStats() {
                 return;
             }
             console.error('❌ Statistika xatosi:', data.message);
-            showError('Ma\'lumotlarni yuklashda xatolik: ' + data.message);
             return;
         }
 
-        const stats = data.data;
+        var stats = data.data;
         lastDashboardStats = stats;
-        console.log('📊 Statistika ma\'lumotlari:', stats);
 
-        const elements = {
+        var elements = {
             teacherCount: document.getElementById('teacherCount'),
             studentCount: document.getElementById('studentCount'),
             totalXP: document.getElementById('totalXP'),
@@ -315,33 +257,33 @@ async function loadDashboardStats() {
         if (elements.totalXP) elements.totalXP.textContent = stats.totalXP || 0;
         if (elements.todayAttendance) elements.todayAttendance.textContent = stats.todayAttendance || 0;
 
-        const present = stats.attendanceStats?.present || 0;
-        const absentReason = stats.attendanceStats?.absent_reason || 0;
-        const absent = stats.attendanceStats?.absent || 0;
+        var present = stats.attendanceStats?.present || 0;
+        var absentReason = stats.attendanceStats?.absent_reason || 0;
+        var absent = stats.attendanceStats?.absent || 0;
 
         if (elements.presentCount) elements.presentCount.textContent = present;
         if (elements.absentReasonCount) elements.absentReasonCount.textContent = absentReason;
         if (elements.absentCount) elements.absentCount.textContent = absent;
 
-        const total = present + absentReason + absent;
+        var total = present + absentReason + absent;
         if (elements.attendancePercent) {
             if (total > 0) {
-                const percent = Math.round((present / total) * 100);
-                elements.attendancePercent.textContent = `${percent}%`;
-                elements.attendancePercent.className = `stat-change ${percent >= 70 ? 'positive' : 'negative'}`;
+                var percent = Math.round((present / total) * 100);
+                elements.attendancePercent.textContent = percent + '%';
+                elements.attendancePercent.className = 'stat-change ' + (percent >= 70 ? 'positive' : 'negative');
             } else {
                 elements.attendancePercent.textContent = '0%';
             }
         }
 
-        // SUBSCRIPTION
+        // ⭐ SUBSCRIPTION
         if (stats.subscription) {
-            const sub = stats.subscription;
-            const statusMap = { 'active': '✅ Faol', 'inactive': '⛔ Faol emas', 'expired': '⚠️ Muddati tugagan' };
+            var sub = stats.subscription;
+            var statusMap = { 'active': '✅ Faol', 'inactive': '⛔ Faol emas', 'expired': '⚠️ Muddati tugagan' };
             if (elements.subscriptionStatus) {
                 elements.subscriptionStatus.textContent = statusMap[sub.status] || sub.status || 'Noma\'lum';
             }
-            const typeMap = { 'monthly': '📅 Oylik', '6months': '📅 6 oylik', 'yearly': '📅 Yillik', 'custom': '⚙️ Custom', 'none': '❌ Yo\'q' };
+            var typeMap = { 'monthly': '📅 Oylik', '6months': '📅 6 oylik', 'yearly': '📅 Yillik', 'custom': '⚙️ Custom', 'none': '❌ Yo\'q' };
             if (elements.subscriptionType) {
                 elements.subscriptionType.textContent = typeMap[sub.type] || sub.type || 'Noma\'lum';
             }
@@ -358,28 +300,16 @@ async function loadDashboardStats() {
                 if (!sub.endDate) {
                     elements.subscriptionDays.textContent = '-';
                 } else {
-                    let endDate = null;
-                    if (typeof sub.endDate === 'string' && sub.endDate.includes('M01')) {
-                        const parts = sub.endDate.split(' ');
-                        if (parts.length === 4) {
-                            const year = parts[0];
-                            const month = parts[1].replace('M', '').padStart(2, '0');
-                            const day = parts[2].padStart(2, '0');
-                            const time = parts[3];
-                            endDate = new Date(`${year}-${month}-${day}T${time}`);
-                        }
-                    } else {
-                        endDate = new Date(sub.endDate);
-                    }
-                    if (endDate && !isNaN(endDate.getTime())) {
-                        const now = new Date();
-                        const diff = endDate - now;
+                    var endDate = new Date(sub.endDate);
+                    if (!isNaN(endDate.getTime())) {
+                        var now = new Date();
+                        var diff = endDate - now;
                         if (diff > 0) {
-                            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-                            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-                            elements.subscriptionDays.textContent = `${days} kun ${hours}s ${minutes}m ${seconds}s`;
+                            var days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                            var hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                            var minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                            var seconds = Math.floor((diff % (1000 * 60)) / 1000);
+                            elements.subscriptionDays.textContent = days + ' kun ' + hours + 's ' + minutes + 'm ' + seconds + 's';
                         } else {
                             elements.subscriptionDays.textContent = '⚠️ Vaqt tugagan!';
                         }
@@ -390,10 +320,9 @@ async function loadDashboardStats() {
             }
         }
 
-        console.log('✅ Dashboard statistikasi yuklandi!');
+        console.log('✅ Dashboard statistikasi yuklandi! (Admin-Customer)');
     } catch (error) {
         console.error('❌ Statistikani yuklash xatosi:', error);
-        showError('Ma\'lumotlarni yuklashda xatolik: ' + error.message);
     }
 }
 
@@ -405,16 +334,16 @@ function startCountdown() {
         clearInterval(countdownInterval);
         countdownInterval = null;
     }
-    countdownInterval = setInterval(() => {
+    countdownInterval = setInterval(function() {
         updateCountdown();
     }, 1000);
 }
 
 function updateCountdown() {
-    const daysEl = document.getElementById('subscriptionDays');
-    const endEl = document.getElementById('subscriptionEnd');
+    var daysEl = document.getElementById('subscriptionDays');
+    var endEl = document.getElementById('subscriptionEnd');
     if (!daysEl || !lastDashboardStats || !lastDashboardStats.subscription) return;
-    const sub = lastDashboardStats.subscription;
+    var sub = lastDashboardStats.subscription;
 
     if (endEl) {
         if (sub.formattedEndDate) {
@@ -431,39 +360,26 @@ function updateCountdown() {
         return;
     }
 
-    let endDate = null;
-    if (typeof sub.endDate === 'string' && sub.endDate.includes('M01')) {
-        const parts = sub.endDate.split(' ');
-        if (parts.length === 4) {
-            const year = parts[0];
-            const month = parts[1].replace('M', '').padStart(2, '0');
-            const day = parts[2].padStart(2, '0');
-            const time = parts[3];
-            endDate = new Date(`${year}-${month}-${day}T${time}`);
-        }
-    } else {
-        endDate = new Date(sub.endDate);
-    }
-
-    if (!endDate || isNaN(endDate.getTime())) {
+    var endDate = new Date(sub.endDate);
+    if (isNaN(endDate.getTime())) {
         daysEl.textContent = '-';
         return;
     }
 
-    const now = new Date();
-    const diff = endDate - now;
+    var now = new Date();
+    var diff = endDate - now;
 
     if (diff <= 0) {
         daysEl.textContent = '⚠️ Vaqt tugagan!';
         return;
     }
 
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+    var days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    var hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    var minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    var seconds = Math.floor((diff % (1000 * 60)) / 1000);
 
-    daysEl.textContent = `${days} kun ${hours}s ${minutes}m ${seconds}s`;
+    daysEl.textContent = days + ' kun ' + hours + 's ' + minutes + 'm ' + seconds + 's';
 }
 
 // ============================================================
@@ -472,7 +388,7 @@ function updateCountdown() {
 function formatDateTime(date) {
     if (!date) return 'Noma\'lum vaqt';
     try {
-        const d = new Date(date);
+        var d = new Date(date);
         if (isNaN(d.getTime())) return 'Noma\'lum vaqt';
         return d.toLocaleString('uz-UZ', {
             timeZone: 'Asia/Tashkent',
@@ -494,48 +410,20 @@ function formatDateTime(date) {
 // ============================================================
 function showError(msg) {
     console.error('⚠️ Xatolik:', msg);
-    
-    const div = document.createElement('div');
-    div.style.cssText = `
-        position: fixed; top: 20px; right: 20px; z-index: 9999;
-        padding: 14px 18px; background: #fef2f2;
-        border: 1px solid #fecaca; border-radius: 10px;
-        color: #dc2626; max-width: 400px;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-        display: flex; align-items: center; gap: 10px;
-        font-size: 0.85rem;
-        z-index: 10000;
-    `;
-    div.innerHTML = `
-        <i class="fas fa-exclamation-circle"></i>
-        <span>${msg}</span>
-        <button onclick="this.parentElement.remove()" style="margin-left: auto; background: none; border: none; color: #dc2626; cursor: pointer; font-size: 1.1rem;">×</button>
-    `;
+    var div = document.createElement('div');
+    div.style.cssText = 'position:fixed;top:20px;right:20px;z-index:9999;padding:14px 18px;background:#fef2f2;border:1px solid #fecaca;border-radius:10px;color:#dc2626;max-width:400px;box-shadow:0 10px 40px rgba(0,0,0,0.1);display:flex;align-items:center;gap:10px;font-size:0.85rem;z-index:10000;';
+    div.innerHTML = '<i class="fas fa-exclamation-circle"></i><span>' + msg + '</span><button onclick="this.parentElement.remove()" style="margin-left:auto;background:none;border:none;color:#dc2626;cursor:pointer;font-size:1.1rem;">×</button>';
     document.body.appendChild(div);
-    setTimeout(() => div.remove(), 8000);
+    setTimeout(function() { if (div.parentElement) div.remove(); }, 5000);
 }
 
 function showSuccess(msg) {
     console.log('✅ Muvaffaqiyat:', msg);
-    
-    const div = document.createElement('div');
-    div.style.cssText = `
-        position: fixed; top: 20px; right: 20px; z-index: 9999;
-        padding: 14px 18px; background: #ecfdf5;
-        border: 1px solid #a7f3d0; border-radius: 10px;
-        color: #065f46; max-width: 400px;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-        display: flex; align-items: center; gap: 10px;
-        font-size: 0.85rem;
-        z-index: 10000;
-    `;
-    div.innerHTML = `
-        <i class="fas fa-check-circle"></i>
-        <span>${msg}</span>
-        <button onclick="this.parentElement.remove()" style="margin-left: auto; background: none; border: none; color: #065f46; cursor: pointer; font-size: 1.1rem;">×</button>
-    `;
+    var div = document.createElement('div');
+    div.style.cssText = 'position:fixed;top:20px;right:20px;z-index:9999;padding:14px 18px;background:#ecfdf5;border:1px solid #a7f3d0;border-radius:10px;color:#065f46;max-width:400px;box-shadow:0 10px 40px rgba(0,0,0,0.1);display:flex;align-items:center;gap:10px;font-size:0.85rem;z-index:10000;';
+    div.innerHTML = '<i class="fas fa-check-circle"></i><span>' + msg + '</span><button onclick="this.parentElement.remove()" style="margin-left:auto;background:none;border:none;color:#065f46;cursor:pointer;font-size:1.1rem;">×</button>';
     document.body.appendChild(div);
-    setTimeout(() => div.remove(), 3000);
+    setTimeout(function() { if (div.parentElement) div.remove(); }, 3000);
 }
 
 // ============================================================
@@ -560,18 +448,13 @@ window.addEventListener('beforeunload', function() {
     }
 });
 
-// ⭐ BADGE PULSE ANIMATSIYASI (Admin-Customer)
-const style = document.createElement('style');
+// ⭐ BADGE PULSE ANIMATSIYASI
+var style = document.createElement('style');
 style.textContent = `
     @keyframes badgePulse {
         0% { transform: scale(1); }
         50% { transform: scale(1.3); }
         100% { transform: scale(1); }
-    }
-    
-    @keyframes slideDown {
-        from { opacity: 0; transform: translateY(-20px); }
-        to { opacity: 1; transform: translateY(0); }
     }
 `;
 document.head.appendChild(style);
