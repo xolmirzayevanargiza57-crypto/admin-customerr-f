@@ -133,9 +133,9 @@ async function updateNotificationBadge() {
                 }
             }
 
-            // ⭐ YANGI XABAR KELGANDA OVOZ VA TOAST
+            // ⭐ YANGI XABAR KELGANDA OVOZ CHIQARISH
             if (unreadCount > lastUnreadCount && lastUnreadCount > 0) {
-                playNotificationSound();
+                playNotificationSound();  // ⬅️ OVOZ SHU YERDA
                 showNotificationToast('🔔 ' + (unreadCount - lastUnreadCount) + ' ta yangi xabar keldi!');
             }
             
@@ -147,39 +147,42 @@ async function updateNotificationBadge() {
 }
 
 // ============================================================
-// ⭐ XABAR OVOZI (Admin-Customer)
+// ⭐ XABAR OVOZI - Web Audio API (Admin-Customer)
 // ============================================================
 function playNotificationSound() {
     try {
+        // ⭐ Audio kontekst yaratish
         var audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        var oscillator = audioContext.createOscillator();
-        var gainNode = audioContext.createGain();
         
-        oscillator.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-        
-        oscillator.frequency.value = 800;
-        oscillator.type = 'sine';
-        gainNode.gain.value = 0.3;
-        
-        oscillator.start();
+        // ⭐ 1-OVOZ: Qisqa "ding" (800 Hz)
+        var oscillator1 = audioContext.createOscillator();
+        var gain1 = audioContext.createGain();
+        oscillator1.connect(gain1);
+        gain1.connect(audioContext.destination);
+        oscillator1.frequency.value = 800;
+        oscillator1.type = 'sine';
+        gain1.gain.value = 0.3;
+        oscillator1.start();
         setTimeout(function() {
-            oscillator.stop();
+            oscillator1.stop();
+        }, 150);
+        
+        // ⭐ 2-OVOZ: Balandroq "ding" (1000 Hz) - 200ms keyin
+        setTimeout(function() {
+            var oscillator2 = audioContext.createOscillator();
+            var gain2 = audioContext.createGain();
+            oscillator2.connect(gain2);
+            gain2.connect(audioContext.destination);
+            oscillator2.frequency.value = 1000;
+            oscillator2.type = 'sine';
+            gain2.gain.value = 0.3;
+            oscillator2.start();
+            setTimeout(function() {
+                oscillator2.stop();
+            }, 150);
         }, 200);
         
-        setTimeout(function() {
-            var osc2 = audioContext.createOscillator();
-            var gain2 = audioContext.createGain();
-            osc2.connect(gain2);
-            gain2.connect(audioContext.destination);
-            osc2.frequency.value = 1000;
-            osc2.type = 'sine';
-            gain2.gain.value = 0.3;
-            osc2.start();
-            setTimeout(function() {
-                osc2.stop();
-            }, 150);
-        }, 250);
+        console.log('🔔 Ovoz chiqdi! (Web Audio)');
     } catch (error) {
         console.log('⚠️ Ovoz chiqarish xatosi:', error);
     }
