@@ -1,5 +1,5 @@
 // ============================================================
-// DASHBOARD - ADMIN-CUSTOMER (TO'LIQ)
+// DASHBOARD - ADMIN-CUSTOMER (TO'LIQ TUZATILGAN)
 // Loyiha: Admin-Customer Frontend
 // Fayl: js/dashboard.js
 // ============================================================
@@ -11,6 +11,7 @@ let countdownInterval = null;
 let profileCheckInterval = null;
 let notificationCheckInterval = null;
 let lastUnreadCount = 0;
+let audioContext = null;
 
 // ============================================================
 // SAHIFA YUKLANGANDA (Admin-Customer)
@@ -52,6 +53,18 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
 
+        // ⭐ AUDIO CONTEXT NI TAYYORLASH (user interaction bilan)
+        document.addEventListener('click', function() {
+            if (!audioContext) {
+                try {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    console.log('✅ AudioContext tayyor');
+                } catch (e) {
+                    console.warn('⚠️ AudioContext xatosi:', e);
+                }
+            }
+        }, { once: true });
+
         // ⭐ XABAR BADGE NI YANGILASH
         updateNotificationBadge();
 
@@ -63,10 +76,10 @@ document.addEventListener('DOMContentLoaded', function() {
             loadDashboardStats();
         }, 60000);
 
-        // ⭐ HAR 5 SONIYADA XABAR BADGE NI YANGILASH
+        // ⭐ HAR 3 SONIYADA XABAR BADGE NI YANGILASH (real-time)
         notificationCheckInterval = setInterval(function() {
             updateNotificationBadge();
-        }, 5000);
+        }, 3000);
 
         // ⭐ HAR 30 SONIYADA PROFIL O'ZGARGANMI TEKSHIRISH
         profileCheckInterval = setInterval(async function() {
@@ -84,7 +97,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // ============================================================
-// ⭐ XABAR BADGE NI YANGILASH (Admin-Customer)
+// ⭐ XABAR BADGE NI YANGILASH (Admin-Customer) - TUZATILGAN
 // ============================================================
 async function updateNotificationBadge() {
     try {
@@ -99,13 +112,18 @@ async function updateNotificationBadge() {
             
             // ⭐ FAQAT O'ZIGA KELGAN XABARLAR
             var myNotifications = response.data.filter(function(n) {
+                // Agar recipientId mavjud bo'lsa, faqat o'ziga kelganlar
                 if (n.recipientId) {
                     return String(n.recipientId) === String(userId);
                 }
+                // recipientId bo'lmasa, recipientRole tekshiriladi
                 return n.recipientRole === 'all' || n.recipientRole === 'admin_customer';
             });
             
+            // ⭐ O'QILMAGAN XABARLAR SONI
             var unreadCount = myNotifications.filter(function(n) { return !n.isRead; }).length;
+            
+            console.log('🔔 O\'qilmagan xabarlar soni:', unreadCount, '(Jami:', myNotifications.length, ')');
 
             // ⭐ HEADER DAGI BADGE
             var badge = document.getElementById('notificationBadge');
@@ -133,12 +151,14 @@ async function updateNotificationBadge() {
                 }
             }
 
-            // ⭐ YANGI XABAR KELGANDA OVOZ CHIQARISH
+            // ⭐ YANGI XABAR KELGANDA OVOZ CHIQARISH (faqat unreadCount oshsa)
             if (unreadCount > lastUnreadCount && lastUnreadCount > 0) {
-                playNotificationSound();  // ⬅️ OVOZ SHU YERDA
-                showNotificationToast('🔔 ' + (unreadCount - lastUnreadCount) + ' ta yangi xabar keldi!');
+                playNotificationSound();
+                var diff = unreadCount - lastUnreadCount;
+                showNotificationToast('🔔 ' + diff + ' ta yangi xabar keldi!');
             }
             
+            // ⭐ LAST UNREAD COUNT NI YANGILASH
             lastUnreadCount = unreadCount;
         }
     } catch (error) {
@@ -147,44 +167,51 @@ async function updateNotificationBadge() {
 }
 
 // ============================================================
-// ⭐ XABAR OVOZI - Web Audio API (Admin-Customer)
+// ⭐ XABAR OVOZI - Web Audio API (Admin-Customer) - TUZATILGAN
 // ============================================================
 function playNotificationSound() {
     try {
-        // ⭐ Audio kontekst yaratish
-        var audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        // ⭐ AudioContext mavjud bo'lmasa yaratish
+        if (!audioContext) {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        
+        // ⭐ Agar audioContext suspended holatda bo'lsa, resume qilish
+        if (audioContext.state === 'suspended') {
+            audioContext.resume();
+        }
         
         // ⭐ 1-OVOZ: Qisqa "ding" (800 Hz)
         var oscillator1 = audioContext.createOscillator();
         var gain1 = audioContext.createGain();
         oscillator1.connect(gain1);
         gain1.connect(audioContext.destination);
-        oscillator1.frequency.value = 800;
+        oscillator1.frequency.value = 880;
         oscillator1.type = 'sine';
-        gain1.gain.value = 0.3;
-        oscillator1.start();
-        setTimeout(function() {
-            oscillator1.stop();
-        }, 150);
+        gain1.gain.setValueAtTime(0.3, audioContext.currentTime);
+        oscillator1.start(audioContext.currentTime);
+        oscillator1.stop(audioContext.currentTime + 0.15);
         
-        // ⭐ 2-OVOZ: Balandroq "ding" (1000 Hz) - 200ms keyin
+        // ⭐ 2-OVOZ: Balandroq "ding" (1100 Hz)
         setTimeout(function() {
-            var oscillator2 = audioContext.createOscillator();
-            var gain2 = audioContext.createGain();
-            oscillator2.connect(gain2);
-            gain2.connect(audioContext.destination);
-            oscillator2.frequency.value = 1000;
-            oscillator2.type = 'sine';
-            gain2.gain.value = 0.3;
-            oscillator2.start();
-            setTimeout(function() {
-                oscillator2.stop();
-            }, 150);
+            try {
+                var oscillator2 = audioContext.createOscillator();
+                var gain2 = audioContext.createGain();
+                oscillator2.connect(gain2);
+                gain2.connect(audioContext.destination);
+                oscillator2.frequency.value = 1100;
+                oscillator2.type = 'sine';
+                gain2.gain.setValueAtTime(0.25, audioContext.currentTime);
+                oscillator2.start(audioContext.currentTime);
+                oscillator2.stop(audioContext.currentTime + 0.15);
+            } catch (e) {
+                console.warn('⚠️ 2-ovoz xatosi:', e);
+            }
         }, 200);
         
         console.log('🔔 Ovoz chiqdi! (Web Audio)');
     } catch (error) {
-        console.log('⚠️ Ovoz chiqarish xatosi:', error);
+        console.warn('⚠️ Ovoz chiqarish xatosi:', error);
     }
 }
 
