@@ -1,7 +1,5 @@
 // ============================================================
-// NOTIFICATIONS - ADMIN-CUSTOMER (TO'LIQ TUZATILGAN)
-// Loyiha: Admin-Customer Frontend
-// Fayl: js/notifications.js
+// NOTIFICATIONS - ADMIN-CUSTOMER (REAL TIME)
 // ============================================================
 
 let allNotifications = [];
@@ -9,28 +7,23 @@ let currentFilter = 'all';
 let refreshInterval = null;
 let lastUnreadCount = 0;
 let audioContext = null;
-let soundEnabled = true;
 
 // ============================================================
-// ⭐ OVOZ YARATISH (100% ISHLASH UCHUN)
+// ⭐ OVOZ
 // ============================================================
 function createNotificationSound() {
     try {
         if (!audioContext) {
             audioContext = new (window.AudioContext || window.webkitAudioContext)();
         }
-        
         if (audioContext.state === 'suspended') {
             audioContext.resume();
         }
-        
         if (audioContext.state === 'closed') {
             audioContext = new (window.AudioContext || window.webkitAudioContext)();
         }
         
         var now = audioContext.currentTime;
-        
-        // 1-OVOZ: 880 Hz (ding)
         var osc1 = audioContext.createOscillator();
         var gain1 = audioContext.createGain();
         osc1.connect(gain1);
@@ -42,7 +35,6 @@ function createNotificationSound() {
         osc1.start(now);
         osc1.stop(now + 0.2);
         
-        // 2-OVOZ: 1100 Hz (ding) - 150ms keyin
         var osc2 = audioContext.createOscillator();
         var gain2 = audioContext.createGain();
         osc2.connect(gain2);
@@ -54,18 +46,16 @@ function createNotificationSound() {
         osc2.start(now + 0.15);
         osc2.stop(now + 0.35);
         
-        console.log('🔔 Ovoz chiqdi!');
         return true;
     } catch (error) {
-        console.warn('⚠️ Ovoz xatosi:', error);
         return false;
     }
 }
 
 function playNotificationSound() {
-    if (!soundEnabled) return;
-    if (createNotificationSound()) return;
-    setTimeout(function() { createNotificationSound(); }, 100);
+    try {
+        createNotificationSound();
+    } catch (e) {}
 }
 
 function initAudio() {
@@ -75,10 +65,7 @@ function initAudio() {
         if (audioContext.state === 'suspended') {
             audioContext.resume();
         }
-        console.log('✅ AudioContext tayyor');
-    } catch (e) {
-        console.warn('⚠️ AudioContext xatosi:', e);
-    }
+    } catch (e) {}
 }
 
 // ============================================================
@@ -88,13 +75,13 @@ document.addEventListener('DOMContentLoaded', async function() {
     console.log('🚀 Notifications sahifasi yuklanmoqda...');
 
     try {
-        const token = localStorage.getItem('customerToken') || sessionStorage.getItem('customerToken');
+        var token = localStorage.getItem('customerToken') || sessionStorage.getItem('customerToken');
         if (!token) {
             window.location.replace('index.html');
             return;
         }
 
-        const user = Auth.getUser();
+        var user = Auth.getUser();
         if (user) {
             var nameEl = document.getElementById('userName');
             var initialEl = document.getElementById('userInitial');
@@ -102,7 +89,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             if (initialEl) initialEl.textContent = Auth.getUserInitial();
         }
 
-        // ⭐ AUDIO CONTEXT NI TAYYORLASH
+        // ⭐ AUDIO
         var initAudioOnce = function() {
             initAudio();
             document.removeEventListener('click', initAudioOnce);
@@ -112,12 +99,12 @@ document.addEventListener('DOMContentLoaded', async function() {
         document.addEventListener('click', initAudioOnce);
         document.addEventListener('touchstart', initAudioOnce);
         document.addEventListener('keydown', initAudioOnce);
-        setTimeout(function() { initAudio(); }, 5000);
+        setTimeout(initAudio, 3000);
 
         await loadNotifications();
         setupListeners();
 
-        // ⭐ HAR 3 SONIYADA XABARLARNI YANGILASH (REAL TIME)
+        // ⭐ HAR 3 SONIYADA YANGILASH (REAL TIME)
         if (refreshInterval) {
             clearInterval(refreshInterval);
             refreshInterval = null;
@@ -129,52 +116,66 @@ document.addEventListener('DOMContentLoaded', async function() {
         console.log('✅ Notifications sahifasi yuklandi!');
     } catch (error) {
         console.error('❌ Notifications yuklash xatosi:', error);
-        showError('Notifications yuklashda xatolik: ' + error.message);
     }
 });
 
 // ============================================================
-// XABARLARNI YUKLASH (TUZATILGAN)
+// XABARLARNI YUKLASH
 // ============================================================
 async function loadNotifications() {
     try {
-        const token = Auth.getToken();
+        var token = Auth.getToken();
         if (!token) return;
 
-        const response = await API.getNotifications();
-        console.log('📨 Xabarlar javobi:', response);
+        // ⭐ TIMEOUT BILAN (5 sekund)
+        var controller = new AbortController();
+        var timeoutId = setTimeout(function() { controller.abort(); }, 5000);
 
-        if (response.success) {
-            var oldUnread = allNotifications.filter(function(n) { return !n.isRead; }).length;
-            allNotifications = response.data || [];
-            renderNotifications(allNotifications);
-            
-            // ⭐ YANGI XABAR KELGANDA OVOZ
-            var newUnread = allNotifications.filter(function(n) { return !n.isRead; }).length;
-            if (newUnread > oldUnread && oldUnread > 0) {
-                playNotificationSound();
-                var diff = newUnread - oldUnread;
-                showNotificationToast('🔔 ' + diff + ' ta yangi xabar keldi!');
+        try {
+            var response = await fetch(API.baseURL + '/api/notifications', {
+                headers: API.getHeaders(),
+                signal: controller.signal
+            });
+            clearTimeout(timeoutId);
+            var data = await response.json();
+
+            if (data.success) {
+                var oldUnread = allNotifications.filter(function(n) { return !n.isRead; }).length;
+                allNotifications = data.data || [];
+                
+                // ⭐ YANGI XABAR KELGANDA OVOZ
+                var newUnread = allNotifications.filter(function(n) { return !n.isRead; }).length;
+                if (newUnread > oldUnread && oldUnread > 0) {
+                    playNotificationSound();
+                    var diff = newUnread - oldUnread;
+                    showNotificationToast('🔔 ' + diff + ' ta yangi xabar keldi!');
+                }
+                lastUnreadCount = newUnread;
+                
+                renderNotifications(allNotifications);
+            } else {
+                allNotifications = [];
+                renderNotifications([]);
             }
-            lastUnreadCount = newUnread;
-        } else {
-            // ⭐ XATOLIK BO'LSA HAM BO'SH RO'YXAT KO'RSATISH
-            allNotifications = [];
-            renderNotifications([]);
-            if (response.timeout) {
-                showError('Server javob bermadi, mahalliy rejim');
+        } catch (fetchError) {
+            if (fetchError.name === 'AbortError') {
+                console.log('⏱️ Notifications timeout');
+            } else {
+                console.error('❌ Xatolik:', fetchError);
+            }
+            // ⭐ TIMEOUT BO'LSA HAM BO'SH KO'RSAT
+            if (allNotifications.length === 0) {
+                allNotifications = [];
+                renderNotifications([]);
             }
         }
     } catch (error) {
         console.error('❌ Xabarlarni yuklash xatosi:', error);
-        allNotifications = [];
-        renderNotifications([]);
-        showError('Xatolik yuz berdi: ' + (error.message || 'Noma\'lum xatolik'));
     }
 }
 
 // ============================================================
-// ⭐ XABARLARNI KO'RSATISH (FAQAT O'ZIGA KELGANLAR)
+// XABARLARNI KO'RSATISH
 // ============================================================
 function renderNotifications(notifications) {
     var container = document.getElementById('notificationsList');
@@ -183,21 +184,16 @@ function renderNotifications(notifications) {
     var user = Auth.getUser();
     var userId = user?._id;
 
-    console.log('👤 Current userId:', userId);
-    console.log('📨 Barcha xabarlar soni:', notifications ? notifications.length : 0);
-
-    // ⭐ FAQAT O'ZIGA KELGAN XABARLAR
     var filtered = notifications ? notifications.filter(function(n) {
         var recipientIdStr = n.recipientId ? String(n.recipientId) : null;
         var userIdStr = userId ? String(userId) : null;
-        
         if (recipientIdStr && userIdStr) {
             return recipientIdStr === userIdStr;
         }
         return n.recipientRole === 'all' || n.recipientRole === 'admin_customer';
     }) : [];
 
-    // ⭐ SO'NGI 30 KUNLIK XABARLAR
+    // ⭐ SO'NGI 30 KUN
     var thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
     filtered = filtered.filter(function(n) {
@@ -205,9 +201,6 @@ function renderNotifications(notifications) {
         return notifDate >= thirtyDaysAgo;
     });
 
-    console.log('📨 Filtrdan keyin (o\'zimga kelganlar):', filtered.length);
-
-    // ⭐ FILTRLASH
     var filteredByDate = filterByDate(filtered, currentFilter);
 
     if (!filteredByDate || filteredByDate.length === 0) {
@@ -228,7 +221,6 @@ function renderNotifications(notifications) {
         return;
     }
 
-    // ⭐ Xabarlarni sana bo'yicha guruhlash
     var grouped = {};
     filteredByDate.forEach(function(notif) {
         var date = new Date(notif.createdAt);
@@ -286,7 +278,6 @@ function renderNotifications(notifications) {
 
     container.innerHTML = html;
 
-    // ⭐ O'qilgan deb belgilash
     document.querySelectorAll('.btn-read').forEach(function(btn) {
         btn.addEventListener('click', async function() {
             var id = this.dataset.id;
@@ -296,7 +287,7 @@ function renderNotifications(notifications) {
 }
 
 // ============================================================
-// ⭐ VAQTNI FORMATLASH (TOSHKENT VAQTI BILAN)
+// VAQTNI FORMATLASH
 // ============================================================
 function formatDateTimeFull(date) {
     if (!date) return 'Noma\'lum vaqt';
@@ -319,7 +310,7 @@ function formatDateTimeFull(date) {
 }
 
 // ============================================================
-// KUN BO'YICHA FILTRLASH
+// FILTRLASH
 // ============================================================
 function filterByDate(notifications, filter) {
     var now = new Date();
@@ -331,7 +322,6 @@ function filterByDate(notifications, filter) {
 
     return notifications.filter(function(notif) {
         var notifDate = new Date(notif.createdAt);
-        
         switch (filter) {
             case 'today': return notifDate >= today;
             case 'week': return notifDate >= weekAgo;
@@ -344,7 +334,7 @@ function filterByDate(notifications, filter) {
 }
 
 // ============================================================
-// XABARNI O'QILGAN DEB BELGILASH
+// O'QILGAN DEB BELGILASH
 // ============================================================
 async function markAsRead(id) {
     try {
@@ -362,7 +352,7 @@ async function markAsRead(id) {
 }
 
 // ============================================================
-// BARCHA XABARLARNI O'QILGAN DEB BELGILASH
+// BARCHASINI O'QILGAN DEB BELGILASH
 // ============================================================
 async function markAllAsRead() {
     try {
@@ -393,7 +383,7 @@ function updateFilterButtons() {
 }
 
 // ============================================================
-// TOAST XABAR
+// TOAST
 // ============================================================
 function showNotificationToast(message) {
     var existing = document.querySelector('.notification-toast');
@@ -428,7 +418,6 @@ function showNotificationToast(message) {
 // EVENT LISTENERLAR
 // ============================================================
 function setupListeners() {
-    // Logout
     var logoutBtn = document.getElementById('logoutBtn');
     if (logoutBtn) {
         var newLogoutBtn = logoutBtn.cloneNode(true);
@@ -442,7 +431,6 @@ function setupListeners() {
         });
     }
 
-    // Filter
     document.querySelectorAll('.filter-pill').forEach(function(btn) {
         btn.addEventListener('click', function() {
             currentFilter = this.dataset.filter;
@@ -451,7 +439,6 @@ function setupListeners() {
         });
     });
 
-    // Refresh
     var refreshBtn = document.getElementById('refreshBtn');
     if (refreshBtn) {
         refreshBtn.addEventListener('click', function() {
@@ -460,13 +447,11 @@ function setupListeners() {
         });
     }
 
-    // Mark all as read
     var markAllReadBtn = document.getElementById('markAllReadBtn');
     if (markAllReadBtn) {
         markAllReadBtn.addEventListener('click', markAllAsRead);
     }
 
-    // Back button
     var backBtn = document.getElementById('backBtn');
     if (backBtn) {
         backBtn.addEventListener('click', function(e) {
@@ -487,36 +472,26 @@ function showError(msg) {
     console.error('⚠️ Xatolik:', msg);
     var div = document.createElement('div');
     div.style.cssText = 
-        'position: fixed; top: 20px; right: 20px; z-index: 9999;' +
-        'padding: 14px 18px; background: #fef2f2;' +
-        'border: 1px solid #fecaca; border-radius: 10px;' +
-        'color: #dc2626; max-width: 400px;' +
-        'box-shadow: 0 10px 40px rgba(0,0,0,0.1);' +
-        'display: flex; align-items: center; gap: 10px;' +
-        'font-size: 0.85rem; z-index: 10000;';
+        'position:fixed;top:20px;right:20px;z-index:9999;padding:14px 18px;background:#fef2f2;' +
+        'border:1px solid #fecaca;border-radius:10px;color:#dc2626;max-width:400px;' +
+        'box-shadow:0 10px 40px rgba(0,0,0,0.1);display:flex;align-items:center;gap:10px;font-size:0.85rem;z-index:10000;';
     div.innerHTML = 
-        '<i class="fas fa-exclamation-circle"></i>' +
-        '<span>' + msg + '</span>' +
-        '<button onclick="this.parentElement.remove()" style="margin-left: auto; background: none; border: none; color: #dc2626; cursor: pointer; font-size: 1.1rem;">×</button>';
+        '<i class="fas fa-exclamation-circle"></i><span>' + msg + '</span>' +
+        '<button onclick="this.parentElement.remove()" style="margin-left:auto;background:none;border:none;color:#dc2626;cursor:pointer;font-size:1.1rem;">×</button>';
     document.body.appendChild(div);
-    setTimeout(function() { if (div.parentElement) div.remove(); }, 6000);
+    setTimeout(function() { if (div.parentElement) div.remove(); }, 5000);
 }
 
 function showSuccess(msg) {
     console.log('✅ Muvaffaqiyat:', msg);
     var div = document.createElement('div');
     div.style.cssText = 
-        'position: fixed; top: 20px; right: 20px; z-index: 9999;' +
-        'padding: 14px 18px; background: #ecfdf5;' +
-        'border: 1px solid #a7f3d0; border-radius: 10px;' +
-        'color: #065f46; max-width: 400px;' +
-        'box-shadow: 0 10px 40px rgba(0,0,0,0.1);' +
-        'display: flex; align-items: center; gap: 10px;' +
-        'font-size: 0.85rem; z-index: 10000;';
+        'position:fixed;top:20px;right:20px;z-index:9999;padding:14px 18px;background:#ecfdf5;' +
+        'border:1px solid #a7f3d0;border-radius:10px;color:#065f46;max-width:400px;' +
+        'box-shadow:0 10px 40px rgba(0,0,0,0.1);display:flex;align-items:center;gap:10px;font-size:0.85rem;z-index:10000;';
     div.innerHTML = 
-        '<i class="fas fa-check-circle"></i>' +
-        '<span>' + msg + '</span>' +
-        '<button onclick="this.parentElement.remove()" style="margin-left: auto; background: none; border: none; color: #065f46; cursor: pointer; font-size: 1.1rem;">×</button>';
+        '<i class="fas fa-check-circle"></i><span>' + msg + '</span>' +
+        '<button onclick="this.parentElement.remove()" style="margin-left:auto;background:none;border:none;color:#065f46;cursor:pointer;font-size:1.1rem;">×</button>';
     document.body.appendChild(div);
     setTimeout(function() { if (div.parentElement) div.remove(); }, 3000);
 }
