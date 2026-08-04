@@ -1,7 +1,5 @@
 // ============================================================
-// API - ADMIN-CUSTOMER (TO'LIQ)
-// Loyiha: Admin-Customer Frontend
-// Fayl: js/api.js
+// API - ADMIN-CUSTOMER (TO'LIQ TUZATILGAN)
 // ============================================================
 
 function getApiBaseURL() {
@@ -47,15 +45,21 @@ const API = {
             const url = endpoint.startsWith('http') ? endpoint : `${this.baseURL}${normalizedEndpoint}`;
             console.log(`📡 ${options.method || 'GET'} ${url}`);
             
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 30000);
+            
             const response = await fetch(url, {
                 ...options,
                 mode: 'cors',
                 credentials: 'include',
+                signal: controller.signal,
                 headers: {
                     ...this.getHeaders(),
                     ...options.headers
                 }
             });
+
+            clearTimeout(timeoutId);
 
             const contentType = response.headers.get('content-type') || '';
             let data;
@@ -88,10 +92,19 @@ const API = {
             
             return data;
         } catch (error) {
+            if (error.name === 'AbortError') {
+                console.error('⏱️ API timeout:', endpoint);
+                return {
+                    success: false,
+                    message: 'Server javob bermadi. Iltimos, qayta urinib ko\'ring.',
+                    status: 408,
+                    timeout: true
+                };
+            }
             console.error('❌ API xatosi:', error);
             return {
                 success: false,
-                message: error?.message || 'Network request failed',
+                message: error?.message || 'Tarmoq xatosi!',
                 status: 0,
                 error
             };
@@ -129,7 +142,7 @@ const API = {
     },
     
     // ============================================================
-    // ⭐ AUTH / PROFILE
+    // AUTH / PROFILE
     // ============================================================
     
     async getProfile() {
@@ -157,7 +170,7 @@ const API = {
     },
     
     // ============================================================
-    // ⭐ DASHBOARD
+    // DASHBOARD
     // ============================================================
     
     async getDashboardStats() {
@@ -165,7 +178,7 @@ const API = {
     },
     
     // ============================================================
-    // ⭐ TEACHERS
+    // TEACHERS
     // ============================================================
     
     async getTeachers(params = {}) {
@@ -189,7 +202,7 @@ const API = {
     },
     
     // ============================================================
-    // ⭐ TEACHER LESSONS
+    // TEACHER LESSONS
     // ============================================================
     
     async getTeacherLessons(params = {}) {
@@ -209,7 +222,7 @@ const API = {
     },
     
     // ============================================================
-    // ⭐ STUDENTS
+    // STUDENTS
     // ============================================================
     
     async getStudents(params = {}) {
@@ -233,7 +246,7 @@ const API = {
     },
     
     // ============================================================
-    // ⭐ STUDENT SUBJECTS
+    // STUDENT SUBJECTS
     // ============================================================
     
     async getStudentSubjects(params = {}) {
@@ -249,7 +262,7 @@ const API = {
     },
     
     // ============================================================
-    // ⭐ SUBJECTS
+    // SUBJECTS
     // ============================================================
     
     async getSubjects() {
@@ -269,7 +282,7 @@ const API = {
     },
     
     // ============================================================
-    // ⭐ ATTENDANCES
+    // ATTENDANCES
     // ============================================================
     
     async getAttendances(params = {}) {
@@ -281,7 +294,7 @@ const API = {
     },
     
     // ============================================================
-    // ⭐ PAYMENTS
+    // PAYMENTS
     // ============================================================
     
     async getPayments(params = {}) {
@@ -301,11 +314,29 @@ const API = {
     },
 
     // ============================================================
-    // ⭐ NOTIFICATIONS
+    // NOTIFICATIONS (TUZATILGAN)
     // ============================================================
     
     async getNotifications(params = {}) {
-        return this.get('/api/notifications', params);
+        try {
+            const result = await this.get('/api/notifications', params);
+            if (!result.success && result.status === 0) {
+                console.warn('⚠️ Server javob bermadi, local xabarlar ko\'rsatiladi');
+                return {
+                    success: true,
+                    data: [],
+                    message: 'Server bilan bog\'lanib bo\'lmadi, mahalliy xabarlar ko\'rsatilmoqda'
+                };
+            }
+            return result;
+        } catch (error) {
+            console.error('❌ Notifications error:', error);
+            return {
+                success: true,
+                data: [],
+                message: 'Xabarlar yuklanmadi, mahalliy rejim'
+            };
+        }
     },
 
     async createNotification(data = {}) {
