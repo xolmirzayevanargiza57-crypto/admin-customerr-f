@@ -1,5 +1,7 @@
 // ============================================================
-// NOTIFICATIONS - ADMIN-CUSTOMER (REAL TIME)
+// NOTIFICATIONS - ADMIN-CUSTOMER (TO'LIQ REAL TIME)
+// Loyiha: Admin-Customer Frontend
+// Fayl: js/notifications.js
 // ============================================================
 
 let allNotifications = [];
@@ -9,7 +11,7 @@ let lastUnreadCount = 0;
 let audioContext = null;
 
 // ============================================================
-// ⭐ OVOZ
+// ⭐ OVOZ YARATISH
 // ============================================================
 function createNotificationSound() {
     try {
@@ -22,7 +24,6 @@ function createNotificationSound() {
         if (audioContext.state === 'closed') {
             audioContext = new (window.AudioContext || window.webkitAudioContext)();
         }
-        
         var now = audioContext.currentTime;
         var osc1 = audioContext.createOscillator();
         var gain1 = audioContext.createGain();
@@ -34,7 +35,6 @@ function createNotificationSound() {
         gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
         osc1.start(now);
         osc1.stop(now + 0.2);
-        
         var osc2 = audioContext.createOscillator();
         var gain2 = audioContext.createGain();
         osc2.connect(gain2);
@@ -45,7 +45,6 @@ function createNotificationSound() {
         gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
         osc2.start(now + 0.15);
         osc2.stop(now + 0.35);
-        
         return true;
     } catch (error) {
         return false;
@@ -55,6 +54,7 @@ function createNotificationSound() {
 function playNotificationSound() {
     try {
         createNotificationSound();
+        setTimeout(function() { createNotificationSound(); }, 200);
     } catch (e) {}
 }
 
@@ -104,39 +104,49 @@ document.addEventListener('DOMContentLoaded', async function() {
         await loadNotifications();
         setupListeners();
 
-        // ⭐ HAR 3 SONIYADA YANGILASH (REAL TIME)
+        // ⭐ HAR 2 SONIYADA YANGILASH (REAL TIME)
         if (refreshInterval) {
             clearInterval(refreshInterval);
             refreshInterval = null;
         }
         refreshInterval = setInterval(function() {
             loadNotifications();
-        }, 3000);
+        }, 2000);
 
         console.log('✅ Notifications sahifasi yuklandi!');
     } catch (error) {
         console.error('❌ Notifications yuklash xatosi:', error);
+        showError('Notifications yuklashda xatolik: ' + error.message);
     }
 });
 
 // ============================================================
-// XABARLARNI YUKLASH
+// ⭐ XABARLARNI YUKLASH (REAL TIME)
 // ============================================================
 async function loadNotifications() {
     try {
         var token = Auth.getToken();
         if (!token) return;
 
-        // ⭐ TIMEOUT BILAN (5 sekund)
         var controller = new AbortController();
         var timeoutId = setTimeout(function() { controller.abort(); }, 5000);
 
         try {
             var response = await fetch(API.baseURL + '/api/notifications', {
                 headers: API.getHeaders(),
-                signal: controller.signal
+                signal: controller.signal,
+                cache: 'no-cache'
             });
             clearTimeout(timeoutId);
+
+            if (!response.ok) {
+                console.warn('⚠️ Notifications response not OK:', response.status);
+                // Agar xatolik bo'lsa ham bo'sh ro'yxat ko'rsatish
+                allNotifications = [];
+                renderNotifications([]);
+                return;
+            }
+
             var data = await response.json();
 
             if (data.success) {
@@ -146,8 +156,8 @@ async function loadNotifications() {
                 // ⭐ YANGI XABAR KELGANDA OVOZ
                 var newUnread = allNotifications.filter(function(n) { return !n.isRead; }).length;
                 if (newUnread > oldUnread && oldUnread > 0) {
-                    playNotificationSound();
                     var diff = newUnread - oldUnread;
+                    playNotificationSound();
                     showNotificationToast('🔔 ' + diff + ' ta yangi xabar keldi!');
                 }
                 lastUnreadCount = newUnread;
@@ -162,6 +172,7 @@ async function loadNotifications() {
                 console.log('⏱️ Notifications timeout');
             } else {
                 console.error('❌ Xatolik:', fetchError);
+                showError('Xabarlar yuklanmadi: ' + (fetchError.message || 'Tarmoq xatosi'));
             }
             // ⭐ TIMEOUT BO'LSA HAM BO'SH KO'RSAT
             if (allNotifications.length === 0) {
@@ -171,11 +182,12 @@ async function loadNotifications() {
         }
     } catch (error) {
         console.error('❌ Xabarlarni yuklash xatosi:', error);
+        showError('Xabarlar yuklanmadi: ' + (error.message || 'Noma\'lum xatolik'));
     }
 }
 
 // ============================================================
-// XABARLARNI KO'RSATISH
+// ⭐ XABARLARNI KO'RSATISH (SCROLL BILAN)
 // ============================================================
 function renderNotifications(notifications) {
     var container = document.getElementById('notificationsList');
@@ -184,6 +196,7 @@ function renderNotifications(notifications) {
     var user = Auth.getUser();
     var userId = user?._id;
 
+    // ⭐ FAQAT O'ZIGA KELGAN XABARLAR
     var filtered = notifications ? notifications.filter(function(n) {
         var recipientIdStr = n.recipientId ? String(n.recipientId) : null;
         var userIdStr = userId ? String(userId) : null;
@@ -201,6 +214,7 @@ function renderNotifications(notifications) {
         return notifDate >= thirtyDaysAgo;
     });
 
+    // ⭐ FILTRLASH
     var filteredByDate = filterByDate(filtered, currentFilter);
 
     if (!filteredByDate || filteredByDate.length === 0) {
@@ -221,6 +235,7 @@ function renderNotifications(notifications) {
         return;
     }
 
+    // ⭐ Xabarlarni sana bo'yicha guruhlash
     var grouped = {};
     filteredByDate.forEach(function(notif) {
         var date = new Date(notif.createdAt);
@@ -255,6 +270,7 @@ function renderNotifications(notifications) {
                 '<div class="notification-item ' + (isUnread ? 'unread' : '') + '">' +
                     '<div class="notification-body">' +
                         '<span class="notification-title">' + (notif.title || 'Xabar') + '</span>' +
+                        // ⭐ MESSAGE WRAPPER - SCROLL QILADIGAN QISM
                         '<div class="notification-message-wrapper">' +
                             '<p class="notification-message">' + (notif.message || '') + '</p>' +
                         '</div>' +
@@ -278,6 +294,7 @@ function renderNotifications(notifications) {
 
     container.innerHTML = html;
 
+    // ⭐ O'qilgan deb belgilash
     document.querySelectorAll('.btn-read').forEach(function(btn) {
         btn.addEventListener('click', async function() {
             var id = this.dataset.id;
@@ -287,7 +304,7 @@ function renderNotifications(notifications) {
 }
 
 // ============================================================
-// VAQTNI FORMATLASH
+// ⭐ VAQTNI FORMATLASH (TOSHKENT VAQTI BILAN)
 // ============================================================
 function formatDateTimeFull(date) {
     if (!date) return 'Noma\'lum vaqt';
@@ -310,7 +327,7 @@ function formatDateTimeFull(date) {
 }
 
 // ============================================================
-// FILTRLASH
+// ⭐ FILTRLASH
 // ============================================================
 function filterByDate(notifications, filter) {
     var now = new Date();
@@ -334,7 +351,7 @@ function filterByDate(notifications, filter) {
 }
 
 // ============================================================
-// O'QILGAN DEB BELGILASH
+// ⭐ O'QILGAN DEB BELGILASH
 // ============================================================
 async function markAsRead(id) {
     try {
@@ -352,7 +369,7 @@ async function markAsRead(id) {
 }
 
 // ============================================================
-// BARCHASINI O'QILGAN DEB BELGILASH
+// ⭐ BARCHASINI O'QILGAN DEB BELGILASH
 // ============================================================
 async function markAllAsRead() {
     try {
@@ -370,7 +387,7 @@ async function markAllAsRead() {
 }
 
 // ============================================================
-// FILTER TUGMALARI
+// ⭐ FILTER TUGMALARI
 // ============================================================
 function updateFilterButtons() {
     document.querySelectorAll('.filter-pill').forEach(function(btn) {
@@ -383,7 +400,7 @@ function updateFilterButtons() {
 }
 
 // ============================================================
-// TOAST
+// ⭐ TOAST XABAR
 // ============================================================
 function showNotificationToast(message) {
     var existing = document.querySelector('.notification-toast');
@@ -415,7 +432,7 @@ function showNotificationToast(message) {
 }
 
 // ============================================================
-// EVENT LISTENERLAR
+// ⭐ EVENT LISTENERLAR
 // ============================================================
 function setupListeners() {
     var logoutBtn = document.getElementById('logoutBtn');
@@ -466,7 +483,7 @@ function setupListeners() {
 }
 
 // ============================================================
-// XATOLIK VA MUVAFFAQIYAT XABARLARI
+// ⭐ XATOLIK VA MUVAFFAQIYAT XABARLARI
 // ============================================================
 function showError(msg) {
     console.error('⚠️ Xatolik:', msg);
@@ -497,7 +514,7 @@ function showSuccess(msg) {
 }
 
 // ============================================================
-// CLEANUP
+// ⭐ CLEANUP
 // ============================================================
 window.addEventListener('beforeunload', function() {
     if (refreshInterval) {
