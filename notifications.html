@@ -32,6 +32,7 @@
             gap: 10px;
         }
 
+        /* ⭐ NOTIFICATION ITEM - CARD ICHIDA SCROLL */
         .notification-item {
             display: flex;
             justify-content: space-between;
@@ -42,6 +43,8 @@
             border-radius: var(--radius-sm);
             border: 1px solid var(--border-color);
             transition: var(--transition);
+            max-width: 100%;
+            overflow: hidden;
         }
 
         .notification-item:hover {
@@ -53,9 +56,12 @@
             background: var(--bg-hover);
         }
 
+        /* ⭐ BODY - MATN SCROLL QILADIGAN QISM */
         .notification-body {
             flex: 1;
             min-width: 0;
+            max-width: 100%;
+            overflow: hidden;
         }
 
         .notification-title {
@@ -64,6 +70,40 @@
             color: var(--text-primary);
             display: block;
             margin-bottom: 4px;
+            word-break: break-word;
+        }
+
+        /* ⭐ MESSAGE WRAPPER - SCROLL QILADIGAN QISM */
+        .notification-message-wrapper {
+            max-height: 80px;
+            overflow-y: auto;
+            overflow-x: auto;
+            padding-right: 4px;
+            margin: 4px 0;
+            word-wrap: break-word;
+            word-break: break-word;
+            white-space: pre-wrap;
+            line-height: 1.5;
+        }
+
+        /* ⭐ SCROLLBAR STILLARI */
+        .notification-message-wrapper::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+
+        .notification-message-wrapper::-webkit-scrollbar-track {
+            background: var(--bg-hover);
+            border-radius: 10px;
+        }
+
+        .notification-message-wrapper::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 10px;
+        }
+
+        .notification-message-wrapper::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted);
         }
 
         .notification-message {
@@ -73,13 +113,8 @@
             word-break: break-word;
             white-space: pre-wrap;
             line-height: 1.5;
-        }
-
-        .notification-message-wrapper {
-            max-height: 100px;
-            overflow-y: auto;
-            padding-right: 4px;
-            margin: 4px 0;
+            min-width: 0;
+            max-width: 100%;
         }
 
         .notification-meta {
@@ -371,6 +406,10 @@
             .top-header h2 {
                 font-size: 0.95rem;
             }
+
+            .notification-message-wrapper {
+                max-height: 60px;
+            }
         }
     </style>
 </head>
@@ -412,7 +451,6 @@
             <!-- HEADER -->
             <header class="top-header">
                 <div class="header-left">
-                    <!-- ⭐ BACK BUTTON - Dashboardga qaytadi -->
                     <a href="dashboard.html" class="back-button" id="backBtn">
                         <i class="fas fa-arrow-left"></i>
                     </a>
