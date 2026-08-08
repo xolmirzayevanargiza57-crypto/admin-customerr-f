@@ -1,5 +1,5 @@
 // ============================================================
-// NOTIFICATIONS - ADMIN-CUSTOMER (TO'LIQ REAL TIME)
+// NOTIFICATIONS - ADMIN-CUSTOMER (TO'LIQ TUZATILGAN)
 // Loyiha: Admin-Customer Frontend
 // Fayl: js/notifications.js
 // ============================================================
@@ -89,7 +89,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             if (initialEl) initialEl.textContent = Auth.getUserInitial();
         }
 
-        // ⭐ AUDIO
+        // ⭐ AUDIO - user interaction dan keyin
         var initAudioOnce = function() {
             initAudio();
             document.removeEventListener('click', initAudioOnce);
@@ -104,14 +104,14 @@ document.addEventListener('DOMContentLoaded', async function() {
         await loadNotifications();
         setupListeners();
 
-        // ⭐ HAR 2 SONIYADA YANGILASH (REAL TIME)
+        // ⭐ HAR 3 SONIYADA YANGILASH (REAL TIME)
         if (refreshInterval) {
             clearInterval(refreshInterval);
             refreshInterval = null;
         }
         refreshInterval = setInterval(function() {
             loadNotifications();
-        }, 2000);
+        }, 3000);
 
         console.log('✅ Notifications sahifasi yuklandi!');
     } catch (error) {
@@ -141,7 +141,6 @@ async function loadNotifications() {
 
             if (!response.ok) {
                 console.warn('⚠️ Notifications response not OK:', response.status);
-                // Agar xatolik bo'lsa ham bo'sh ro'yxat ko'rsatish
                 allNotifications = [];
                 renderNotifications([]);
                 return;
@@ -174,7 +173,6 @@ async function loadNotifications() {
                 console.error('❌ Xatolik:', fetchError);
                 showError('Xabarlar yuklanmadi: ' + (fetchError.message || 'Tarmoq xatosi'));
             }
-            // ⭐ TIMEOUT BO'LSA HAM BO'SH KO'RSAT
             if (allNotifications.length === 0) {
                 allNotifications = [];
                 renderNotifications([]);
@@ -187,7 +185,7 @@ async function loadNotifications() {
 }
 
 // ============================================================
-// ⭐ XABARLARNI KO'RSATISH (SCROLL BILAN)
+// ⭐ XABARLARNI KO'RSATISH (TO'G'RI - Rasm URL'lari tuzatilgan)
 // ============================================================
 function renderNotifications(notifications) {
     var container = document.getElementById('notificationsList');
@@ -270,7 +268,6 @@ function renderNotifications(notifications) {
                 '<div class="notification-item ' + (isUnread ? 'unread' : '') + '">' +
                     '<div class="notification-body">' +
                         '<span class="notification-title">' + (notif.title || 'Xabar') + '</span>' +
-                        // ⭐ MESSAGE WRAPPER - SCROLL QILADIGAN QISM
                         '<div class="notification-message-wrapper">' +
                             '<p class="notification-message">' + (notif.message || '') + '</p>' +
                         '</div>' +
