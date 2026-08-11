@@ -41,6 +41,7 @@ const API = {
     
     async request(endpoint, options = {}) {
         try {
+            // ⭐ endpoint / bilan boshlanishiga ishonch hosil qilish
             const normalizedEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
             const url = endpoint.startsWith('http') ? endpoint : `${this.baseURL}${normalizedEndpoint}`;
             console.log(`📡 ${options.method || 'GET'} ${url}`);
