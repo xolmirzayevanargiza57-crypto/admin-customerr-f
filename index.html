@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Admin Customer v1.0 - Login</title>
 
-    <!-- ⭐ PWA MANIFEST -->
+    <!-- ⭐ PWA MANIFEST (FAQAT MAVJUD BO'LSA) -->
     <link rel="manifest" href="/manifest.json" />
 
     <!-- ⭐ APPLE TOUCH ICON -->
@@ -94,17 +94,27 @@
     <script src="js/i18n.js"></script>
     <script src="js/login.js"></script>
 
-    <!-- ⭐ SERVICE WORKER REGISTRATION -->
+    <!-- ⭐ SERVICE WORKER REGISTRATION (FAQAT MAVJUD BO'LSA) -->
     <script>
-        // Service Worker ro'yxatdan o'tkazish
         if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')
-                    .then(reg => {
-                        console.log('✅ Service Worker registered successfully:', reg);
+            window.addEventListener('load', function() {
+                // ⭐ SW FAYLI MAVJUDLIGINI TEKSHIRISH
+                fetch('/sw.js', { method: 'HEAD' })
+                    .then(function(response) {
+                        if (response.ok) {
+                            navigator.serviceWorker.register('/sw.js', { scope: '/' })
+                                .then(function(reg) {
+                                    console.log('✅ Service Worker registered successfully:', reg);
+                                })
+                                .catch(function(err) {
+                                    console.warn('⚠️ Service Worker registration failed:', err);
+                                });
+                        } else {
+                            console.log('ℹ️ Service Worker fayli topilmadi, o\'tkazib yuborilmoqda');
+                        }
                     })
-                    .catch(err => {
-                        console.error('❌ Service Worker registration failed:', err);
+                    .catch(function() {
+                        console.log('ℹ️ Service Worker fayli tekshirilmadi');
                     });
             });
         }
