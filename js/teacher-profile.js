@@ -16,8 +16,10 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     var user = Auth.getUser();
     if (user) {
-        document.getElementById('userName').textContent = user.fullName || 'Admin';
-        document.getElementById('userInitial').textContent = Auth.getUserInitial();
+        var nameEl = document.getElementById('userName');
+        var initialEl = document.getElementById('userInitial');
+        if (nameEl) nameEl.textContent = user.fullName || 'Admin';
+        if (initialEl) initialEl.textContent = Auth.getUserInitial();
     }
 
     var params = new URLSearchParams(window.location.search);
@@ -27,6 +29,8 @@ document.addEventListener('DOMContentLoaded', async function() {
         setTimeout(function() { window.location.href = 'teachers.html'; }, 2000);
         return;
     }
+
+    console.log('🔍 Teacher ID:', teacherId);
 
     await loadTeacherProfile();
     await loadTeacherPayments();
@@ -39,8 +43,11 @@ document.addEventListener('DOMContentLoaded', async function() {
 // ============================================================
 async function loadTeacherProfile() {
     try {
+        console.log('🔄 O\'qituvchi profili yuklanmoqda...');
         var data = await API.getTeacher(teacherId);
-        if (data.success) {
+        console.log('📦 API javobi:', data);
+        
+        if (data.success && data.data) {
             currentTeacher = data.data;
             renderProfile(currentTeacher);
             updateTeacherSalary(currentTeacher);
@@ -50,7 +57,7 @@ async function loadTeacherProfile() {
         }
     } catch (error) {
         console.error('❌ Xatolik:', error);
-        showError(I18N.t('network_error'));
+        showError('Tarmoq xatosi! Qayta urinib ko\'ring.');
     }
 }
 
@@ -94,46 +101,70 @@ async function loadTeacherAttendance() {
 }
 
 // ============================================================
-// ⭐ PROFILNI KO'RSATISH
+// ⭐ PROFILNI KO'RSATISH (XATOLIKLARDAN HIMOYA QILINGAN)
 // ============================================================
 function renderProfile(teacher) {
+    // ⭐ Har bir elementni tekshirib ko'rsatish
+    function setText(id, value) {
+        var el = document.getElementById(id);
+        if (el) {
+            el.textContent = value || '-';
+        } else {
+            console.warn('⚠️ Element topilmadi:', id);
+        }
+    }
+
+    function setInnerHTML(id, value) {
+        var el = document.getElementById(id);
+        if (el) {
+            el.innerHTML = value || '';
+        } else {
+            console.warn('⚠️ Element topilmadi:', id);
+        }
+    }
+
     // Avatar
-    document.getElementById('teacherAvatar').textContent = teacher.status === 'active' ? '👨‍🏫' : '👨‍🏫⛔';
+    var avatarEl = document.getElementById('teacherAvatar');
+    if (avatarEl) {
+        avatarEl.textContent = teacher.status === 'active' ? '👨‍🏫' : '👨‍🏫⛔';
+    }
     
     // Ism va ma'lumotlar
-    document.getElementById('teacherFullName').textContent = teacher.fullName || 'Noma\'lum';
-    document.getElementById('teacherEmail').textContent = teacher.email || '-';
-    document.getElementById('teacherPhone').textContent = teacher.phone || '-';
-    document.getElementById('teacherProfileName').textContent = teacher.fullName || 'O\'qituvchi';
-    document.getElementById('teacherSubject').textContent = teacher.subject || '-';
-    document.getElementById('teacherStudentCount').textContent = teacher.studentCount || 0;
-    document.getElementById('teacherJoined').textContent = formatDate(teacher.createdAt);
-    document.getElementById('teacherBirthDate').textContent = formatDate(teacher.birthDate);
+    setText('teacherFullName', teacher.fullName);
+    setText('teacherEmail', teacher.email);
+    setText('teacherPhone', teacher.phone);
+    setText('teacherProfileName', teacher.fullName);
+    setText('teacherSubject', teacher.subject);
+    setText('teacherStudentCount', teacher.studentCount || 0);
+    setText('teacherJoined', formatDate(teacher.createdAt));
+    setText('teacherBirthDate', formatDate(teacher.birthDate));
 
     // Darslar
-    document.getElementById('teacherDailyLessons').textContent = teacher.dailyLessons || 4;
-    document.getElementById('teacherLessonDuration').textContent = (teacher.lessonDuration || 60) + ' daqiqa';
+    setText('teacherDailyLessons', teacher.dailyLessons || 4);
+    setText('teacherLessonDuration', (teacher.lessonDuration || 60) + ' daqiqa');
 
     // Status
     var statusEl = document.getElementById('teacherStatus');
-    if (teacher.status === 'active') {
-        statusEl.textContent = '✅ Faol';
-        statusEl.style.color = '#34c759';
-    } else if (teacher.status === 'blocked') {
-        statusEl.textContent = '⛔ Bloklangan';
-        statusEl.style.color = '#ff3b30';
-    } else {
-        statusEl.textContent = '⛔ Faol emas';
-        statusEl.style.color = 'var(--text-muted)';
+    if (statusEl) {
+        if (teacher.status === 'active') {
+            statusEl.textContent = '✅ Faol';
+            statusEl.style.color = '#34c759';
+        } else if (teacher.status === 'blocked') {
+            statusEl.textContent = '⛔ Bloklangan';
+            statusEl.style.color = '#ff3b30';
+        } else {
+            statusEl.textContent = '⛔ Faol emas';
+            statusEl.style.color = 'var(--text-muted)';
+        }
     }
 
     // Stats
-    document.getElementById('statStudents').textContent = teacher.studentCount || 0;
-    document.getElementById('statAge').textContent = calculateAge(teacher.birthDate);
-    document.getElementById('statStatus').textContent = teacher.status === 'active' ? 'Faol' : teacher.status === 'blocked' ? 'Bloklangan' : 'Faol emas';
+    setText('statStudents', teacher.studentCount || 0);
+    setText('statAge', calculateAge(teacher.birthDate));
+    setText('statStatus', teacher.status === 'active' ? 'Faol' : teacher.status === 'blocked' ? 'Bloklangan' : 'Faol emas');
 
-    // ⭐ O'quvchilar soni badge
-    document.getElementById('studentCountBadge').textContent = teacher.studentCount || 0;
+    // O'quvchilar soni badge
+    setText('studentCountBadge', teacher.studentCount || 0);
 
     // ⭐ Ish vaqtlari
     renderWorkingHours(teacher);
@@ -162,8 +193,8 @@ function renderWorkingHours(teacher) {
 
     container.innerHTML = sortedLessons.map(function(lesson) {
         return '<div class="working-hour-item">' +
-            '<span class="day">' + lesson.day + '</span>' +
-            '<span class="time">' + lesson.startTime + ' - ' + lesson.endTime + '</span>' +
+            '<span class="day">' + (lesson.day || '-') + '</span>' +
+            '<span class="time">' + (lesson.startTime || '') + ' - ' + (lesson.endTime || '') + '</span>' +
         '</div>';
     }).join('');
 }
@@ -201,12 +232,19 @@ function updateTeacherSalary(teacher) {
     var yearly = salary * 12;
     var daily = Math.round(salary / 22);
 
-    document.getElementById('teacherMonthlySalaryDisplay').textContent = formatMoney(salary);
-    document.getElementById('teacherTotalPaidDisplay').textContent = formatMoney(totalPaid);
-    document.getElementById('teacherRemainingDisplay').textContent = formatMoney(remaining);
-    document.getElementById('teacherYearlySalaryDisplay').textContent = formatMoney(yearly);
-    document.getElementById('teacherDailySalaryDisplay').textContent = formatMoney(daily);
-    document.getElementById('teacherTotalSalaryDisplay2').textContent = formatMoney(totalPaid);
+    function setText(id, value) {
+        var el = document.getElementById(id);
+        if (el) {
+            el.textContent = value;
+        }
+    }
+
+    setText('teacherMonthlySalaryDisplay', formatMoney(salary));
+    setText('teacherTotalPaidDisplay', formatMoney(totalPaid));
+    setText('teacherRemainingDisplay', formatMoney(remaining));
+    setText('teacherYearlySalaryDisplay', formatMoney(yearly));
+    setText('teacherDailySalaryDisplay', formatMoney(daily));
+    setText('teacherTotalSalaryDisplay2', formatMoney(totalPaid));
 }
 
 // ============================================================
@@ -222,7 +260,11 @@ function renderPayments(payments) {
     }
 
     var total = payments.reduce(function(sum, p) { return sum + (p.amount || 0); }, 0);
-    document.getElementById('teacherTotalSalaryDisplay2').textContent = formatMoney(total);
+    
+    var totalEl = document.getElementById('teacherTotalSalaryDisplay2');
+    if (totalEl) {
+        totalEl.textContent = formatMoney(total);
+    }
 
     container.innerHTML = payments.map(function(p) {
         return '<div class="history-item-slim">' +
@@ -272,7 +314,11 @@ function renderAttendance(attendances) {
 
         var toggleButton = document.getElementById('toggleTeacherAttendance');
         if (toggleButton) {
-            toggleButton.addEventListener('click', function() {
+            // Eski event listenerlarni tozalash
+            var newToggle = toggleButton.cloneNode(true);
+            toggleButton.parentNode.replaceChild(newToggle, toggleButton);
+            
+            newToggle.addEventListener('click', function() {
                 teacherAttendanceExpanded = !teacherAttendanceExpanded;
                 renderAttendance(teacherAttendanceData);
             });
@@ -299,13 +345,17 @@ function setupListeners() {
     var sidebar = document.getElementById('sidebar');
     var overlay = document.getElementById('sidebarOverlay');
     if (menuToggle && sidebar) {
-        menuToggle.addEventListener('click', function() {
+        var newToggle = menuToggle.cloneNode(true);
+        menuToggle.parentNode.replaceChild(newToggle, menuToggle);
+        newToggle.addEventListener('click', function() {
             sidebar.classList.toggle('open');
             if (overlay) overlay.classList.toggle('show');
         });
     }
     if (overlay) {
-        overlay.addEventListener('click', function() {
+        var newOverlay = overlay.cloneNode(true);
+        overlay.parentNode.replaceChild(newOverlay, overlay);
+        newOverlay.addEventListener('click', function() {
             sidebar.classList.remove('open');
             this.classList.remove('show');
         });
