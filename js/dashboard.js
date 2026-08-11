@@ -84,8 +84,14 @@ function initAudio() {
 // SAHIFA YUKLANGANDA
 // ============================================================
 document.addEventListener('DOMContentLoaded', function() {
-    if (dashboardLoaded) return;
+    // ⭐ FAQAT 1 MARTA YUKLANISHI UCHUN
+    if (dashboardLoaded) {
+        console.log('⚠️ Dashboard allaqachon yuklangan');
+        return;
+    }
     dashboardLoaded = true;
+
+    console.log('🚀 Dashboard yuklanmoqda...');
 
     var token = localStorage.getItem('customerToken') || sessionStorage.getItem('customerToken');
     if (!token) {
@@ -103,7 +109,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (schoolEl) schoolEl.textContent = user.schoolName || 'Nurli Ta\'lim Markazi';
     }
 
-    // Logout
+    // ⭐ LOGOUT
     var logoutBtn = document.getElementById('logoutBtn');
     if (logoutBtn) {
         var newLogoutBtn = logoutBtn.cloneNode(true);
@@ -117,7 +123,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Audio
+    // ⭐ AUDIO
     var initAudioOnce = function() {
         initAudio();
         document.removeEventListener('click', initAudioOnce);
@@ -129,26 +135,28 @@ document.addEventListener('DOMContentLoaded', function() {
     document.addEventListener('keydown', initAudioOnce);
     setTimeout(initAudio, 3000);
 
-    // Load data
+    // ⭐ XABAR BADGE
     updateNotificationBadge();
+
+    // ⭐ DASHBOARD STATISTIKASI
     loadDashboardStats();
 
-    // Refresh every 10 seconds
+    // ⭐ HAR 10 SONIYADA YANGILASH
     refreshInterval = setInterval(function() {
         loadDashboardStats();
     }, 10000);
 
-    // Notification badge every 3 seconds
+    // ⭐ HAR 3 SONIYADA XABAR BADGE
     notificationCheckInterval = setInterval(function() {
         updateNotificationBadge();
     }, 3000);
 
-    // Profile check every 30 seconds
+    // ⭐ HAR 30 SONIYADA PROFIL
     profileCheckInterval = setInterval(async function() {
         await Auth.checkAuth();
     }, 30000);
 
-    // Countdown
+    // ⭐ COUNTDOWN
     startCountdown();
 
     console.log('✅ Dashboard yuklandi!');
@@ -174,6 +182,7 @@ async function updateNotificationBadge() {
             clearTimeout(timeoutId);
 
             if (!response.ok) {
+                console.warn('⚠️ Notifications response not OK:', response.status);
                 return;
             }
 
@@ -192,7 +201,7 @@ async function updateNotificationBadge() {
 
                 var unreadCount = myNotifications.filter(function(n) { return !n.isRead; }).length;
 
-                // Header badge
+                // ⭐ HEADER BADGE
                 var badge = document.getElementById('notificationBadge');
                 if (badge) {
                     if (unreadCount > 0) {
@@ -207,7 +216,7 @@ async function updateNotificationBadge() {
                     }
                 }
 
-                // Sidebar badge
+                // ⭐ SIDEBAR BADGE
                 var sidebarBadge = document.getElementById('sidebarBadge');
                 if (sidebarBadge) {
                     if (unreadCount > 0) {
@@ -218,7 +227,7 @@ async function updateNotificationBadge() {
                     }
                 }
 
-                // New notification sound
+                // ⭐ YANGI XABAR KELGANDA OVOZ
                 if (unreadCount > lastUnreadCount && lastUnreadCount > 0) {
                     var diff = unreadCount - lastUnreadCount;
                     if (!audioContext || audioContext.state === 'closed') {
@@ -236,12 +245,15 @@ async function updateNotificationBadge() {
             }
         } catch (fetchError) {
             if (fetchError.name === 'AbortError') {
+                console.log('⏱️ Notifications timeout');
                 if (notificationRetryCount < maxNotificationRetry) {
                     notificationRetryCount++;
                     setTimeout(function() {
                         updateNotificationBadge();
                     }, 1000);
                 }
+            } else {
+                console.error('❌ Notifications fetch error:', fetchError);
             }
         }
     } catch (error) {
@@ -286,6 +298,8 @@ function showNotificationToast(message) {
 // ============================================================
 async function loadDashboardStats() {
     try {
+        console.log('📊 Statistika yuklanmoqda...');
+
         var controller = new AbortController();
         var timeoutId = setTimeout(function() { controller.abort(); }, 8000);
 
@@ -301,48 +315,60 @@ async function loadDashboardStats() {
                     Auth.logout();
                     return;
                 }
+                console.error('❌ Statistika xatosi:', response.status);
                 return;
             }
 
             var data = await response.json();
 
             if (!data.success) {
+                console.error('❌ Statistika xatosi:', data.message);
                 return;
             }
 
             var stats = data.data;
             lastDashboardStats = stats;
 
-            // Teacher stats
+            // ⭐ Teacher stats
             var teacherCount = stats.teacherCount || 0;
             var activeTeachers = stats.activeTeachers || 0;
-            document.getElementById('teacherCount').textContent = teacherCount;
-            document.getElementById('activeTeachers').textContent = activeTeachers;
+            var teacherEl = document.getElementById('teacherCount');
+            var activeTeacherEl = document.getElementById('activeTeachers');
+            if (teacherEl) teacherEl.textContent = teacherCount;
+            if (activeTeacherEl) activeTeacherEl.textContent = activeTeachers;
 
-            // Student stats
+            // ⭐ Student stats
             var studentCount = stats.studentCount || 0;
             var activeStudents = stats.activeStudents || 0;
-            document.getElementById('studentCount').textContent = studentCount;
-            document.getElementById('activeStudents').textContent = activeStudents;
+            var studentEl = document.getElementById('studentCount');
+            var activeStudentEl = document.getElementById('activeStudents');
+            if (studentEl) studentEl.textContent = studentCount;
+            if (activeStudentEl) activeStudentEl.textContent = activeStudents;
 
-            // XP stats
+            // ⭐ XP stats
             var totalXP = stats.totalXP || 0;
             var avgXP = studentCount > 0 ? Math.round(totalXP / studentCount) : 0;
-            document.getElementById('totalXP').textContent = totalXP;
-            document.getElementById('avgXP').textContent = avgXP;
+            var totalXpEl = document.getElementById('totalXP');
+            var avgXpEl = document.getElementById('avgXP');
+            if (totalXpEl) totalXpEl.textContent = totalXP;
+            if (avgXpEl) avgXpEl.textContent = avgXP;
 
-            // Attendance stats
+            // ⭐ Attendance stats
             var present = stats.attendanceStats?.present || 0;
             var absentReason = stats.attendanceStats?.absent_reason || 0;
             var absent = stats.attendanceStats?.absent || 0;
             var totalAttendance = present + absentReason + absent;
 
-            document.getElementById('todayAttendance').textContent = totalAttendance;
-            document.getElementById('presentCount').textContent = present;
-            document.getElementById('absentReasonCount').textContent = absentReason;
-            document.getElementById('absentCount').textContent = absent;
+            var todayEl = document.getElementById('todayAttendance');
+            var presentEl = document.getElementById('presentCount');
+            var absentReasonEl = document.getElementById('absentReasonCount');
+            var absentEl = document.getElementById('absentCount');
+            if (todayEl) todayEl.textContent = totalAttendance;
+            if (presentEl) presentEl.textContent = present;
+            if (absentReasonEl) absentReasonEl.textContent = absentReason;
+            if (absentEl) absentEl.textContent = absent;
 
-            // Attendance percent
+            // ⭐ Attendance percent
             var percentEl = document.getElementById('attendancePercent');
             if (percentEl) {
                 if (totalAttendance > 0) {
@@ -354,7 +380,7 @@ async function loadDashboardStats() {
                 }
             }
 
-            // Subscription
+            // ⭐ Subscription
             if (stats.subscription) {
                 var sub = stats.subscription;
                 var statusMap = { 'active': '✅ Faol', 'inactive': '⛔ Faol emas', 'expired': '⚠️ Muddati tugagan' };
@@ -387,6 +413,8 @@ async function loadDashboardStats() {
         } catch (fetchError) {
             if (fetchError.name === 'AbortError') {
                 console.log('⏱️ Dashboard stats timeout');
+            } else {
+                console.error('❌ Statistikani yuklash xatosi:', fetchError);
             }
         }
     } catch (error) {
