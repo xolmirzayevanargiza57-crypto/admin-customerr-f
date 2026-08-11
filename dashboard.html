@@ -3,440 +3,413 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Admin Customer v1.0 - Dashboard</title>
+    <title>Admin Customer v1.0 - O'qituvchi profili</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-
     <link rel="stylesheet" href="css/style.css" />
-    <link rel="stylesheet" href="css/input.css" />
-    <link rel="stylesheet" href="css/modal.css" />
-    <link rel="stylesheet" href="css/responsive.css" />
-    <link rel="stylesheet" href="css/theme.css" />
 
     <style>
         /* ============================================================
-           DASHBOARD - CHIROYLI IKONKALAR BILAN
+           TEACHER PROFILE - CHIROYLI STILLAR
            ============================================================ */
         
-        /* Stats Grid */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 16px;
+        .profile-container {
             padding: 20px 24px;
+            max-width: 1000px;
+            margin: 0 auto;
         }
 
-        .stat-card {
-            background: var(--bg-card);
-            border-radius: var(--radius);
-            padding: 20px 24px;
+        .profile-header-card {
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 24px;
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 28px 32px;
             border: 1px solid var(--border-color);
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
+            margin-bottom: 20px;
+            transition: var(--transition);
         }
 
-        .stat-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+        .profile-header-card:hover {
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
         }
 
-        .stat-card .stat-icon-wrapper {
-            width: 52px;
-            height: 52px;
-            border-radius: 14px;
+        .profile-avatar-large {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: var(--text-primary);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.4rem;
+            color: var(--bg-primary);
+            font-size: 2.4rem;
+            font-weight: 600;
             flex-shrink: 0;
-            position: relative;
-            z-index: 1;
         }
 
-        .stat-card .stat-icon-wrapper.blue {
-            background: #e8f0fe;
-            color: #007aff;
-        }
-        .stat-card .stat-icon-wrapper.green {
-            background: #e8f5e9;
-            color: #34c759;
-        }
-        .stat-card .stat-icon-wrapper.purple {
-            background: #f3e8ff;
-            color: #7c3aed;
-        }
-        .stat-card .stat-icon-wrapper.orange {
-            background: #fff3e0;
-            color: #ff9500;
-        }
-        .stat-card .stat-icon-wrapper.pink {
-            background: #fce4ec;
-            color: #e83e8c;
-        }
-        .stat-card .stat-icon-wrapper.teal {
-            background: #e0f7fa;
-            color: #00bcd4;
-        }
-
-        [data-theme="dark"] .stat-card .stat-icon-wrapper.blue {
-            background: #1a2a4a;
-            color: #4a9aff;
-        }
-        [data-theme="dark"] .stat-card .stat-icon-wrapper.green {
-            background: #1a3a2a;
-            color: #4ac759;
-        }
-        [data-theme="dark"] .stat-card .stat-icon-wrapper.purple {
-            background: #2a1a4a;
-            color: #9a6aff;
-        }
-        [data-theme="dark"] .stat-card .stat-icon-wrapper.orange {
-            background: #3a2a1a;
-            color: #ff9a4a;
-        }
-        [data-theme="dark"] .stat-card .stat-icon-wrapper.pink {
-            background: #3a1a2a;
-            color: #e83e8c;
-        }
-        [data-theme="dark"] .stat-card .stat-icon-wrapper.teal {
-            background: #1a2a3a;
-            color: #00bcd4;
-        }
-
-        .stat-card .stat-info {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .stat-card .stat-info .stat-label {
-            font-size: 0.78rem;
-            color: var(--text-muted);
-            margin-bottom: 2px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .stat-card .stat-info .stat-label i {
-            font-size: 0.7rem;
-        }
-
-        .stat-card .stat-info .stat-value {
-            font-size: 1.5rem;
+        .profile-info h2 {
+            font-size: 1.3rem;
             font-weight: 700;
             color: var(--text-primary);
-            line-height: 1.2;
         }
 
-        .stat-card .stat-info .stat-change {
-            font-size: 0.7rem;
-            font-weight: 600;
+        .profile-info .text-muted {
+            color: var(--text-muted);
+            margin-top: 2px;
+            font-size: 0.85rem;
+        }
+
+        .profile-badges {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+
+        .profile-badges .badge-item {
             display: inline-flex;
             align-items: center;
-            gap: 4px;
-            margin-top: 2px;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            background: var(--bg-hover);
+            color: var(--text-secondary);
         }
 
-        .stat-card .stat-info .stat-change.positive {
-            color: var(--color-success);
-        }
-        .stat-card .stat-info .stat-change.negative {
-            color: var(--color-danger);
+        .profile-badges .badge-item i {
+            font-size: 0.65rem;
         }
 
-        /* Stat card - background decoration */
-        .stat-card .stat-bg-icon {
-            position: absolute;
-            right: -10px;
-            bottom: -10px;
-            font-size: 5rem;
-            opacity: 0.04;
-            pointer-events: none;
-        }
-
-        /* ============================================================
-           ATTENDANCE CARDS
-           ============================================================ */
-        .attendance-cards {
+        .stats-grid-3 {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 14px;
-            padding: 0 24px 16px;
-        }
-
-        .attendance-card {
             background: var(--bg-card);
             border-radius: var(--radius);
-            padding: 16px 20px;
+            padding: 20px 24px;
             border: 1px solid var(--border-color);
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            transition: all 0.3s ease;
+            margin-bottom: 20px;
         }
 
-        .attendance-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+        .stat-item-center {
+            text-align: center;
         }
 
-        .attendance-card .icon {
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            flex-shrink: 0;
-        }
-
-        .attendance-card .icon.green {
-            background: #e8f5e9;
-            color: #34c759;
-        }
-        .attendance-card .icon.orange {
-            background: #fff3e0;
-            color: #ff9500;
-        }
-        .attendance-card .icon.red {
-            background: #fef2f2;
-            color: #ff3b30;
-        }
-
-        [data-theme="dark"] .attendance-card .icon.green {
-            background: #1a3a2a;
-            color: #4ac759;
-        }
-        [data-theme="dark"] .attendance-card .icon.orange {
-            background: #3a2a1a;
-            color: #ff9a4a;
-        }
-        [data-theme="dark"] .attendance-card .icon.red {
-            background: #3a1a1a;
-            color: #ff3b30;
-        }
-
-        .attendance-card .info .label {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-        }
-
-        .attendance-card .info .value {
-            font-size: 1.2rem;
+        .stat-item-center .stat-number {
+            font-size: 1.3rem;
             font-weight: 700;
             color: var(--text-primary);
         }
 
-        /* ============================================================
-           SUBSCRIPTION CARD
-           ============================================================ */
-        .subscription-card {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 14px;
-            padding: 0 24px 16px;
+        .stat-item-center .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 2px;
         }
 
-        .subscription-card .sub-item {
+        .stat-item-center .stat-label i {
+            margin-right: 4px;
+        }
+
+        .section-card {
             background: var(--bg-card);
             border-radius: var(--radius);
-            padding: 14px 18px;
+            padding: 20px 24px;
             border: 1px solid var(--border-color);
-            transition: all 0.3s ease;
+            margin-bottom: 16px;
+            transition: var(--transition);
         }
 
-        .subscription-card .sub-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+        .section-card:hover {
+            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
         }
 
-        .subscription-card .sub-item .label {
-            font-size: 0.7rem;
-            color: var(--text-muted);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .subscription-card .sub-item .label i {
-            font-size: 0.75rem;
-        }
-
-        .subscription-card .sub-item .value {
-            font-size: 0.95rem;
+        .section-card .section-title {
+            font-size: 0.9rem;
             font-weight: 600;
             color: var(--text-primary);
-            margin-top: 4px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .subscription-card .sub-item .value.status-active {
-            color: var(--color-success);
-        }
-        .subscription-card .sub-item .value.status-inactive {
-            color: var(--color-danger);
-        }
-        .subscription-card .sub-item .value.status-expired {
-            color: var(--color-warning);
+        .section-card .section-title i {
+            color: var(--text-muted);
         }
 
-        /* ============================================================
-           RESPONSIVE
-           ============================================================ */
-        @media (max-width: 1024px) {
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            .attendance-cards {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            .subscription-card {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (max-width: 768px) {
-            .stats-grid {
-                padding: 12px 16px;
-                gap: 10px;
-            }
-            .stat-card {
-                padding: 14px 16px;
-            }
-            .stat-card .stat-icon-wrapper {
-                width: 40px;
-                height: 40px;
-                font-size: 1rem;
-                border-radius: 10px;
-            }
-            .stat-card .stat-info .stat-value {
-                font-size: 1.2rem;
-            }
-            .attendance-cards {
-                padding: 0 16px 12px;
-                grid-template-columns: 1fr;
-            }
-            .subscription-card {
-                padding: 0 16px 12px;
-                grid-template-columns: 1fr 1fr;
-                gap: 10px;
-            }
-            .subscription-card .sub-item {
-                padding: 12px 14px;
-            }
-            .subscription-card .sub-item .value {
-                font-size: 0.85rem;
-            }
-            .top-header {
-                padding: 10px 16px;
-            }
-            .header-left .text-muted {
-                display: none;
-            }
-            .user-info {
-                display: none;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-            .subscription-card {
-                grid-template-columns: 1fr;
-            }
-            .stat-card .stat-icon-wrapper {
-                width: 36px;
-                height: 36px;
-                font-size: 0.9rem;
-            }
-            .stat-card .stat-info .stat-value {
-                font-size: 1rem;
-            }
-            .attendance-card {
-                padding: 12px 16px;
-            }
-            .attendance-card .icon {
-                width: 36px;
-                height: 36px;
-                font-size: 1rem;
-            }
-            .attendance-card .info .value {
-                font-size: 1rem;
-            }
+        .section-card .section-title .sub-text {
+            font-size: 0.7rem;
+            font-weight: 400;
+            color: var(--text-muted);
+            margin-left: 4px;
         }
 
         /* ============================================================
-           TOAST
+           ⭐ MAOSH KARTALARI - IKONKALAR BILAN
            ============================================================ */
-        .notification-toast {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 99999;
-            background: #007aff;
-            color: white;
-            padding: 16px 24px;
-            border-radius: 12px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-            font-size: 0.95rem;
-            max-width: 400px;
+        .salary-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .salary-item {
             display: flex;
             align-items: center;
             gap: 12px;
-            animation: slideDown 0.5s ease;
-            cursor: pointer;
-            font-family: 'Inter', sans-serif;
-        }
-
-        .notification-toast button {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 1.2rem;
-            cursor: pointer;
-            margin-left: auto;
-        }
-
-        [data-theme="dark"] .notification-toast {
-            background: #1a2a4a;
-        }
-
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes badgePulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.3); }
-            100% { transform: scale(1); }
-        }
-
-        .sidebar-badge {
-            margin-left: auto;
-            background: #ff3b30;
-            color: white;
-            font-size: 0.55rem;
-            padding: 2px 8px;
+            padding: 14px 16px;
+            background: var(--bg-hover);
             border-radius: 10px;
-            display: none;
-            font-weight: 600;
-            min-width: 18px;
-            text-align: center;
+            border-left: 4px solid #007aff;
+            transition: all 0.2s ease;
         }
+
+        .salary-item:hover {
+            transform: translateX(4px);
+            background: var(--bg-active);
+        }
+
+        .salary-item .icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+            background: var(--bg-card);
+        }
+
+        .salary-item .icon.blue { color: #007aff; background: #e8f0fe; }
+        .salary-item .icon.green { color: #34c759; background: #e8f5e9; }
+        .salary-item .icon.orange { color: #ff9500; background: #fff3e0; }
+        .salary-item .icon.purple { color: #7c3aed; background: #f3e8ff; }
+        .salary-item .icon.red { color: #ff6b6b; background: #fef2f2; }
+
+        [data-theme="dark"] .salary-item .icon.blue { background: #1a2a4a; color: #4a9aff; }
+        [data-theme="dark"] .salary-item .icon.green { background: #1a3a2a; color: #4ac759; }
+        [data-theme="dark"] .salary-item .icon.orange { background: #3a2a1a; color: #ff9a4a; }
+        [data-theme="dark"] .salary-item .icon.purple { background: #2a1a4a; color: #9a6aff; }
+        [data-theme="dark"] .salary-item .icon.red { background: #3a1a1a; color: #ff6b6b; }
+
+        .salary-item .info .label {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .salary-item .info .label i {
+            margin-right: 4px;
+        }
+
+        .salary-item .info .value {
+            font-size: 1rem;
+            font-weight: 700;
+        }
+
+        .salary-item.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .salary-item.border-blue { border-left-color: #007aff; }
+        .salary-item.border-green { border-left-color: #34c759; }
+        .salary-item.border-orange { border-left-color: #ff9500; }
+        .salary-item.border-purple { border-left-color: #7c3aed; }
+        .salary-item.border-red { border-left-color: #ff6b6b; }
+
+        .salary-item .color-blue { color: #007aff; }
+        .salary-item .color-green { color: #34c759; }
+        .salary-item .color-orange { color: #ff9500; }
+        .salary-item .color-purple { color: #7c3aed; }
+        .salary-item .color-red { color: #ff6b6b; }
+
+        /* ============================================================
+           WORKING HOURS
+           ============================================================ */
+        .working-hours-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 8px;
+        }
+
+        .working-hour-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 12px;
+            background: var(--bg-hover);
+            border-radius: 8px;
+            font-size: 0.8rem;
+            border-left: 3px solid #007aff;
+        }
+
+        .working-hour-item .day {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .working-hour-item .day i {
+            margin-right: 6px;
+            color: var(--text-muted);
+        }
+
+        .working-hour-item .time {
+            color: var(--text-muted);
+        }
+
+        .working-hour-item .time i {
+            margin-right: 4px;
+        }
+
+        /* ============================================================
+           STUDENTS LIST
+           ============================================================ */
+        .student-list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: var(--transition);
+            border-radius: 6px;
+        }
+
+        .student-list-item:hover {
+            background: var(--bg-hover);
+        }
+
+        .student-list-item:last-child {
+            border-bottom: none;
+        }
+
+        .student-list-item .name {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .student-list-item .name i {
+            margin-right: 8px;
+            color: var(--text-muted);
+        }
+
+        /* ============================================================
+           PAYMENT / ATTENDANCE ITEMS
+           ============================================================ */
+        .history-item-slim {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .history-item-slim:last-child {
+            border-bottom: none;
+        }
+
+        .history-item-slim .left .name {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .history-item-slim .left .name i {
+            margin-right: 6px;
+            color: var(--text-muted);
+        }
+
+        .history-item-slim .left .meta {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-left: 8px;
+        }
+
+        .history-item-slim .left .meta i {
+            margin-right: 4px;
+        }
+
+        .history-item-slim .right .amount {
+            font-weight: 600;
+            color: var(--color-success);
+        }
+
+        .history-item-slim .right .amount i {
+            margin-right: 4px;
+        }
+
+        .history-item-slim .right .status {
+            margin-left: 8px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 24px 16px;
+            color: var(--text-muted);
+        }
+
+        .empty-state i {
+            font-size: 2rem;
+            display: block;
+            margin-bottom: 8px;
+            opacity: 0.3;
+        }
+
+        .empty-state p {
+            font-size: 0.85rem;
+        }
+
+        .btn-back {
+            width: auto;
+            padding: 8px 16px;
+            font-size: 0.8rem;
+        }
+
+        @media (max-width: 768px) {
+            .profile-container { padding: 12px 16px; }
+            .profile-header-card { flex-direction: column; text-align: center; padding: 20px; }
+            .profile-avatar-large { width: 72px; height: 72px; font-size: 1.8rem; }
+            .profile-info h2 { font-size: 1.1rem; }
+            .stats-grid-3 { grid-template-columns: 1fr; padding: 16px; }
+            .salary-grid { grid-template-columns: 1fr; }
+            .salary-item.full-width { grid-column: 1; }
+            .working-hours-grid { grid-template-columns: 1fr 1fr; }
+            .section-card { padding: 16px; }
+            .history-item-slim { flex-direction: column; align-items: flex-start; gap: 6px; }
+            .history-item-slim .right { width: 100%; display: flex; justify-content: space-between; }
+            .student-list-item { flex-direction: column; align-items: flex-start; gap: 4px; }
+        }
+
+        @media (max-width: 480px) {
+            .working-hours-grid { grid-template-columns: 1fr; }
+            .profile-header-card { padding: 16px; }
+            .profile-avatar-large { width: 60px; height: 60px; font-size: 1.5rem; }
+            .profile-info h2 { font-size: 1rem; }
+            .salary-item { padding: 12px 14px; }
+            .salary-item .info .value { font-size: 0.9rem; }
+            .section-card { padding: 12px 14px; }
+            .section-card .section-title { font-size: 0.8rem; }
+        }
+
+        [data-theme="dark"] .salary-item { background: var(--bg-hover); }
+        [data-theme="dark"] .salary-item:hover { background: var(--bg-active); }
+        [data-theme="dark"] .working-hour-item { background: var(--bg-hover); }
+        [data-theme="dark"] .student-list-item:hover { background: var(--bg-hover); }
+        [data-theme="dark"] .profile-header-card:hover { box-shadow: 0 4px 20px rgba(255,255,255,0.03); }
+        [data-theme="dark"] .section-card:hover { box-shadow: 0 2px 12px rgba(255,255,255,0.02); }
     </style>
 </head>
 <body>
     <div class="app-container">
-        <!-- ==================== SIDEBAR ==================== -->
+        <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-brand">
                 <div class="brand-icon"><i class="fas fa-crown"></i></div>
@@ -446,183 +419,215 @@
                 </div>
             </div>
             <nav class="sidebar-nav">
-                <a href="dashboard.html" class="nav-link active">
-                    <i class="fas fa-chart-pie"></i> <span data-i18n="dashboard">Dashboard</span>
-                </a>
-                <a href="teachers.html" class="nav-link">
-                    <i class="fas fa-chalkboard-teacher"></i> <span data-i18n="teachers">O'qituvchilar</span>
-                    <span class="sidebar-badge" id="sidebarTeacherBadge" style="display:none;">0</span>
-                </a>
-                <a href="students.html" class="nav-link">
-                    <i class="fas fa-graduation-cap"></i> <span data-i18n="students">O'quvchilar</span>
-                    <span class="sidebar-badge" id="sidebarStudentBadge" style="display:none;">0</span>
-                </a>
-                <a href="payments.html" class="nav-link">
-                    <i class="fas fa-money-bill"></i> <span data-i18n="payments">To'lovlar</span>
-                </a>
-                <a href="attendance.html" class="nav-link">
-                    <i class="fas fa-calendar-check"></i> <span data-i18n="attendance">Davomat</span>
-                </a>
-                <a href="reports.html" class="nav-link">
-                    <i class="fas fa-file-alt"></i> <span data-i18n="reports">Hisobotlar</span>
-                </a>
-                <a href="subjects.html" class="nav-link">
-                    <i class="fas fa-book"></i> <span data-i18n="subjects">Fanlar</span>
-                </a>
-                <a href="all.html" class="nav-link">
-                    <i class="fas fa-th-list"></i> <span data-i18n="all">Barchasi</span>
-                </a>
-                <a href="notifications.html" class="nav-link">
-                    <i class="fas fa-bell"></i> <span data-i18n="notifications">Bildirishnomalar</span>
-                    <span class="sidebar-badge" id="sidebarBadge" style="display:none;">0</span>
-                </a>
-                <a href="settings.html" class="nav-link">
-                    <i class="fas fa-cog"></i> <span data-i18n="settings">Sozlamalar</span>
-                </a>
+                <a href="dashboard.html" class="nav-link"><i class="fas fa-chart-pie"></i> <span data-i18n="dashboard">Dashboard</span></a>
+                <a href="teachers.html" class="nav-link active"><i class="fas fa-chalkboard-teacher"></i> <span data-i18n="teachers">O'qituvchilar</span></a>
+                <a href="students.html" class="nav-link"><i class="fas fa-graduation-cap"></i> <span data-i18n="students">O'quvchilar</span></a>
+                <a href="payments.html" class="nav-link"><i class="fas fa-money-bill"></i> <span data-i18n="payments">To'lovlar</span></a>
+                <a href="attendance.html" class="nav-link"><i class="fas fa-calendar-check"></i> <span data-i18n="attendance">Davomat</span></a>
+                <a href="reports.html" class="nav-link"><i class="fas fa-file-alt"></i> <span data-i18n="reports">Hisobotlar</span></a>
+                <a href="subjects.html" class="nav-link"><i class="fas fa-book"></i> <span data-i18n="subjects">Fanlar</span></a>
+                <a href="all.html" class="nav-link"><i class="fas fa-th-list"></i> <span data-i18n="all">Barchasi</span></a>
+                <a href="settings.html" class="nav-link"><i class="fas fa-cog"></i> <span data-i18n="settings">Sozlamalar</span></a>
             </nav>
             <div class="sidebar-footer">
-                <button id="logoutBtn" class="btn-logout">
-                    <i class="fas fa-sign-out-alt"></i> <span data-i18n="logout">Chiqish</span>
-                </button>
+                <button id="logoutBtn" class="btn-logout"><i class="fas fa-sign-out-alt"></i> <span data-i18n="logout">Chiqish</span></button>
             </div>
         </aside>
-
         <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-        <!-- ==================== MAIN CONTENT ==================== -->
+        <!-- Main Content -->
         <main class="main-content">
-            <!-- HEADER -->
+            <!-- Header -->
             <header class="top-header">
                 <div class="header-left">
                     <button id="menuToggle" class="menu-toggle"><i class="fas fa-bars"></i></button>
                     <div>
-                        <h2><i class="fas fa-chart-pie"></i> <span data-i18n="dashboard">Dashboard</span></h2>
-                        <p class="text-muted" id="schoolName">Nurli Ta'lim Markazi</p>
+                        <h2><i class="fas fa-chalkboard-teacher"></i> <span data-i18n="teacher_profile">O'qituvchi profili</span></h2>
+                        <p class="text-muted" id="teacherProfileName"><i class="fas fa-user"></i> O'qituvchi ma'lumotlari</p>
                     </div>
                 </div>
                 <div class="header-right">
-                    <!-- ⭐ NOTIFICATION ICON -->
-                    <a href="notifications.html" class="notification-link" id="notificationBell" style="position:relative;display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;border:1px solid var(--border-color);background:var(--bg-card);color:var(--text-primary);text-decoration:none;transition:var(--transition);">
-                        <i class="fas fa-bell" style="font-size:1.2rem;"></i>
-                        <span id="notificationBadge" style="position:absolute;top:-4px;right:-4px;background:#ff3b30;color:white;font-size:0.6rem;border-radius:50%;padding:2px 6px;min-width:18px;text-align:center;display:none;font-weight:700;line-height:1.4;box-shadow:0 2px 6px rgba(255,59,48,0.3);">0</span>
-                    </a>
-
                     <div class="user-profile">
                         <div class="user-avatar"><span id="userInitial">A</span></div>
                         <div class="user-info">
                             <p class="user-name" id="userName">Admin</p>
-                            <p class="user-role text-muted">Admin Customer</p>
+                            <p class="user-role text-muted"><i class="fas fa-user-shield"></i> Admin Customer</p>
                         </div>
                     </div>
                 </div>
             </header>
 
-            <!-- ==================== STATS CARDS ==================== -->
-            <section class="stats-grid">
-                <!-- 1. O'qituvchilar -->
-                <div class="stat-card">
-                    <div class="stat-icon-wrapper blue">
+            <!-- Profile Content -->
+            <div class="profile-container" id="profileContainer">
+
+                <!-- ============================================================
+                     PROFILE HEADER
+                     ============================================================ -->
+                <div class="profile-header-card">
+                    <div class="profile-avatar-large" id="teacherAvatar">
                         <i class="fas fa-chalkboard-teacher"></i>
                     </div>
-                    <div class="stat-info">
-                        <p class="stat-label"><i class="fas fa-users"></i> Jami O'qituvchilar</p>
-                        <p class="stat-value" id="teacherCount">0</p>
-                        <span class="stat-change positive" id="teacherChange">
-                            <i class="fas fa-arrow-up"></i> Faol: <span id="activeTeachers">0</span>
-                        </span>
+                    <div class="profile-info">
+                        <h2 id="teacherFullName">-</h2>
+                        <p class="text-muted" id="teacherEmail"><i class="fas fa-envelope"></i> -</p>
+                        <p class="text-muted" id="teacherPhone" style="font-size:0.8rem;"><i class="fas fa-phone"></i> -</p>
+                        <div class="profile-badges">
+                            <span class="badge-item" id="teacherStatus"><i class="fas fa-circle" style="color:#34c759;"></i> Faol</span>
+                            <span class="badge-item" id="teacherSubject"><i class="fas fa-book"></i> -</span>
+                            <span class="badge-item"><i class="fas fa-users"></i> <span id="teacherStudentCount">0</span> o'quvchi</span>
+                            <span class="badge-item"><i class="fas fa-calendar-plus"></i> Qo'shilgan: <span id="teacherJoined">-</span></span>
+                        </div>
                     </div>
-                    <div class="stat-bg-icon"><i class="fas fa-chalkboard-teacher"></i></div>
+                    <div style="margin-left:auto;">
+                        <button class="btn-secondary btn-back" onclick="window.location.href='teachers.html'">
+                            <i class="fas fa-arrow-left"></i> Orqaga
+                        </button>
+                    </div>
                 </div>
 
-                <!-- 2. O'quvchilar -->
-                <div class="stat-card">
-                    <div class="stat-icon-wrapper green">
-                        <i class="fas fa-graduation-cap"></i>
+                <!-- ============================================================
+                     STATS
+                     ============================================================ -->
+                <div class="stats-grid-3">
+                    <div class="stat-item-center">
+                        <div class="stat-number" id="statStudents">0</div>
+                        <div class="stat-label"><i class="fas fa-users"></i> O'quvchilar</div>
                     </div>
-                    <div class="stat-info">
-                        <p class="stat-label"><i class="fas fa-user-graduate"></i> Jami O'quvchilar</p>
-                        <p class="stat-value" id="studentCount">0</p>
-                        <span class="stat-change positive" id="studentChange">
-                            <i class="fas fa-arrow-up"></i> Faol: <span id="activeStudents">0</span>
-                        </span>
+                    <div class="stat-item-center">
+                        <div class="stat-number" id="statAge">-</div>
+                        <div class="stat-label"><i class="fas fa-calendar-alt"></i> Yosh</div>
                     </div>
-                    <div class="stat-bg-icon"><i class="fas fa-graduation-cap"></i></div>
+                    <div class="stat-item-center">
+                        <div class="stat-number" id="statStatus">-</div>
+                        <div class="stat-label"><i class="fas fa-circle"></i> Holati</div>
+                    </div>
                 </div>
 
-                <!-- 3. Jami XP -->
-                <div class="stat-card">
-                    <div class="stat-icon-wrapper purple">
-                        <i class="fas fa-star"></i>
+                <!-- ============================================================
+                     ⭐ MAOSH MA'LUMOTLARI - IKONKALAR BILAN
+                     ============================================================ -->
+                <div class="section-card">
+                    <div class="section-title">
+                        <i class="fas fa-money-bill-wave"></i> Maosh ma'lumotlari
+                        <span class="sub-text"><i class="fas fa-info-circle"></i> Oylik asosida</span>
                     </div>
-                    <div class="stat-info">
-                        <p class="stat-label"><i class="fas fa-trophy"></i> Jami XP</p>
-                        <p class="stat-value" id="totalXP">0</p>
-                        <span class="stat-change positive" id="xpChange">
-                            <i class="fas fa-star"></i> O'rtacha: <span id="avgXP">0</span>
-                        </span>
+                    <div class="salary-grid">
+                        <!-- Oylik maosh -->
+                        <div class="salary-item border-blue">
+                            <div class="icon blue"><i class="fas fa-calendar-alt"></i></div>
+                            <div class="info">
+                                <div class="label"><i class="fas fa-calendar-alt"></i> Oylik maosh</div>
+                                <div class="value color-blue" id="teacherMonthlySalaryDisplay">0 so'm</div>
+                            </div>
+                        </div>
+
+                        <!-- To'langan -->
+                        <div class="salary-item border-green">
+                            <div class="icon green"><i class="fas fa-check-circle"></i></div>
+                            <div class="info">
+                                <div class="label"><i class="fas fa-check-circle"></i> To'langan</div>
+                                <div class="value color-green" id="teacherTotalPaidDisplay">0 so'm</div>
+                            </div>
+                        </div>
+
+                        <!-- Qolgan qarz -->
+                        <div class="salary-item border-orange">
+                            <div class="icon orange"><i class="fas fa-exclamation-triangle"></i></div>
+                            <div class="info">
+                                <div class="label"><i class="fas fa-exclamation-triangle"></i> Qolgan qarz</div>
+                                <div class="value color-orange" id="teacherRemainingDisplay">0 so'm</div>
+                            </div>
+                        </div>
+
+                        <!-- Yillik maosh -->
+                        <div class="salary-item border-purple">
+                            <div class="icon purple"><i class="fas fa-chart-bar"></i></div>
+                            <div class="info">
+                                <div class="label"><i class="fas fa-chart-bar"></i> Yillik maosh</div>
+                                <div class="value color-purple" id="teacherYearlySalaryDisplay">0 so'm</div>
+                            </div>
+                        </div>
+
+                        <!-- Kunlik maosh -->
+                        <div class="salary-item border-red full-width">
+                            <div class="icon red"><i class="fas fa-coins"></i></div>
+                            <div class="info">
+                                <div class="label"><i class="fas fa-coins"></i> Kunlik maosh (22 kun)</div>
+                                <div class="value color-red" id="teacherDailySalaryDisplay">0 so'm</div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="stat-bg-icon"><i class="fas fa-star"></i></div>
                 </div>
 
-                <!-- 4. Bugungi davomat -->
-                <div class="stat-card">
-                    <div class="stat-icon-wrapper orange">
-                        <i class="fas fa-calendar-check"></i>
+                <!-- ============================================================
+                     ISH VAQTLARI
+                     ============================================================ -->
+                <div class="section-card">
+                    <div class="section-title">
+                        <i class="fas fa-clock"></i> Ish vaqtlari
+                        <span class="sub-text"><i class="fas fa-calendar-week"></i> Haftalik jadval</span>
                     </div>
-                    <div class="stat-info">
-                        <p class="stat-label"><i class="fas fa-clock"></i> Bugungi davomat</p>
-                        <p class="stat-value" id="todayAttendance">0</p>
-                        <span class="stat-change" id="attendancePercent">0%</span>
+                    <div id="teacherWorkingHours" class="working-hours-grid">
+                        <div class="empty-state">
+                            <i class="fas fa-clock"></i>
+                            <p><i class="fas fa-info-circle"></i> Ish vaqtlari belgilanmagan</p>
+                        </div>
                     </div>
-                    <div class="stat-bg-icon"><i class="fas fa-calendar-check"></i></div>
+                    <div style="display:flex;gap:16px;margin-top:12px;font-size:0.8rem;color:var(--text-muted);flex-wrap:wrap;">
+                        <span><i class="fas fa-calendar-day"></i> Kunlik dars: <strong id="teacherDailyLessons">4</strong></span>
+                        <span><i class="fas fa-hourglass-half"></i> Dars davomiyligi: <strong id="teacherLessonDuration">60 daqiqa</strong></span>
+                    </div>
                 </div>
-            </section>
 
-            <!-- ==================== ATTENDANCE CARDS ==================== -->
-            <section class="attendance-cards">
-                <div class="attendance-card">
-                    <div class="icon green"><i class="fas fa-check-circle"></i></div>
-                    <div class="info">
-                        <p class="label"><i class="fas fa-user-check"></i> Keldi</p>
-                        <p class="value" id="presentCount" style="color:var(--color-success);">0</p>
+                <!-- ============================================================
+                     O'QUVCHILAR RO'YXATI
+                     ============================================================ -->
+                <div class="section-card">
+                    <div class="section-title">
+                        <i class="fas fa-users"></i> O'quvchilar ro'yxati
+                        <span class="sub-text"><i class="fas fa-user-graduate"></i> Jami: <span id="studentCountBadge">0</span> ta</span>
+                    </div>
+                    <div id="studentsList">
+                        <div class="empty-state">
+                            <i class="fas fa-user-graduate"></i>
+                            <p><i class="fas fa-info-circle"></i> O'quvchilar mavjud emas</p>
+                        </div>
                     </div>
                 </div>
-                <div class="attendance-card">
-                    <div class="icon orange"><i class="fas fa-exclamation-triangle"></i></div>
-                    <div class="info">
-                        <p class="label"><i class="fas fa-comment"></i> Sababli</p>
-                        <p class="value" id="absentReasonCount" style="color:var(--color-warning);">0</p>
-                    </div>
-                </div>
-                <div class="attendance-card">
-                    <div class="icon red"><i class="fas fa-times-circle"></i></div>
-                    <div class="info">
-                        <p class="label"><i class="fas fa-user-times"></i> Kelmadi</p>
-                        <p class="value" id="absentCount" style="color:var(--color-danger);">0</p>
-                    </div>
-                </div>
-            </section>
 
-            <!-- ==================== SUBSCRIPTION CARD ==================== -->
-            <section class="subscription-card">
-                <div class="sub-item">
-                    <div class="label"><i class="fas fa-circle" style="color:#34c759;"></i> Holati</div>
-                    <div class="value status-active" id="subscriptionStatus">Yuklanmoqda...</div>
+                <!-- ============================================================
+                     TO'LOVLAR
+                     ============================================================ -->
+                <div class="section-card">
+                    <div class="section-title">
+                        <i class="fas fa-money-bill-wave"></i> To'lovlar
+                        <span class="sub-text"><i class="fas fa-wallet"></i> Jami: <span id="teacherTotalSalaryDisplay2">0 so'm</span></span>
+                    </div>
+                    <div id="teacherPaymentsList">
+                        <div class="empty-state">
+                            <i class="fas fa-money-bill"></i>
+                            <p><i class="fas fa-info-circle"></i> To'lovlar mavjud emas</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="sub-item">
-                    <div class="label"><i class="fas fa-tag"></i> Turi</div>
-                    <div class="value" id="subscriptionType">Yuklanmoqda...</div>
-                </div>
-                <div class="sub-item">
-                    <div class="label"><i class="fas fa-calendar-alt"></i> Tugash vaqti</div>
-                    <div class="value" id="subscriptionEnd">Yuklanmoqda...</div>
-                </div>
-                <div class="sub-item">
-                    <div class="label"><i class="fas fa-clock"></i> Qolgan kun</div>
-                    <div class="value" id="subscriptionDays" style="color:#007aff;">Yuklanmoqda...</div>
-                </div>
-            </section>
 
+                <!-- ============================================================
+                     DAVOMAT TARIXI
+                     ============================================================ -->
+                <div class="section-card">
+                    <div class="section-title">
+                        <i class="fas fa-calendar-check"></i> Davomat tarixi
+                        <span class="sub-text"><i class="fas fa-clock"></i> Oxirgi 10 kun</span>
+                    </div>
+                    <div id="teacherAttendanceList">
+                        <div class="empty-state">
+                            <i class="fas fa-calendar"></i>
+                            <p><i class="fas fa-info-circle"></i> Davomat ma'lumotlari mavjud emas</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
         </main>
     </div>
 
@@ -640,6 +645,6 @@
     <script src="js/theme.js"></script>
     <script src="js/i18n.js"></script>
     <script src="js/utils.js"></script>
-    <script src="js/dashboard.js"></script>
+    <script src="js/teacher-profile.js"></script>
 </body>
 </html>
