@@ -373,31 +373,41 @@ async function loadDashboardStats() {
                 }
             }
 
-            // ⭐ Subscription
+            // ⭐ Subscription (IKONKALAR BILAN)
             if (stats.subscription) {
                 var sub = stats.subscription;
-                var statusMap = { 'active': '✅ Faol', 'inactive': '⛔ Faol emas', 'expired': '⚠️ Muddati tugagan' };
+                var statusMap = { 
+                    'active': '<i class="fas fa-check-circle" style="color:#34c759;"></i> Faol', 
+                    'inactive': '<i class="fas fa-times-circle" style="color:#ff3b30;"></i> Faol emas', 
+                    'expired': '<i class="fas fa-exclamation-circle" style="color:#ff9500;"></i> Muddati tugagan' 
+                };
                 var statusEl = document.getElementById('subscriptionStatus');
                 if (statusEl) {
                     var statusText = statusMap[sub.status] || sub.status || 'Noma\'lum';
-                    statusEl.textContent = statusText;
+                    statusEl.innerHTML = statusText;
                     statusEl.className = 'value ' + (sub.status === 'active' ? 'status-active' : sub.status === 'expired' ? 'status-expired' : 'status-inactive');
                 }
 
-                var typeMap = { 'monthly': '📅 Oylik', '6months': '📅 6 oylik', 'yearly': '📅 Yillik', 'custom': '⚙️ Custom', 'none': '❌ Yo\'q' };
+                var typeMap = { 
+                    'monthly': '<i class="fas fa-calendar-alt"></i> Oylik', 
+                    '6months': '<i class="fas fa-calendar-alt"></i> 6 oylik', 
+                    'yearly': '<i class="fas fa-calendar-alt"></i> Yillik', 
+                    'custom': '<i class="fas fa-cogs"></i> Custom', 
+                    'none': '<i class="fas fa-times"></i> Yo\'q' 
+                };
                 var typeEl = document.getElementById('subscriptionType');
                 if (typeEl) {
-                    typeEl.textContent = typeMap[sub.type] || sub.type || 'Noma\'lum';
+                    typeEl.innerHTML = typeMap[sub.type] || sub.type || 'Noma\'lum';
                 }
 
                 var endEl = document.getElementById('subscriptionEnd');
                 if (endEl) {
                     if (sub.formattedEndDate) {
-                        endEl.textContent = sub.formattedEndDate;
+                        endEl.innerHTML = '<i class="fas fa-clock"></i> ' + sub.formattedEndDate;
                     } else if (sub.endDate) {
-                        endEl.textContent = formatDateTime(sub.endDate);
+                        endEl.innerHTML = '<i class="fas fa-clock"></i> ' + formatDateTime(sub.endDate);
                     } else {
-                        endEl.textContent = 'Muddati yo\'q';
+                        endEl.innerHTML = '<i class="fas fa-clock"></i> Muddati yo\'q';
                     }
                 }
             }
@@ -434,13 +444,13 @@ function updateCountdown() {
 
     var sub = lastDashboardStats.subscription;
     if (!sub.endDate) {
-        daysEl.textContent = '-';
+        daysEl.innerHTML = '<i class="fas fa-hourglass-half"></i> -';
         return;
     }
 
     var endDate = new Date(sub.endDate);
     if (isNaN(endDate.getTime())) {
-        daysEl.textContent = '-';
+        daysEl.innerHTML = '<i class="fas fa-hourglass-half"></i> -';
         return;
     }
 
@@ -448,7 +458,7 @@ function updateCountdown() {
     var diff = endDate - now;
 
     if (diff <= 0) {
-        daysEl.textContent = '⚠️ Vaqt tugagan!';
+        daysEl.innerHTML = '<i class="fas fa-exclamation-triangle" style="color:var(--color-danger);"></i> Vaqt tugagan!';
         daysEl.style.color = 'var(--color-danger)';
         return;
     }
@@ -458,7 +468,8 @@ function updateCountdown() {
     var minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
     var seconds = Math.floor((diff % (1000 * 60)) / 1000);
 
-    daysEl.textContent = days + ' kun ' + hours + 's ' + minutes + 'm ' + seconds + 's';
+    var icon = days < 7 ? '<i class="fas fa-clock" style="color:var(--color-warning);"></i>' : '<i class="fas fa-hourglass-half"></i>';
+    daysEl.innerHTML = icon + ' ' + days + ' kun ' + hours + 's ' + minutes + 'm ' + seconds + 's';
     daysEl.style.color = days < 7 ? 'var(--color-warning)' : 'var(--color-success)';
 }
 
