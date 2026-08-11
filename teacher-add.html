@@ -14,9 +14,126 @@
     <link rel="stylesheet" href="css/input.css" />
     <link rel="stylesheet" href="css/theme.css" />
     <link rel="stylesheet" href="css/responsive.css" />
+
+    <style>
+        /* ============================================================
+           FORM STYLES - CHIROYLI
+           ============================================================ */
+        .form-container {
+            padding: 20px 24px;
+            max-width: 640px;
+            margin: 0 auto;
+        }
+
+        .app-form {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 28px 32px;
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+        }
+
+        .app-form:hover {
+            box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+        }
+
+        .app-form .form-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        .app-form .form-actions .btn-primary,
+        .app-form .form-actions .btn-secondary {
+            flex: 1;
+            justify-content: center;
+        }
+
+        .form-message {
+            margin-top: 16px;
+            padding: 12px 16px;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .form-message.success {
+            display: block;
+            background: #e8f5e9;
+            color: var(--color-success);
+            border: 1px solid #a5d6a7;
+        }
+
+        .form-message.error {
+            display: block;
+            background: #fef2f2;
+            color: var(--color-danger);
+            border: 1px solid #fecaca;
+        }
+
+        [data-theme="dark"] .form-message.success {
+            background: #1a3a2a;
+            color: #4ac759;
+            border-color: #4ac759;
+        }
+
+        [data-theme="dark"] .form-message.error {
+            background: #3a1a1a;
+            color: #ff3b30;
+            border-color: #ff3b30;
+        }
+
+        /* Loading state for select */
+        .input-wrapper select:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .form-container {
+                padding: 12px 16px;
+            }
+
+            .app-form {
+                padding: 16px 18px;
+            }
+
+            .app-form .form-actions {
+                flex-direction: column;
+            }
+
+            .app-form .form-actions .btn-primary,
+            .app-form .form-actions .btn-secondary {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .app-form {
+                padding: 12px 14px;
+                border-radius: 12px;
+            }
+
+            .form-group {
+                margin-bottom: 12px;
+            }
+
+            .input-wrapper input,
+            .input-wrapper select {
+                padding: 8px 12px;
+                font-size: 0.8rem;
+            }
+        }
+
+        [data-theme="dark"] .app-form {
+            background: var(--bg-card);
+            border-color: var(--border-color);
+        }
+    </style>
 </head>
 <body>
     <div class="app-container">
+        <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-brand">
                 <div class="brand-icon"><i class="fas fa-crown"></i></div>
@@ -24,57 +141,44 @@
                 <span class="brand-version">v1.0</span>
             </div>
             <nav class="sidebar-nav">
-                <a href="dashboard.html" class="nav-link" data-i18n="dashboard">
-                    <i class="fas fa-chart-pie"></i> <span>Dashboard</span>
-                </a>
-                <a href="teachers.html" class="nav-link active" data-i18n="teachers">
-                    <i class="fas fa-chalkboard-teacher"></i> <span>O'qituvchilar</span>
-                </a>
-                <a href="students.html" class="nav-link" data-i18n="students">
-                    <i class="fas fa-graduation-cap"></i> <span>O'quvchilar</span>
-                </a>
-                <a href="payments.html" class="nav-link" data-i18n="payments">
-                    <i class="fas fa-money-bill"></i> <span>To'lovlar</span>
-                </a>
-                 <a href="attendance.html" class="nav-link">
-                    <i class="fas fa-calendar-check"></i> <span data-i18n="attendance">Davomat</span>
-                </a>
-                <a href="reports.html" class="nav-link" data-i18n="reports">
-                    <i class="fas fa-file-alt"></i> <span>Hisobotlar</span>
-                </a>
-                <a href="subjects.html" class="nav-link" data-i18n="subjects">
-                    <i class="fas fa-book"></i> <span>Fanlar</span>
-                </a>
-                <a href="settings.html" class="nav-link" data-i18n="settings">
-                    <i class="fas fa-cog"></i> <span>Sozlamalar</span>
-                </a>
+                <a href="dashboard.html" class="nav-link"><i class="fas fa-chart-pie"></i> Dashboard</a>
+                <a href="teachers.html" class="nav-link active"><i class="fas fa-chalkboard-teacher"></i> O'qituvchilar</a>
+                <a href="students.html" class="nav-link"><i class="fas fa-graduation-cap"></i> O'quvchilar</a>
+                <a href="payments.html" class="nav-link"><i class="fas fa-money-bill"></i> To'lovlar</a>
+                <a href="attendance.html" class="nav-link"><i class="fas fa-calendar-check"></i> Davomat</a>
+                <a href="reports.html" class="nav-link"><i class="fas fa-file-alt"></i> Hisobotlar</a>
+                <a href="subjects.html" class="nav-link"><i class="fas fa-book"></i> Fanlar</a>
+                <a href="all.html" class="nav-link"><i class="fas fa-th-list"></i> Barchasi</a>
+                <a href="settings.html" class="nav-link"><i class="fas fa-cog"></i> Sozlamalar</a>
             </nav>
             <div class="sidebar-footer">
-                <button id="logoutBtn" class="btn-logout">
-                    <i class="fas fa-sign-out-alt"></i> <span data-i18n="logout">Chiqish</span>
-                </button>
+                <button id="logoutBtn" class="btn-logout"><i class="fas fa-sign-out-alt"></i> Chiqish</button>
             </div>
         </aside>
 
+        <!-- Main Content -->
         <main class="main-content">
+            <!-- Header -->
             <header class="top-header">
                 <div class="header-left">
                     <button id="menuToggle" class="menu-toggle"><i class="fas fa-bars"></i></button>
                     <div>
-                        <h2 data-i18n="add_teacher"><i class="fas fa-user-plus"></i> Yangi O'qituvchi</h2>
-                        <p class="text-muted" data-i18n="teachers_desc">Yangi o'qituvchi qo'shish</p>
+                        <h2><i class="fas fa-user-plus"></i> Yangi O'qituvchi</h2>
+                        <p class="text-muted">Yangi o'qituvchi qo'shish</p>
                     </div>
                 </div>
                 <div class="header-right">
                     <button class="theme-toggle-small" id="themeToggleSmall"><i class="fas fa-moon"></i></button>
-                    <a href="teachers.html" class="btn-secondary"><i class="fas fa-arrow-left"></i> <span data-i18n="back">Orqaga</span></a>
+                    <a href="teachers.html" class="btn-secondary"><i class="fas fa-arrow-left"></i> Orqaga</a>
                 </div>
             </header>
 
+            <!-- Form -->
             <section class="form-container">
                 <form id="addTeacherForm" class="app-form">
+                    <!-- F.I.SH -->
                     <div class="form-group">
-                        <label for="fullName"><i class="fas fa-user"></i> <span data-i18n="full_name">F.I.SH</span></label>
+                        <label for="fullName"><i class="fas fa-user"></i> F.I.SH <span style="color:var(--color-danger);">*</span></label>
                         <div class="input-wrapper">
                             <input type="text" id="fullName" placeholder="Palonchiyev Palonchi" required />
                             <i class="fas fa-check-circle input-icon success"></i>
@@ -82,8 +186,9 @@
                         </div>
                     </div>
 
+                    <!-- Email -->
                     <div class="form-group">
-                        <label for="email"><i class="fas fa-envelope"></i> <span data-i18n="email">Email</span></label>
+                        <label for="email"><i class="fas fa-envelope"></i> Email <span style="color:var(--color-danger);">*</span></label>
                         <div class="input-wrapper">
                             <input type="email" id="email" placeholder="teacher@example.com" required />
                             <i class="fas fa-check-circle input-icon success"></i>
@@ -91,39 +196,45 @@
                         </div>
                     </div>
 
+                    <!-- Telefon -->
                     <div class="form-group">
-                        <label for="phone"><i class="fas fa-phone"></i> <span data-i18n="phone">Telefon</span></label>
+                        <label for="phone"><i class="fas fa-phone"></i> Telefon</label>
                         <div class="input-wrapper">
                             <input type="text" id="phone" placeholder="+998 90 123 45 67" />
                             <i class="fas fa-check-circle input-icon success"></i>
                         </div>
                     </div>
 
+                    <!-- Parol -->
                     <div class="form-group">
-                        <label for="password"><i class="fas fa-lock"></i> <span data-i18n="password">Parol</span></label>
+                        <label for="password"><i class="fas fa-lock"></i> Parol <span style="color:var(--color-danger);">*</span></label>
                         <div class="input-wrapper">
                             <input type="password" id="password" placeholder="••••••••" required minlength="6" />
-                            <i class="fas fa-check-circle input-icon success"></i>
-                            <i class="fas fa-exclamation-circle input-icon error"></i>
                             <button type="button" class="password-toggle" id="passwordToggle">
                                 <i class="fas fa-eye"></i>
                             </button>
+                            <i class="fas fa-check-circle input-icon success"></i>
+                            <i class="fas fa-exclamation-circle input-icon error"></i>
                         </div>
+                        <small class="input-help"><i class="fas fa-info-circle"></i> Parol kamida 6 ta belgi</small>
                     </div>
 
+                    <!-- Fan -->
                     <div class="form-group">
-                        <label for="subject"><i class="fas fa-book"></i> <span data-i18n="subject">Fan</span></label>
+                        <label for="subject"><i class="fas fa-book"></i> Fan <span style="color:var(--color-danger);">*</span></label>
                         <div class="input-wrapper">
                             <select id="subject" required>
                                 <option value="" selected disabled>Fan tanlang...</option>
                             </select>
                             <i class="fas fa-check-circle input-icon success"></i>
                         </div>
+                        <small class="input-help" id="subjectHelp"><i class="fas fa-spinner fa-spin"></i> Fanlar yuklanmoqda...</small>
                     </div>
 
+                    <!-- Tugmalar -->
                     <div class="form-actions">
-                        <button type="submit" id="submitBtn" class="btn-primary"><i class="fas fa-save"></i> <span data-i18n="save">Saqlash</span></button>
-                        <a href="teachers.html" class="btn-secondary"><span data-i18n="cancel">Bekor qilish</span></a>
+                        <button type="submit" id="submitBtn" class="btn-primary"><i class="fas fa-save"></i> Saqlash</button>
+                        <a href="teachers.html" class="btn-secondary">Bekor qilish</a>
                     </div>
                 </form>
 
@@ -132,6 +243,7 @@
         </main>
     </div>
 
+    <!-- Theme Toggle -->
     <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
         <i class="fas fa-moon moon"></i>
         <i class="fas fa-sun sun"></i>
