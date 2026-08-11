@@ -84,11 +84,7 @@ function initAudio() {
 // SAHIFA YUKLANGANDA
 // ============================================================
 document.addEventListener('DOMContentLoaded', function() {
-    // ⭐ FAQAT 1 MARTA YUKLANISHI UCHUN
-    if (dashboardLoaded) {
-        console.log('⚠️ Dashboard allaqachon yuklangan');
-        return;
-    }
+    if (dashboardLoaded) return;
     dashboardLoaded = true;
 
     console.log('🚀 Dashboard yuklanmoqda...');
@@ -182,7 +178,6 @@ async function updateNotificationBadge() {
             clearTimeout(timeoutId);
 
             if (!response.ok) {
-                console.warn('⚠️ Notifications response not OK:', response.status);
                 return;
             }
 
@@ -252,8 +247,6 @@ async function updateNotificationBadge() {
                         updateNotificationBadge();
                     }, 1000);
                 }
-            } else {
-                console.error('❌ Notifications fetch error:', fetchError);
             }
         }
     } catch (error) {
