@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 });
 
 // ============================================================
-// O'QITUVCHI MA'LUMOTLARI
+// ⭐ O'QITUVCHI MA'LUMOTLARI
 // ============================================================
 async function loadTeacherProfile() {
     try {
@@ -43,6 +43,7 @@ async function loadTeacherProfile() {
         if (data.success) {
             currentTeacher = data.data;
             renderProfile(currentTeacher);
+            updateTeacherSalary(currentTeacher);
         } else {
             showError('O\'qituvchi topilmadi!');
             setTimeout(function() { window.location.href = 'teachers.html'; }, 2000);
@@ -54,7 +55,7 @@ async function loadTeacherProfile() {
 }
 
 // ============================================================
-// O'QITUVCHI TO'LOVLARI
+// ⭐ O'QITUVCHI TO'LOVLARI
 // ============================================================
 async function loadTeacherPayments() {
     try {
@@ -68,7 +69,7 @@ async function loadTeacherPayments() {
 }
 
 // ============================================================
-// O'QITUVCHI DAVOMATI
+// ⭐ O'QITUVCHI DAVOMATI
 // ============================================================
 async function loadTeacherAttendance() {
     try {
@@ -93,110 +94,159 @@ async function loadTeacherAttendance() {
 }
 
 // ============================================================
-// PROFILNI KO'RSATISH
+// ⭐ PROFILNI KO'RSATISH
 // ============================================================
 function renderProfile(teacher) {
+    // Avatar
     document.getElementById('teacherAvatar').textContent = teacher.status === 'active' ? '👨‍🏫' : '👨‍🏫⛔';
+    
+    // Ism va ma'lumotlar
     document.getElementById('teacherFullName').textContent = teacher.fullName || 'Noma\'lum';
     document.getElementById('teacherEmail').textContent = teacher.email || '-';
-    document.getElementById('teacherSubject').textContent = teacher.subject || '-';
     document.getElementById('teacherPhone').textContent = teacher.phone || '-';
     document.getElementById('teacherProfileName').textContent = teacher.fullName || 'O\'qituvchi';
+    document.getElementById('teacherSubject').textContent = teacher.subject || '-';
     document.getElementById('teacherStudentCount').textContent = teacher.studentCount || 0;
     document.getElementById('teacherJoined').textContent = formatDate(teacher.createdAt);
     document.getElementById('teacherBirthDate').textContent = formatDate(teacher.birthDate);
-    document.getElementById('teacherSalary').textContent = formatMoney(teacher.salary || 0);
+
+    // Darslar
     document.getElementById('teacherDailyLessons').textContent = teacher.dailyLessons || 4;
     document.getElementById('teacherLessonDuration').textContent = (teacher.lessonDuration || 60) + ' daqiqa';
 
-    // Ish vaqtlari
-    var workingHoursEl = document.getElementById('teacherWorkingHours');
-    if (workingHoursEl && teacher.lessons && teacher.lessons.length > 0) {
-        var workingDays = teacher.lessons.filter(function(w) { return w.isActive !== false; });
-        if (workingDays.length > 0) {
-            workingHoursEl.innerHTML = workingDays.map(function(w) {
-                return '<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border-color);font-size:0.8rem;">' +
-                    '<span>' + w.day + '</span>' +
-                    '<span>' + w.startTime + ' - ' + w.endTime + '</span>' +
-                '</div>';
-            }).join('');
-        } else {
-            workingHoursEl.innerHTML = '<p class="text-muted" style="font-size:0.8rem;">Ish vaqtlari belgilanmagan</p>';
-        }
-    } else {
-        workingHoursEl.innerHTML = '<p class="text-muted" style="font-size:0.8rem;">Ish vaqtlari belgilanmagan</p>';
-    }
-
+    // Status
     var statusEl = document.getElementById('teacherStatus');
     if (teacher.status === 'active') {
-        statusEl.className = 'status-badge active';
         statusEl.textContent = '✅ Faol';
+        statusEl.style.color = '#34c759';
     } else if (teacher.status === 'blocked') {
-        statusEl.className = 'status-badge blocked';
         statusEl.textContent = '⛔ Bloklangan';
+        statusEl.style.color = '#ff3b30';
     } else {
-        statusEl.className = 'status-badge inactive';
         statusEl.textContent = '⛔ Faol emas';
+        statusEl.style.color = 'var(--text-muted)';
     }
 
-    document.getElementById('profileAvatar').textContent = teacher.status === 'active' ? '👨‍🏫' : '👨‍🏫⛔';
-    document.getElementById('profileName').textContent = teacher.fullName || 'Noma\'lum';
-    document.getElementById('profileEmail').textContent = teacher.email || '-';
+    // Stats
     document.getElementById('statStudents').textContent = teacher.studentCount || 0;
     document.getElementById('statAge').textContent = calculateAge(teacher.birthDate);
     document.getElementById('statStatus').textContent = teacher.status === 'active' ? 'Faol' : teacher.status === 'blocked' ? 'Bloklangan' : 'Faol emas';
 
-    var studentsList = document.getElementById('studentsList');
-    if (teacher.students && teacher.students.length > 0) {
-        studentsList.innerHTML = teacher.students.map(function(s) {
-            return '<div class="student-item" onclick="window.location.href=\'student-profile.html?id=' + s._id + '\'" style="cursor:pointer;">' +
-                '<span><i class="fas fa-user-circle"></i> ' + (s.fullName || 'Noma\'lum') + '</span>' +
-                '<span class="status-badge ' + getStatusClass(s.status) + '" style="font-size:0.65rem;">' + formatStatus(s.status) + '</span>' +
-            '</div>';
-        }).join('');
-    } else {
-        studentsList.innerHTML = '<p class="text-muted" style="text-align:center; padding:10px 0;">O\'quvchilar mavjud emas</p>';
-    }
+    // ⭐ O'quvchilar soni badge
+    document.getElementById('studentCountBadge').textContent = teacher.studentCount || 0;
+
+    // ⭐ Ish vaqtlari
+    renderWorkingHours(teacher);
+
+    // ⭐ O'quvchilar ro'yxati
+    renderStudents(teacher);
 }
 
 // ============================================================
-// TO'LOVLARNI KO'RSATISH
+// ⭐ ISH VAQTLARINI KO'RSATISH
+// ============================================================
+function renderWorkingHours(teacher) {
+    var container = document.getElementById('teacherWorkingHours');
+    if (!container) return;
+
+    var lessons = teacher.lessons || [];
+    if (lessons.length === 0) {
+        container.innerHTML = '<div class="empty-state"><i class="fas fa-clock"></i><p>Ish vaqtlari belgilanmagan</p></div>';
+        return;
+    }
+
+    var sortedLessons = lessons.slice().sort(function(a, b) {
+        var days = ['Dushanba', 'Seshanba', 'Chorshanba', 'Payshanba', 'Juma', 'Shanba', 'Yakshanba'];
+        return days.indexOf(a.day) - days.indexOf(b.day);
+    });
+
+    container.innerHTML = sortedLessons.map(function(lesson) {
+        return '<div class="working-hour-item">' +
+            '<span class="day">' + lesson.day + '</span>' +
+            '<span class="time">' + lesson.startTime + ' - ' + lesson.endTime + '</span>' +
+        '</div>';
+    }).join('');
+}
+
+// ============================================================
+// ⭐ O'QUVCHILAR RO'YXATI
+// ============================================================
+function renderStudents(teacher) {
+    var container = document.getElementById('studentsList');
+    if (!container) return;
+
+    var students = teacher.students || [];
+    if (students.length === 0) {
+        container.innerHTML = '<div class="empty-state"><i class="fas fa-user-graduate"></i><p>O\'quvchilar mavjud emas</p></div>';
+        return;
+    }
+
+    container.innerHTML = students.map(function(s) {
+        var statusClass = s.status === 'active' ? 'active' : 'inactive';
+        var statusLabel = s.status === 'active' ? '✅ Faol' : '⛔ Faol emas';
+        return '<div class="student-list-item" onclick="window.location.href=\'student-profile.html?id=' + s._id + '\'">' +
+            '<span class="name"><i class="fas fa-user-circle"></i> ' + (s.fullName || 'Noma\'lum') + '</span>' +
+            '<span class="status-badge ' + statusClass + '" style="font-size:0.65rem;">' + statusLabel + '</span>' +
+        '</div>';
+    }).join('');
+}
+
+// ============================================================
+// ⭐ MAOSH MA'LUMOTLARINI YANGILASH
+// ============================================================
+function updateTeacherSalary(teacher) {
+    var salary = teacher.salary || 0;
+    var totalPaid = teacher.totalPaid || 0;
+    var remaining = salary - totalPaid;
+    var yearly = salary * 12;
+    var daily = Math.round(salary / 22);
+
+    document.getElementById('teacherMonthlySalaryDisplay').textContent = formatMoney(salary);
+    document.getElementById('teacherTotalPaidDisplay').textContent = formatMoney(totalPaid);
+    document.getElementById('teacherRemainingDisplay').textContent = formatMoney(remaining);
+    document.getElementById('teacherYearlySalaryDisplay').textContent = formatMoney(yearly);
+    document.getElementById('teacherDailySalaryDisplay').textContent = formatMoney(daily);
+    document.getElementById('teacherTotalSalaryDisplay2').textContent = formatMoney(totalPaid);
+}
+
+// ============================================================
+// ⭐ TO'LOVLARNI KO'RSATISH
 // ============================================================
 function renderPayments(payments) {
     var container = document.getElementById('teacherPaymentsList');
     if (!container) return;
     
     if (!payments || payments.length === 0) {
-        container.innerHTML = '<p class="text-muted" style="text-align:center; padding:10px 0;">To\'lovlar mavjud emas</p>';
+        container.innerHTML = '<div class="empty-state"><i class="fas fa-money-bill"></i><p>To\'lovlar mavjud emas</p></div>';
         return;
     }
 
     var total = payments.reduce(function(sum, p) { return sum + (p.amount || 0); }, 0);
-    document.getElementById('teacherTotalSalary').textContent = formatMoney(total);
+    document.getElementById('teacherTotalSalaryDisplay2').textContent = formatMoney(total);
 
     container.innerHTML = payments.map(function(p) {
-        return '<div class="payment-item" style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-bottom:1px solid var(--border-color);">' +
-            '<div>' +
-                '<span style="font-weight:600;">' + (p.studentName || 'Noma\'lum') + '</span>' +
-                '<span style="font-size:0.7rem;color:var(--text-muted);margin-left:8px;">' + (p.month || '-') + '</span>' +
+        return '<div class="history-item-slim">' +
+            '<div class="left">' +
+                '<span class="name">' + (p.studentName || 'Noma\'lum') + '</span>' +
+                '<span class="meta">' + (p.month || '-') + '</span>' +
             '</div>' +
-            '<div>' +
-                '<span style="font-weight:600;color:var(--color-success);">' + formatMoney(p.amount) + '</span>' +
-                '<span class="payment-status ' + getStatusClass(p.status) + '" style="font-size:0.6rem;margin-left:8px;">' + formatStatus(p.status) + '</span>' +
+            '<div class="right">' +
+                '<span class="amount">' + formatMoney(p.amount) + '</span>' +
+                '<span class="status status-badge ' + getStatusClass(p.status) + '" style="font-size:0.6rem;">' + formatStatus(p.status) + '</span>' +
             '</div>' +
         '</div>';
     }).join('');
 }
 
 // ============================================================
-// DAVOMATNI KO'RSATISH
+// ⭐ DAVOMATNI KO'RSATISH
 // ============================================================
 function renderAttendance(attendances) {
     var container = document.getElementById('teacherAttendanceList');
     if (!container) return;
     
     if (!attendances || attendances.length === 0) {
-        container.innerHTML = '<p class="text-muted" style="text-align:center; padding:10px 0;">Davomat ma\'lumotlari mavjud emas</p>';
+        container.innerHTML = '<div class="empty-state"><i class="fas fa-calendar"></i><p>Davomat ma\'lumotlari mavjud emas</p></div>';
         return;
     }
 
@@ -204,18 +254,20 @@ function renderAttendance(attendances) {
     var moreCount = Math.max(attendances.length - visible.length, 0);
 
     container.innerHTML = visible.map(function(a) {
-        return '<div class="attendance-item" style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-bottom:1px solid var(--border-color);">' +
-            '<div>' +
-                '<span style="font-weight:500;">' + (a.date || '-') + '</span>' +
-                (a.reason ? '<span style="font-size:0.7rem;color:var(--text-muted);margin-left:8px;"><i class="fas fa-comment"></i> ' + a.reason + '</span>' : '') +
+        return '<div class="history-item-slim">' +
+            '<div class="left">' +
+                '<span class="name">' + (a.date || '-') + '</span>' +
+                (a.reason ? '<span class="meta"><i class="fas fa-comment"></i> ' + a.reason + '</span>' : '') +
             '</div>' +
-            '<span class="status-badge ' + getStatusClass(a.attendance) + '" style="font-size:0.7rem;">' + formatStatus(a.attendance) + '</span>' +
+            '<div class="right">' +
+                '<span class="status status-badge ' + getStatusClass(a.attendance) + '" style="font-size:0.65rem;">' + formatStatus(a.attendance) + '</span>' +
+            '</div>' +
         '</div>';
     }).join('');
 
     if (moreCount > 0) {
-        container.innerHTML += '<button id="toggleTeacherAttendance" class="btn-secondary" style="margin:12px auto 0;display:block;padding:8px 16px;font-size:0.85rem;">' +
-            (teacherAttendanceExpanded ? 'Yopish' : 'Barchasini ko\'rsatish (' + moreCount + '+)') +
+        container.innerHTML += '<button id="toggleTeacherAttendance" class="btn-secondary" style="margin:12px auto 0;display:block;padding:8px 16px;font-size:0.85rem;width:auto;">' +
+            (teacherAttendanceExpanded ? '🔽 Yopish' : '📋 Barchasini ko\'rsatish (' + moreCount + '+)') +
         '</button>';
 
         var toggleButton = document.getElementById('toggleTeacherAttendance');
@@ -232,13 +284,36 @@ function renderAttendance(attendances) {
 // EVENT LISTENERLAR
 // ============================================================
 function setupListeners() {
-    document.getElementById('logoutBtn').addEventListener('click', function() {
-        Auth.logout();
-    });
+    var logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        var newBtn = logoutBtn.cloneNode(true);
+        logoutBtn.parentNode.replaceChild(newBtn, logoutBtn);
+        newBtn.addEventListener('click', function() {
+            if (confirm('Haqiqatan ham chiqmoqchimisiz?')) {
+                Auth.logout();
+            }
+        });
+    }
+
+    var menuToggle = document.getElementById('menuToggle');
+    var sidebar = document.getElementById('sidebar');
+    var overlay = document.getElementById('sidebarOverlay');
+    if (menuToggle && sidebar) {
+        menuToggle.addEventListener('click', function() {
+            sidebar.classList.toggle('open');
+            if (overlay) overlay.classList.toggle('show');
+        });
+    }
+    if (overlay) {
+        overlay.addEventListener('click', function() {
+            sidebar.classList.remove('open');
+            this.classList.remove('show');
+        });
+    }
 }
 
 // ============================================================
-// YORDAMCHI FUNKSIYALAR
+// ⭐ YORDAMCHI FUNKSIYALAR
 // ============================================================
 function formatMoney(amount) {
     if (!amount && amount !== 0) return '0 so\'m';
