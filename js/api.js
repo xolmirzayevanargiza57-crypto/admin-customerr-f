@@ -45,8 +45,9 @@ const API = {
             const url = endpoint.startsWith('http') ? endpoint : `${this.baseURL}${normalizedEndpoint}`;
             console.log(`📡 ${options.method || 'GET'} ${url}`);
             
+            // ⭐ TIMEOUT 60 SONIYAGA OSHIRILDI
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 30000);
+            const timeoutId = setTimeout(() => controller.abort(), 60000);
             
             const response = await fetch(url, {
                 ...options,
@@ -142,7 +143,7 @@ const API = {
     },
     
     // ============================================================
-    // AUTH / PROFILE
+    // ⭐ AUTH / PROFILE
     // ============================================================
     
     async getProfile() {
@@ -170,7 +171,7 @@ const API = {
     },
     
     // ============================================================
-    // DASHBOARD
+    // ⭐ DASHBOARD
     // ============================================================
     
     async getDashboardStats() {
@@ -178,7 +179,7 @@ const API = {
     },
     
     // ============================================================
-    // TEACHERS
+    // ⭐ TEACHERS
     // ============================================================
     
     async getTeachers(params = {}) {
@@ -202,7 +203,7 @@ const API = {
     },
     
     // ============================================================
-    // TEACHER LESSONS
+    // ⭐ TEACHER LESSONS
     // ============================================================
     
     async getTeacherLessons(params = {}) {
@@ -222,7 +223,7 @@ const API = {
     },
     
     // ============================================================
-    // STUDENTS
+    // ⭐ STUDENTS
     // ============================================================
     
     async getStudents(params = {}) {
@@ -246,7 +247,7 @@ const API = {
     },
     
     // ============================================================
-    // STUDENT SUBJECTS
+    // ⭐ STUDENT SUBJECTS
     // ============================================================
     
     async getStudentSubjects(params = {}) {
@@ -262,7 +263,7 @@ const API = {
     },
     
     // ============================================================
-    // SUBJECTS
+    // ⭐ SUBJECTS
     // ============================================================
     
     async getSubjects() {
@@ -282,7 +283,7 @@ const API = {
     },
     
     // ============================================================
-    // ATTENDANCES
+    // ⭐ ATTENDANCES
     // ============================================================
     
     async getAttendances(params = {}) {
@@ -294,7 +295,7 @@ const API = {
     },
     
     // ============================================================
-    // PAYMENTS
+    // ⭐ PAYMENTS
     // ============================================================
     
     async getPayments(params = {}) {
@@ -314,7 +315,7 @@ const API = {
     },
 
     // ============================================================
-    // NOTIFICATIONS (TUZATILGAN)
+    // ⭐ NOTIFICATIONS
     // ============================================================
     
     async getNotifications(params = {}) {
