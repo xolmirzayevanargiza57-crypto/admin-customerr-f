@@ -11,13 +11,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
     <link rel="stylesheet" href="css/style.css" />
-    <link rel="stylesheet" href="css/input.css" />
-    <link rel="stylesheet" href="css/modal.css" />
-    <link rel="stylesheet" href="css/responsive.css" />
-    <link rel="stylesheet" href="css/theme.css" />
 
-    <style>
-        /* ============================================================
+    <style>/* ============================================================
            DASHBOARD STYLES
            ============================================================ */
         .stats-grid {
@@ -417,9 +412,22 @@
 
             <!-- ==================== STATS CARDS ==================== -->
             <section class="stats-grid">
-                <!-- 1. O'qituvchilar -->
+                <!-- 1. Jami Xodimlar -->
                 <div class="stat-card">
-                    <div class="stat-icon-wrapper blue"><i class="fas fa-chalkboard-teacher"></i></div>
+                    <div class="stat-icon-wrapper blue"><i class="fas fa-users"></i></div>
+                    <div class="stat-info">
+                        <p class="stat-label"><i class="fas fa-user-tie"></i> Jami Xodimlar</p>
+                        <p class="stat-value" id="totalStaff">0</p>
+                        <span class="stat-change positive" id="staffChange">
+                            <i class="fas fa-arrow-up"></i> +<span id="newStaff">0</span> bu oy
+                        </span>
+                    </div>
+                    <div class="stat-bg-icon"><i class="fas fa-users"></i></div>
+                </div>
+
+                <!-- 2. Jami O'qituvchilar -->
+                <div class="stat-card">
+                    <div class="stat-icon-wrapper green"><i class="fas fa-chalkboard-teacher"></i></div>
                     <div class="stat-info">
                         <p class="stat-label"><i class="fas fa-users"></i> Jami O'qituvchilar</p>
                         <p class="stat-value" id="teacherCount">0</p>
@@ -430,9 +438,9 @@
                     <div class="stat-bg-icon"><i class="fas fa-chalkboard-teacher"></i></div>
                 </div>
 
-                <!-- 2. O'quvchilar -->
+                <!-- 3. Jami O'quvchilar -->
                 <div class="stat-card">
-                    <div class="stat-icon-wrapper green"><i class="fas fa-graduation-cap"></i></div>
+                    <div class="stat-icon-wrapper purple"><i class="fas fa-graduation-cap"></i></div>
                     <div class="stat-info">
                         <p class="stat-label"><i class="fas fa-user-graduate"></i> Jami O'quvchilar</p>
                         <p class="stat-value" id="studentCount">0</p>
@@ -443,9 +451,9 @@
                     <div class="stat-bg-icon"><i class="fas fa-graduation-cap"></i></div>
                 </div>
 
-                <!-- 3. Jami XP -->
+                <!-- 4. Jami XP -->
                 <div class="stat-card">
-                    <div class="stat-icon-wrapper purple"><i class="fas fa-star"></i></div>
+                    <div class="stat-icon-wrapper orange"><i class="fas fa-star"></i></div>
                     <div class="stat-info">
                         <p class="stat-label"><i class="fas fa-trophy"></i> Jami XP</p>
                         <p class="stat-value" id="totalXP">0</p>
@@ -454,17 +462,6 @@
                         </span>
                     </div>
                     <div class="stat-bg-icon"><i class="fas fa-star"></i></div>
-                </div>
-
-                <!-- 4. Bugungi davomat -->
-                <div class="stat-card">
-                    <div class="stat-icon-wrapper orange"><i class="fas fa-calendar-check"></i></div>
-                    <div class="stat-info">
-                        <p class="stat-label"><i class="fas fa-clock"></i> Bugungi davomat</p>
-                        <p class="stat-value" id="todayAttendance">0</p>
-                        <span class="stat-change" id="attendancePercent">0%</span>
-                    </div>
-                    <div class="stat-bg-icon"><i class="fas fa-calendar-check"></i></div>
                 </div>
             </section>
 
@@ -493,33 +490,26 @@
                 </div>
             </section>
 
-            <!-- ==================== SUBSCRIPTION CARD (IKONKALAR BILAN) ==================== -->
+            <!-- ==================== SUBSCRIPTION CARD ==================== -->
             <section class="subscription-card">
-                <!-- Holati -->
                 <div class="sub-item">
                     <div class="label"><i class="fas fa-circle" style="color:#34c759;"></i> Holati</div>
                     <div class="value status-active" id="subscriptionStatus">
-                        <i class="fas fa-check-circle" style="color:#34c759;"></i> Yuklanmoqda...
+                        <i class="fas fa-check-circle"></i> Yuklanmoqda...
                     </div>
                 </div>
-
-                <!-- Turi -->
                 <div class="sub-item">
                     <div class="label"><i class="fas fa-tag"></i> Turi</div>
                     <div class="value" id="subscriptionType">
                         <i class="fas fa-calendar-alt"></i> Yuklanmoqda...
                     </div>
                 </div>
-
-                <!-- Tugash vaqti -->
                 <div class="sub-item">
                     <div class="label"><i class="fas fa-calendar-alt"></i> Tugash vaqti</div>
                     <div class="value" id="subscriptionEnd">
                         <i class="fas fa-clock"></i> Yuklanmoqda...
                     </div>
                 </div>
-
-                <!-- Qolgan kun -->
                 <div class="sub-item">
                     <div class="label"><i class="fas fa-clock"></i> Qolgan kun</div>
                     <div class="value" id="subscriptionDays" style="color:#007aff;">
