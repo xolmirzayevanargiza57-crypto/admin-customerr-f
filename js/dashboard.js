@@ -291,8 +291,7 @@ async function loadDashboardStats() {
         const staffEl = document.getElementById('totalStaff');
         if (staffEl) staffEl.textContent = totalStaff;
 
-        const newStaffEl = document.getElementById('newStaff');
-        if (newStaffEl) newStaffEl.textContent = Math.floor(Math.random() * 5) + 1;
+
 
         // O'qituvchilar
         const teacherEl = document.getElementById('teacherCount');
