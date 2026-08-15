@@ -68,12 +68,10 @@
         }
 
         /* Dark modeda hamma joy bir xil rang */
-        [data-theme="dark"] body,
-        [data-theme="dark"] .app-container,
-        [data-theme="dark"] .main-content,
-        [data-theme="dark"] .top-header {
-            background: #1c1c1e;
-        }
+        [data-theme="dark"] body { background: #1c1c1e !important; }
+        [data-theme="dark"] .main-content { background: #1c1c1e !important; }
+        [data-theme="dark"] .top-header { background: #1c1c1e !important; }
+        [data-theme="dark"] .sidebar { background: #1c1c1e !important; }
 
         ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
@@ -508,14 +506,30 @@
         window.__API_BASE_URL__ = 'https://admin-customerr.onrender.com';
 
         document.addEventListener('DOMContentLoaded', function() {
+            // Theme toggle
             var themeBtn = document.getElementById('themeToggleBtn');
             if (themeBtn) {
                 themeBtn.addEventListener('click', function() {
                     var html = document.documentElement;
-                    var currentTheme = html.getAttribute('data-theme');
-                    var newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                    var newTheme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
                     html.setAttribute('data-theme', newTheme);
                     localStorage.setItem('theme', newTheme);
+                });
+            }
+
+            // Hamburger menu
+            var menuToggle = document.getElementById('menuToggle');
+            var sidebar = document.getElementById('sidebar');
+            var overlay = document.getElementById('sidebarOverlay');
+
+            if (menuToggle && sidebar && overlay) {
+                menuToggle.addEventListener('click', function() {
+                    sidebar.classList.toggle('open');
+                    overlay.classList.toggle('show');
+                });
+                overlay.addEventListener('click', function() {
+                    sidebar.classList.remove('open');
+                    overlay.classList.remove('show');
                 });
             }
         });
