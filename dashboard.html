@@ -192,7 +192,19 @@
             position: sticky;
             top: 0;
             z-index: 50;
-            box-shadow: 0 1px 0 0 var(--border-color);
+        }
+
+        /* Sidebar brand pastki chizig'i bilan bir xil chiziq —
+           fixed pozitsiyada sidebar ustiga yopishtirilgan */
+        .header-divider {
+            position: fixed;
+            top: 73px;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: var(--border-color);
+            z-index: 99;
+            pointer-events: none;
         }
 
         /* Stats padding */
@@ -430,6 +442,9 @@
 
         <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
+        <!-- Sidebar brand chizig'ini davom ettiruvchi fixed chiziq -->
+        <div class="header-divider" id="headerDivider"></div>
+
         <!-- MAIN CONTENT -->
         <main class="main-content">
             <!-- HEADER -->
@@ -538,6 +553,19 @@
                     overlay.classList.remove('show');
                 });
             }
+
+            // Header divider — sidebar brand balandligiga moslashtirish
+            function updateDivider() {
+                var brand = document.querySelector('.sidebar-brand');
+                var divider = document.getElementById('headerDivider');
+                if (brand && divider) {
+                    var h = brand.getBoundingClientRect().height;
+                    var top = brand.getBoundingClientRect().bottom;
+                    divider.style.top = top + 'px';
+                }
+            }
+            updateDivider();
+            window.addEventListener('resize', updateDivider);
         });
     </script>
 
