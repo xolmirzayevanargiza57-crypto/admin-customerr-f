@@ -107,21 +107,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Mobil menyu
-    const menuToggle = document.getElementById('menuToggle');
-    const sidebar = document.getElementById('sidebar');
-    const overlay = document.getElementById('sidebarOverlay');
-    if (menuToggle && sidebar && overlay) {
-        menuToggle.addEventListener('click', () => {
-            sidebar.classList.toggle('open');
-            overlay.classList.toggle('show');
-        });
-        overlay.addEventListener('click', () => {
-            sidebar.classList.remove('open');
-            overlay.classList.remove('show');
-        });
-    }
-
     // Audio — foydalanuvchi birinchi interaksiyada init
     const initAudioOnce = function () {
         initAudio();
