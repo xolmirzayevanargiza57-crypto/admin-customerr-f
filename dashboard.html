@@ -679,6 +679,193 @@
             border-radius: 10px; display: none;
             font-weight: 600; min-width: 18px; text-align: center;
         }
+
+        /* ============================================================
+   ⭐ SUBSCRIPTION CARD - CHIROYLI VA ICONLI
+   ============================================================ */
+.subscription-wrapper {
+    padding: 0 32px;
+    margin-bottom: 16px;
+}
+
+.subscription-card {
+    background: var(--bg-card);
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    border: 1px solid var(--border-color);
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    transition: var(--transition);
+    transform: none !important;
+    position: relative;
+    overflow: hidden;
+}
+
+.subscription-card:hover {
+    box-shadow: var(--shadow-hover);
+    transform: none !important;
+}
+
+.subscription-card .card-bg-icon {
+    position: absolute;
+    right: -5px;
+    bottom: -5px;
+    font-size: 5rem;
+    opacity: 0.04;
+    pointer-events: none;
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .subscription-card .card-bg-icon {
+    opacity: 0.06;
+}
+
+/* ⭐ SUBSCRIPTION ITEM */
+.sub-item {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 14px 18px;
+    background: var(--bg-hover);
+    border-radius: 12px;
+    transition: var(--transition);
+    transform: none !important;
+    position: relative;
+    z-index: 1;
+    border: 1px solid transparent;
+}
+
+.sub-item:hover {
+    background: var(--bg-active);
+    transform: none !important;
+    border-color: var(--border-color);
+}
+
+.sub-item .label {
+    font-size: 0.6rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sub-item .label svg {
+    width: 14px;
+    height: 14px;
+    stroke: var(--text-muted);
+    flex-shrink: 0;
+}
+
+.sub-item .value {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.sub-item .value .status-icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+/* ⭐ HOLATI - STATUS */
+.sub-item .value.status-active {
+    color: var(--color-success);
+}
+
+.sub-item .value.status-active .status-icon {
+    stroke: var(--color-success);
+}
+
+.sub-item .value.status-inactive {
+    color: var(--text-muted);
+}
+
+.sub-item .value.status-inactive .status-icon {
+    stroke: var(--text-muted);
+}
+
+.sub-item .value.status-expired {
+    color: var(--color-danger);
+}
+
+.sub-item .value.status-expired .status-icon {
+    stroke: var(--color-danger);
+}
+
+/* ⭐ QOLGAN KUN */
+.sub-item .value .countdown {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    margin-left: 2px;
+}
+
+/* ⭐ TUGASH VAQTI - VAQT QISMI */
+.sub-item .value .time-part {
+    font-size: 0.8rem;
+    font-weight: 400;
+    color: var(--text-muted);
+}
+
+/* ============================================================
+   ⭐ RESPONSIVE
+   ============================================================ */
+@media (max-width: 1024px) {
+    .subscription-card {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .subscription-wrapper {
+        padding: 0 12px;
+    }
+
+    .subscription-card {
+        grid-template-columns: 1fr 1fr;
+        padding: 16px;
+        gap: 10px;
+    }
+
+    .sub-item {
+        padding: 12px 14px;
+    }
+
+    .sub-item .value {
+        font-size: 0.9rem;
+    }
+
+    .sub-item .value .countdown {
+        font-size: 0.7rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .subscription-card {
+        grid-template-columns: 1fr;
+    }
+
+    .subscription-wrapper {
+        padding: 0 10px;
+    }
+
+    .sub-item {
+        padding: 10px 14px;
+    }
+
+    .sub-item .value {
+        font-size: 0.85rem;
+    }
+}
     </style>
 </head>
 <body>
@@ -921,69 +1108,89 @@
                 </div>
             </section>
 
-            <!-- ============================================================
-                 ⭐ SUBSCRIPTION CARD - ALOHIDA
-                 ============================================================ -->
-            <section class="subscription-wrapper">
-                <div class="subscription-card" id="subscriptionCard">
-                    <div class="card-bg-icon"><i class="fas fa-crown"></i></div>
+           <!-- ============================================================
+     ⭐ SUBSCRIPTION CARD - CHIROYLI VA ICONLI
+     ============================================================ -->
+<section class="subscription-wrapper">
+    <div class="subscription-card" id="subscriptionCard">
+        <div class="card-bg-icon"><i class="fas fa-crown"></i></div>
 
-                    <!-- Holati -->
-                    <div class="sub-item">
-                        <span class="label">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="10"/>
-                            </svg>
-                            Holati
-                        </span>
-                        <span class="value status-active" id="subStatus">
-                            <svg class="status-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-                                <polyline points="20 6 9 17 4 12"/>
-                            </svg>
-                            Faol
-                        </span>
-                    </div>
+        <!-- 1. HOLATI -->
+        <div class="sub-item">
+            <span class="label">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                </svg>
+                HOLATI
+            </span>
+            <span class="value status-active" id="subStatus">
+                <svg class="status-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                    <polyline points="20 6 9 17 4 12"/>
+                </svg>
+                Faol
+            </span>
+        </div>
 
-                    <!-- Turi -->
-                    <div class="sub-item">
-                        <span class="label">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                                <line x1="16" y1="2" x2="16" y2="6"/>
-                                <line x1="8" y1="2" x2="8" y2="6"/>
-                                <line x1="3" y1="10" x2="21" y2="10"/>
-                            </svg>
-                            Turi
-                        </span>
-                        <span class="value" id="subType">Oylik</span>
-                    </div>
+        <!-- 2. TURI -->
+        <div class="sub-item">
+            <span class="label">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                    <line x1="16" y1="2" x2="16" y2="6"/>
+                    <line x1="8" y1="2" x2="8" y2="6"/>
+                    <line x1="3" y1="10" x2="21" y2="10"/>
+                </svg>
+                TURI
+            </span>
+            <span class="value" id="subType">
+                <svg class="status-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                    <path d="M2 17l10 5 10-5"/>
+                    <path d="M2 12l10 5 10-5"/>
+                </svg>
+                Oylik
+            </span>
+        </div>
 
-                    <!-- Tugash vaqti -->
-                    <div class="sub-item">
-                        <span class="label">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="10"/>
-                                <polyline points="12 6 12 12 16 14"/>
-                            </svg>
-                            Tugash vaqti
-                        </span>
-                        <span class="value" id="subEndDate">2026-09-15 20:59:00</span>
-                    </div>
+        <!-- 3. TUGASH VAQTI -->
+        <div class="sub-item">
+            <span class="label">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                </svg>
+                TUGASH VAQTI
+            </span>
+            <span class="value" id="subEndDate">
+                <svg class="status-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                    <line x1="16" y1="2" x2="16" y2="6"/>
+                    <line x1="8" y1="2" x2="8" y2="6"/>
+                    <line x1="3" y1="10" x2="21" y2="10"/>
+                </svg>
+                2026-09-15 <span style="font-size:0.8rem;color:var(--text-muted);font-weight:400;">20:59:00</span>
+            </span>
+        </div>
 
-                    <!-- Qolgan kun -->
-                    <div class="sub-item">
-                        <span class="label">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="10"/>
-                                <polyline points="12 6 12 12 16 14"/>
-                            </svg>
-                            Qolgan kun
-                        </span>
-                        <span class="value" id="subDaysLeft">0 <span class="countdown">kun</span></span>
-                    </div>
-                </div>
-            </section>
-
+        <!-- 4. QOLGAN KUN -->
+        <div class="sub-item">
+            <span class="label">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                </svg>
+                QOLGAN KUN
+            </span>
+            <span class="value" id="subDaysLeft">
+                <svg class="status-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                </svg>
+                29 <span class="countdown">kun 23s 5m 2s</span>
+            </span>
+        </div>
+    </div>
+</section>
         </main>
     </div>
 
