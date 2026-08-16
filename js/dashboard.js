@@ -4,9 +4,11 @@
 
 let dashboardLoaded = false;
 let refreshInterval = null;
+let countdownInterval = null;
 let notificationCheckInterval = null;
 let profileCheckInterval = null;
 let lastUnreadCount = 0;
+let lastDashboardStats = null;
 let audioContext = null;
 let soundEnabled = true;
 let notificationRetryCount = 0;
@@ -130,6 +132,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Har 30 soniyada auth tekshirish
     profileCheckInterval = setInterval(() => Auth.checkAuth(), 30000);
+
+    // Countdown
+    countdownInterval = setInterval(updateCountdown, 1000);
 });
 
 // ============================================================
@@ -290,6 +295,47 @@ async function loadDashboardStats() {
         if (studentEl) studentEl.textContent = stats.studentCount || 0;
         if (activeStudentEl) activeStudentEl.textContent = stats.activeStudents || 0;
 
+        // Subscription
+        lastDashboardStats = stats;
+        if (stats.subscription) {
+            const sub = stats.subscription;
+
+            const statusMap = {
+                'active':   '<i class="fas fa-check-circle"></i> Faol',
+                'inactive': '<i class="fas fa-times-circle"></i> Faol emas',
+                'expired':  '<i class="fas fa-exclamation-circle"></i> Muddati tugagan'
+            };
+            const statusEl = document.getElementById('subscriptionStatus');
+            if (statusEl) {
+                statusEl.innerHTML = statusMap[sub.status] || sub.status || "Noma'lum";
+                statusEl.className = 'sub-value ' + (
+                    sub.status === 'active' ? 'status-active' :
+                    sub.status === 'expired' ? 'status-expired' : 'status-inactive'
+                );
+            }
+
+            const typeMap = {
+                'monthly':  '<i class="fas fa-calendar-alt"></i> Oylik',
+                '6months':  '<i class="fas fa-calendar-alt"></i> 6 oylik',
+                'yearly':   '<i class="fas fa-calendar-alt"></i> Yillik',
+                'custom':   '<i class="fas fa-cogs"></i> Custom',
+                'none':     '<i class="fas fa-times"></i> Yo\'q'
+            };
+            const typeEl = document.getElementById('subscriptionType');
+            if (typeEl) typeEl.innerHTML = typeMap[sub.type] || sub.type || "Noma'lum";
+
+            const endEl = document.getElementById('subscriptionEnd');
+            if (endEl) {
+                if (sub.formattedEndDate) {
+                    endEl.innerHTML = '<i class="fas fa-clock"></i> ' + sub.formattedEndDate;
+                } else if (sub.endDate) {
+                    endEl.innerHTML = '<i class="fas fa-clock"></i> ' + formatDateTime(sub.endDate);
+                } else {
+                    endEl.innerHTML = '<i class="fas fa-clock"></i> Muddati yo\'q';
+                }
+            }
+        }
+
     } catch (error) {
         if (error.name !== 'AbortError') {
             console.error('Statistika xatosi:', error);
@@ -298,10 +344,60 @@ async function loadDashboardStats() {
 }
 
 // ============================================================
+// COUNTDOWN
+// ============================================================
+function updateCountdown() {
+    const daysEl = document.getElementById('subscriptionDays');
+    if (!daysEl || !lastDashboardStats || !lastDashboardStats.subscription) return;
+
+    const sub = lastDashboardStats.subscription;
+    if (!sub.endDate) { daysEl.innerHTML = '<i class="fas fa-hourglass-half"></i> -'; return; }
+
+    const endDate = new Date(sub.endDate);
+    if (isNaN(endDate.getTime())) { daysEl.innerHTML = '<i class="fas fa-hourglass-half"></i> -'; return; }
+
+    const diff = endDate - new Date();
+    if (diff <= 0) {
+        daysEl.innerHTML = '<i class="fas fa-exclamation-triangle" style="color:var(--color-red);"></i> Vaqt tugagan!';
+        daysEl.style.color = 'var(--color-red)';
+        return;
+    }
+
+    const days    = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours   = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+    const icon = days < 7
+        ? '<i class="fas fa-clock" style="color:var(--color-orange);"></i>'
+        : '<i class="fas fa-hourglass-half"></i>';
+    daysEl.innerHTML = icon + ' ' + days + 'k ' + hours + 's ' + minutes + 'm ' + seconds + 's';
+    daysEl.style.color = days < 7 ? 'var(--color-orange)' : 'var(--color-green)';
+}
+
+// ============================================================
+// VAQT FORMATLASH
+// ============================================================
+function formatDateTime(date) {
+    if (!date) return "Noma'lum vaqt";
+    try {
+        const d = new Date(date);
+        if (isNaN(d.getTime())) return "Noma'lum vaqt";
+        return d.toLocaleString('uz-UZ', {
+            timeZone: 'Asia/Tashkent',
+            year: 'numeric', month: '2-digit', day: '2-digit',
+            hour: '2-digit', minute: '2-digit', second: '2-digit',
+            hour12: false
+        });
+    } catch (e) { return "Noma'lum vaqt"; }
+}
+
+// ============================================================
 // CLEANUP
 // ============================================================
 window.addEventListener('beforeunload', function () {
     if (refreshInterval) clearInterval(refreshInterval);
+    if (countdownInterval) clearInterval(countdownInterval);
     if (notificationCheckInterval) clearInterval(notificationCheckInterval);
     if (profileCheckInterval) clearInterval(profileCheckInterval);
 });
