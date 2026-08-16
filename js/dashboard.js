@@ -1,5 +1,5 @@
 // ============================================================
-// DASHBOARD - ADMIN-CUSTOMER (CHART BILAN)
+// DASHBOARD - ADMIN-CUSTOMER (DOUGHNUT CHART BILAN)
 // ============================================================
 
 let dashboardLoaded = false;
@@ -504,12 +504,12 @@ function renderStats(stats) {
     // ⭐ Subscription yangilash
     updateSubscriptionCountdown();
 
-    // ⭐ CHART yaratish
+    // ⭐ DOUGHNUT CHART yaratish
     createDashboardChart(stats);
 }
 
 // ============================================================
-// ⭐ CHART YARATISH - RASMDAGIGA O'XSHASH
+// ⭐ DOUGHNUT CHART - DUMALOQ GRAFIK
 // ============================================================
 function createDashboardChart(stats) {
     const ctx = document.getElementById('dashboardChart');
@@ -527,6 +527,7 @@ function createDashboardChart(stats) {
     const present = stats.attendanceStats?.present || 0;
     const absent = stats.attendanceStats?.absent || 0;
 
+    // ⭐ Ma'lumotlar
     const labels = [
         'Jami O\'qituvchilar',
         'Faol O\'qituvchilar',
@@ -545,83 +546,66 @@ function createDashboardChart(stats) {
         absent
     ];
 
+    // ⭐ Ranglar - Apple style
     const colors = [
+        '#007aff',   // Ko'k
+        '#4a9aff',   // Och ko'k
+        '#34c759',   // Yashil
+        '#4ac759',   // Och yashil
+        '#34c759',   // Yashil (Keldi)
+        '#ff3b30'    // Qizil (Kelmadi)
+    ];
+
+    const backgroundColors = [
         'rgba(0, 122, 255, 0.85)',
-        'rgba(0, 122, 255, 0.55)',
+        'rgba(74, 154, 255, 0.75)',
         'rgba(52, 199, 89, 0.85)',
-        'rgba(52, 199, 89, 0.55)',
+        'rgba(74, 199, 89, 0.75)',
         'rgba(52, 199, 89, 0.85)',
         'rgba(255, 59, 48, 0.85)'
     ];
 
-    const borderColors = [
-        '#007aff',
-        '#007aff',
-        '#34c759',
-        '#34c759',
-        '#34c759',
-        '#ff3b30'
-    ];
-
     dashboardChart = new Chart(ctx, {
-        type: 'bar',
+        type: 'doughnut', // ⭐ DUMALOQ GRAFIK
         data: {
             labels: labels,
             datasets: [{
-                label: 'Statistika',
                 data: dataValues,
-                backgroundColor: colors,
-                borderColor: borderColors,
-                borderWidth: 2,
-                borderRadius: 8,
-                barPercentage: 0.6
+                backgroundColor: backgroundColors,
+                borderColor: colors,
+                borderWidth: 3,
+                hoverOffset: 8
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            cutout: '55%', // ⭐ Ichki teshik o'lchami (donut uslubi)
             plugins: {
                 legend: {
-                    display: false
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        stepSize: 1,
+                    position: 'right',
+                    labels: {
+                        usePointStyle: true,
+                        pointStyle: 'circle',
+                        padding: 16,
                         font: {
-                            size: 11,
-                            family: 'Inter'
+                            size: 12,
+                            family: 'Inter',
+                            weight: '500'
                         },
-                        color: getComputedStyle(document.documentElement).getPropertyValue('--text-muted').trim() || '#8e8e93'
-                    },
-                    grid: {
-                        color: getComputedStyle(document.documentElement).getPropertyValue('--border-color').trim() || '#e5e5ea',
-                        drawBorder: false
-                    }
-                },
-                x: {
-                    ticks: {
-                        font: {
-                            size: 10,
-                            family: 'Inter'
-                        },
-                        color: getComputedStyle(document.documentElement).getPropertyValue('--text-muted').trim() || '#8e8e93',
-                        maxRotation: 30,
-                        minRotation: 20
-                    },
-                    grid: {
-                        display: false
+                        color: getComputedStyle(document.documentElement).getPropertyValue('--text-primary').trim() || '#1c1c1e'
                     }
                 }
             },
             animation: {
-                duration: 800,
+                animateRotate: true,
+                duration: 1000,
                 easing: 'easeInOutQuart'
             }
         }
     });
+
+    console.log('✅ Doughnut chart yaratildi!');
 }
 
 // ============================================================
@@ -639,4 +623,4 @@ window.addEventListener('beforeunload', function() {
     cachedStats = null;
 });
 
-console.log('✅ dashboard.js yuklandi');
+console.log('✅ dashboard.js yuklandi (Doughnut Chart)');
