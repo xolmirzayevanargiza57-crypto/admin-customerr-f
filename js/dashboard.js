@@ -139,7 +139,6 @@ function updateSubscriptionCountdown() {
     const subStatusEl = document.getElementById('subStatus');
     const subTypeEl = document.getElementById('subType');
 
-    // Ma'lumotlarni dashboard.js dan olamiz
     if (typeof window.statsData !== 'undefined' && window.statsData && window.statsData.subscription) {
         const sub = window.statsData.subscription;
         const endDate = sub.endDate ? new Date(sub.endDate) : null;
