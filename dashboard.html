@@ -376,7 +376,7 @@
             .subscription-grid { grid-template-columns: repeat(2, 1fr); padding: 0 16px; gap: 10px; }
             .main-content { padding: 0; }
             .top-header { padding: 12px 16px 12px 16px; }
-            .stats-grid { grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 16px; margin-top: 24px; }
+            .stats-grid { grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 16px; margin-top: 48px; }
             .stat-card { padding: 14px 16px; }
             .stat-card .stat-icon { width: 36px; height: 36px; font-size: 1rem; }
             .stat-card .stat-value { font-size: 1.2rem; }
@@ -624,13 +624,29 @@
                 var brand = document.querySelector('.sidebar-brand');
                 var divider = document.getElementById('headerDivider');
                 if (brand && divider) {
-                    var h = brand.getBoundingClientRect().height;
                     var top = brand.getBoundingClientRect().bottom;
                     divider.style.top = top + 'px';
                 }
             }
+
+            // Telefonda kartalarni header pastiga moslashtirish
+            function updateStatsMargin() {
+                var header = document.querySelector('.top-header');
+                var grid = document.querySelector('.stats-grid');
+                if (header && grid && window.innerWidth <= 768) {
+                    var headerH = header.getBoundingClientRect().height;
+                    grid.style.marginTop = (headerH > 0 ? 16 : 24) + 'px';
+                } else if (grid) {
+                    grid.style.marginTop = '';
+                }
+            }
+
             updateDivider();
-            window.addEventListener('resize', updateDivider);
+            updateStatsMargin();
+            window.addEventListener('resize', function() {
+                updateDivider();
+                updateStatsMargin();
+            });
         });
     </script>
 
