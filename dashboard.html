@@ -10,13 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-
     <style>
-        /* ============================================================
-           ROOT VARIABLES - APPLE STYLE
-           ============================================================ */
         :root {
             --bg-primary: #f5f5f7;
             --bg-card: #ffffff;
@@ -42,10 +36,6 @@
             --color-warning: #ff9500;
             --sidebar-width: 220px;
             --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
-
-            /* ⭐ APPLE STYLE GRADIENT BACKGROUND */
-            --bg-gradient-start: #e8f0fe;
-            --bg-gradient-end: #f5f5f7;
         }
 
         [data-theme="dark"] {
@@ -60,8 +50,6 @@
             --border-color: #3a3a3c;
             --shadow: 0 2px 16px rgba(0,0,0,0.3);
             --shadow-hover: 0 8px 30px rgba(0,0,0,0.4);
-            --bg-gradient-start: #1a2a4a;
-            --bg-gradient-end: #1c1c1e;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -88,14 +76,12 @@
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 10px; }
 
-        /* APP CONTAINER */
         .app-container {
             display: flex;
             min-height: 100vh;
             width: 100%;
         }
 
-        /* SIDEBAR */
         .sidebar {
             width: var(--sidebar-width);
             min-width: var(--sidebar-width);
@@ -181,7 +167,6 @@
         }
         .sidebar-overlay.show { display: block; }
 
-        /* MAIN CONTENT - APPLE STYLE GRADIENT */
         .main-content {
             flex: 1;
             min-width: 0;
@@ -191,16 +176,14 @@
             max-width: calc(100% - var(--sidebar-width));
             padding: 0 0 32px 0;
             background: var(--bg-primary);
-            background: linear-gradient(180deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
         }
 
-        /* TOP HEADER */
         .top-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 16px 32px;
-            background: transparent;
+            background: var(--bg-primary);
             position: sticky;
             top: 0;
             z-index: 50;
@@ -281,102 +264,13 @@
         .user-info .user-name { font-size: 0.85rem; font-weight: 600; color: var(--text-primary); }
         .user-info .user-role { font-size: 0.7rem; color: var(--text-muted); }
 
-        /* ============================================================
-           ⭐ SUBSCRIPTION CARD - APPLE STYLE (HOVERDA SILJISH YO'Q)
-           ============================================================ */
-        .subscription-wrapper {
-            padding: 0 32px;
-            margin-top: 8px;
-            margin-bottom: 8px;
-        }
-
-        .subscription-card {
-            background: var(--bg-card);
-            border-radius: var(--radius);
-            padding: 20px 24px;
-            border: 1px solid var(--border-color);
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr 1fr;
-            gap: 16px;
-            transition: var(--transition);
-            /* ⭐ HOVERDA SILJIB KETMASLIK UCHUN */
-            transform: none !important;
-        }
-
-        .subscription-card:hover {
-            box-shadow: var(--shadow-hover);
-            /* ⭐ transform: none - siljish YO'Q */
-            transform: none !important;
-        }
-
-        .sub-item {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            padding: 8px 12px;
-            background: var(--bg-hover);
-            border-radius: 10px;
-            transition: var(--transition);
-            /* ⭐ HOVERDA SILJIB KETMASLIK UCHUN */
-            transform: none !important;
-        }
-
-        .sub-item:hover {
-            background: var(--bg-active);
-            /* ⭐ transform: none - siljish YO'Q */
-            transform: none !important;
-        }
-
-        .sub-item .label {
-            font-size: 0.7rem;
-            font-weight: 500;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .sub-item .label i {
-            font-size: 0.65rem;
-        }
-
-        .sub-item .value {
-            font-size: 1rem;
-            font-weight: 700;
-            color: var(--text-primary);
-        }
-
-        .sub-item .value.status-active {
-            color: var(--color-success);
-        }
-
-        .sub-item .value.status-inactive {
-            color: var(--text-muted);
-        }
-
-        .sub-item .value.status-expired {
-            color: var(--color-danger);
-        }
-
-        .sub-item .value .countdown {
-            font-size: 0.8rem;
-            font-weight: 500;
-            color: var(--text-muted);
-            margin-left: 6px;
-        }
-
-        /* ============================================================
-           ⭐ STATS CARDS - HOVERDA SILJISH YO'Q
-           ============================================================ */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 16px;
-            padding: 0 32px;
-            margin-top: 16px;
+            margin-top: 20px;
             margin-bottom: 20px;
+            padding: 0 32px;
         }
 
         .stat-card {
@@ -385,15 +279,9 @@
             padding: 18px 20px;
             border: 1px solid var(--border-color);
             transition: var(--transition);
-            /* ⭐ HOVERDA SILJIB KETMASLIK UCHUN */
-            transform: none !important;
         }
 
-        .stat-card:hover {
-            box-shadow: var(--shadow-hover);
-            /* ⭐ transform: none - siljish YO'Q */
-            transform: none !important;
-        }
+        .stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-hover); }
 
         .stat-card .stat-top { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
 
@@ -411,118 +299,21 @@
         [data-theme="dark"] .stat-card .stat-icon.green { background: #1a3a2a; color: #4ac759; }
         [data-theme="dark"] .stat-card .stat-icon.purple { background: #2a1a4a; color: #9a6aff; }
 
-        .stat-card .stat-label {
-            font-size: 0.75rem;
-            font-weight: 500;
-            color: var(--text-muted);
-            letter-spacing: 0.3px;
-        }
-
+        .stat-card .stat-label { font-size: 0.75rem; font-weight: 500; color: var(--text-muted); letter-spacing: 0.3px; }
         .stat-card .stat-label i { margin-right: 4px; }
-
-        .stat-card .stat-value {
-            font-size: 1.6rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            line-height: 1.2;
-            letter-spacing: -0.5px;
-        }
+        .stat-card .stat-value { font-size: 1.6rem; font-weight: 700; color: var(--text-primary); line-height: 1.2; letter-spacing: -0.5px; }
 
         .stat-card .stat-change {
-            font-size: 0.7rem;
-            font-weight: 500;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            margin-top: 4px;
-            color: var(--text-muted);
+            font-size: 0.7rem; font-weight: 500;
+            display: inline-flex; align-items: center; gap: 4px;
+            margin-top: 4px; color: var(--text-muted);
         }
 
         .stat-card .stat-change.positive { color: var(--color-success); }
         .stat-card .stat-change.negative { color: var(--color-danger); }
 
-        /* ============================================================
-           ⭐ CHART CARD - APPLE STYLE (KO'K GRADIENT)
-           ============================================================ */
-        .chart-wrapper {
-            padding: 0 32px;
-            margin-bottom: 20px;
-        }
-
-        .chart-card {
-            background: var(--bg-card);
-            border-radius: var(--radius);
-            padding: 24px 28px;
-            border: 1px solid var(--border-color);
-            transition: var(--transition);
-            /* ⭐ HOVERDA SILJIB KETMASLIK UCHUN */
-            transform: none !important;
-        }
-
-        .chart-card:hover {
-            box-shadow: var(--shadow-hover);
-            /* ⭐ transform: none - siljish YO'Q */
-            transform: none !important;
-        }
-
-        .chart-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-
-        .chart-header h3 {
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .chart-header h3 i {
-            margin-right: 8px;
-            color: var(--text-muted);
-        }
-
-        .chart-header .chart-legend {
-            display: flex;
-            gap: 16px;
-            flex-wrap: wrap;
-        }
-
-        .chart-header .chart-legend .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 0.75rem;
-            color: var(--text-muted);
-        }
-
-        .chart-header .chart-legend .legend-item .dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            display: inline-block;
-        }
-
-        .chart-container {
-            position: relative;
-            height: 280px;
-            width: 100%;
-        }
-
-        .chart-container canvas {
-            width: 100% !important;
-            height: 100% !important;
-        }
-
-        /* ============================================================
-           RESPONSIVE
-           ============================================================ */
         @media (max-width: 1024px) {
             .stats-grid { grid-template-columns: repeat(2, 1fr); }
-            .subscription-card { grid-template-columns: 1fr 1fr; }
         }
 
         @media (max-width: 768px) {
@@ -538,18 +329,6 @@
             .sidebar { transform: translateX(-100%); width: 280px; }
             .sidebar.open { transform: translateX(0); }
             .main-content { margin-left: 0; width: 100%; max-width: 100%; }
-
-            .subscription-wrapper { padding: 0 12px; }
-            .subscription-card { grid-template-columns: 1fr 1fr; padding: 16px; gap: 10px; }
-            .sub-item { padding: 8px 10px; }
-            .sub-item .value { font-size: 0.85rem; }
-
-            .chart-wrapper { padding: 0 12px; }
-            .chart-card { padding: 16px; }
-            .chart-container { height: 220px; }
-            .chart-header h3 { font-size: 0.85rem; }
-            .chart-header .chart-legend { gap: 10px; }
-            .chart-header .chart-legend .legend-item { font-size: 0.65rem; }
         }
 
         @media (max-width: 480px) {
@@ -562,17 +341,16 @@
             .theme-toggle-btn { width: 34px; height: 34px; font-size: 0.9rem; }
             .notification-link { width: 34px; height: 34px; }
             .user-avatar { width: 30px; height: 30px; font-size: 0.7rem; }
-
-            .subscription-card { grid-template-columns: 1fr; }
-            .subscription-wrapper { padding: 0 10px; }
-            .chart-wrapper { padding: 0 10px; }
-            .chart-card { padding: 12px; }
-            .chart-container { height: 180px; }
         }
 
-        /* ============================================================
-           NOTIFICATION TOAST
-           ============================================================ */
+        .sidebar-badge {
+            margin-left: auto;
+            background: #ff3b30; color: white;
+            font-size: 0.55rem; padding: 2px 8px;
+            border-radius: 10px; display: none;
+            font-weight: 600; min-width: 18px; text-align: center;
+        }
+
         .notification-toast {
             position: fixed; top: 20px; right: 20px; z-index: 99999;
             background: #007aff; color: white;
@@ -598,21 +376,10 @@
             50% { transform: scale(1.3); }
             100% { transform: scale(1); }
         }
-
-        .sidebar-badge {
-            margin-left: auto;
-            background: #ff3b30; color: white;
-            font-size: 0.55rem; padding: 2px 8px;
-            border-radius: 10px; display: none;
-            font-weight: 600; min-width: 18px; text-align: center;
-        }
     </style>
 </head>
 <body>
     <div class="app-container">
-        <!-- ============================================================
-             SIDEBAR
-             ============================================================ -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-brand">
                 <div class="brand-icon"><i class="fas fa-crown"></i></div>
@@ -663,12 +430,9 @@
 
         <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-        <!-- ============================================================
-             MAIN CONTENT
-             ============================================================ -->
-        <main class="main-content">
+        <div class="header-divider" id="headerDivider"></div>
 
-            <!-- HEADER -->
+        <main class="main-content">
             <header class="top-header">
                 <div class="header-left">
                     <button id="menuToggle" class="menu-toggle"><i class="fas fa-bars"></i></button>
@@ -698,39 +462,7 @@
                 </div>
             </header>
 
-            <!-- ============================================================
-                 ⭐ SUBSCRIPTION CARD - TEPADA (HOVERDA SILJISH YO'Q)
-                 ============================================================ -->
-            <section class="subscription-wrapper">
-                <div class="subscription-card" id="subscriptionCard">
-                    <!-- Holati -->
-                    <div class="sub-item">
-                        <span class="label"><i class="fas fa-circle"></i> Holati</span>
-                        <span class="value status-active" id="subStatus">✅ Faol</span>
-                    </div>
-                    <!-- Turi -->
-                    <div class="sub-item">
-                        <span class="label"><i class="fas fa-tag"></i> Turi</span>
-                        <span class="value" id="subType">Oylik</span>
-                    </div>
-                    <!-- Tugash vaqti -->
-                    <div class="sub-item">
-                        <span class="label"><i class="fas fa-clock"></i> Tugash vaqti</span>
-                        <span class="value" id="subEndDate">15/09/2026, 20:59:00</span>
-                    </div>
-                    <!-- Qolgan kun -->
-                    <div class="sub-item">
-                        <span class="label"><i class="fas fa-hourglass-half"></i> Qolgan kun</span>
-                        <span class="value" id="subDaysLeft">0 <span class="countdown">kun</span></span>
-                    </div>
-                </div>
-            </section>
-
-            <!-- ============================================================
-                 STATS CARDS
-                 ============================================================ -->
             <section class="stats-grid">
-                <!-- 1. Jami Xodimlar -->
                 <div class="stat-card">
                     <div class="stat-top">
                         <div class="stat-icon blue"><i class="fas fa-users"></i></div>
@@ -741,7 +473,6 @@
                     </div>
                 </div>
 
-                <!-- 2. Jami O'qituvchilar -->
                 <div class="stat-card">
                     <div class="stat-top">
                         <div class="stat-icon green"><i class="fas fa-chalkboard-teacher"></i></div>
@@ -755,7 +486,6 @@
                     </div>
                 </div>
 
-                <!-- 3. Jami O'quvchilar -->
                 <div class="stat-card">
                     <div class="stat-top">
                         <div class="stat-icon purple"><i class="fas fa-graduation-cap"></i></div>
@@ -769,49 +499,13 @@
                     </div>
                 </div>
             </section>
-
-            <!-- ============================================================
-                 ⭐ CHART - APPLE STYLE (KO'K GRADIENT)
-                 ============================================================ -->
-            <section class="chart-wrapper">
-                <div class="chart-card">
-                    <div class="chart-header">
-                        <h3><i class="fas fa-chart-bar"></i> <span data-i18n="reports_title">Hisobotlar grafigi</span></h3>
-                        <div class="chart-legend">
-                            <span class="legend-item">
-                                <span class="dot" style="background: #007aff;"></span> O'qituvchilar
-                            </span>
-                            <span class="legend-item">
-                                <span class="dot" style="background: #34c759;"></span> O'quvchilar
-                            </span>
-                            <span class="legend-item">
-                                <span class="dot" style="background: #ff9500;"></span> Davomat
-                            </span>
-                        </div>
-                    </div>
-                    <div class="chart-container">
-                        <canvas id="dashboardChart"></canvas>
-                    </div>
-                </div>
-            </section>
-
         </main>
     </div>
 
-    <!-- Theme Toggle (Floating) -->
-    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme" style="display:none;">
-        <i class="fas fa-moon moon"></i>
-        <i class="fas fa-sun sun"></i>
-    </button>
-
-    <!-- ============================================================
-         SCRIPTS
-         ============================================================ -->
     <script>
         window.__API_BASE_URL__ = 'https://admin-customerr.onrender.com';
 
         document.addEventListener('DOMContentLoaded', function() {
-            // Theme toggle
             var themeBtn = document.getElementById('themeToggleBtn');
             if (themeBtn) {
                 themeBtn.addEventListener('click', function() {
@@ -822,7 +516,6 @@
                 });
             }
 
-            // Hamburger menu
             var menuToggle = document.getElementById('menuToggle');
             var sidebar = document.getElementById('sidebar');
             var overlay = document.getElementById('sidebarOverlay');
@@ -838,7 +531,6 @@
                 });
             }
 
-            // Header divider
             function updateDivider() {
                 var brand = document.querySelector('.sidebar-brand');
                 var divider = document.getElementById('headerDivider');
