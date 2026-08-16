@@ -1,5 +1,5 @@
 // ============================================================
-// DASHBOARD - ADMIN-CUSTOMER (TO'LIQ TUZATILGAN)
+// DASHBOARD - ADMIN-CUSTOMER
 // ============================================================
 
 let dashboardLoaded = false;
@@ -11,8 +11,6 @@ let audioContext = null;
 let soundEnabled = true;
 let notificationRetryCount = 0;
 const maxNotificationRetry = 3;
-let dashboardChart = null;
-let subscriptionUpdateInterval = null;
 
 // ============================================================
 // OVOZ YARATISH
@@ -84,7 +82,6 @@ document.addEventListener('DOMContentLoaded', function () {
         return;
     }
 
-    // Foydalanuvchi ma'lumotlari
     const user = Auth.getUser();
     if (user) {
         const nameEl = document.getElementById('userName');
@@ -95,7 +92,6 @@ document.addEventListener('DOMContentLoaded', function () {
         if (schoolEl) schoolEl.textContent = user.schoolName || "Nurli Ta'lim Markazi";
     }
 
-    // Logout
     const logoutBtn = document.getElementById('logoutBtn');
     if (logoutBtn) {
         const newBtn = logoutBtn.cloneNode(true);
@@ -109,7 +105,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Audio — foydalanuvchi birinchi interaksiyada init
     const initAudioOnce = function () {
         initAudio();
         document.removeEventListener('click', initAudioOnce);
@@ -120,99 +115,13 @@ document.addEventListener('DOMContentLoaded', function () {
     document.addEventListener('touchstart', initAudioOnce);
     document.addEventListener('keydown', initAudioOnce);
 
-    // Ma'lumotlarni yuklash
     updateNotificationBadge();
     loadDashboardStats();
 
-    // Har 10 soniyada statistika yangilash
     refreshInterval = setInterval(loadDashboardStats, 10000);
-
-    // Har 3 soniyada xabar badge yangilash
     notificationCheckInterval = setInterval(updateNotificationBadge, 3000);
-
-    // Har 30 soniyada auth tekshirish
     profileCheckInterval = setInterval(() => Auth.checkAuth(), 30000);
-
-    // Har 1 soniyada subscription vaqtini yangilash
-    subscriptionUpdateInterval = setInterval(updateSubscriptionCountdown, 1000);
 });
-
-// ============================================================
-// ⭐ SUBSCRIPTION COUNTDOWN - REAL TIME
-// ============================================================
-function updateSubscriptionCountdown() {
-    const subEndDateEl = document.getElementById('subEndDate');
-    const subDaysLeftEl = document.getElementById('subDaysLeft');
-    const subStatusEl = document.getElementById('subStatus');
-    const subTypeEl = document.getElementById('subType');
-
-    // Ma'lumotlarni dashboard.js dan olamiz
-    // Agar statsData mavjud bo'lsa
-    if (typeof statsData !== 'undefined' && statsData && statsData.subscription) {
-        const sub = statsData.subscription;
-        const endDate = sub.endDate ? new Date(sub.endDate) : null;
-        const now = new Date();
-
-        // Holat
-        if (subStatusEl) {
-            if (sub.status === 'active' && endDate && endDate > now) {
-                subStatusEl.textContent = '✅ Faol';
-                subStatusEl.className = 'value status-active';
-            } else if (sub.status === 'active' && endDate && endDate <= now) {
-                subStatusEl.textContent = '⏰ Muddati tugagan';
-                subStatusEl.className = 'value status-expired';
-            } else {
-                subStatusEl.textContent = '❌ Faol emas';
-                subStatusEl.className = 'value status-inactive';
-            }
-        }
-
-        // Turi
-        if (subTypeEl) {
-            const typeMap = {
-                'monthly': 'Oylik',
-                '6months': '6 oylik',
-                'yearly': 'Yillik',
-                'custom': 'Custom',
-                'none': 'Yo\'q'
-            };
-            subTypeEl.textContent = typeMap[sub.type] || sub.type || 'Yo\'q';
-        }
-
-        // Tugash vaqti
-        if (subEndDateEl && endDate) {
-            const options = {
-                timeZone: 'Asia/Tashkent',
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit',
-                hour12: false
-            };
-            subEndDateEl.textContent = endDate.toLocaleString('uz-UZ', options);
-        } else if (subEndDateEl) {
-            subEndDateEl.textContent = '-';
-        }
-
-        // Qolgan kun
-        if (subDaysLeftEl && endDate) {
-            const diff = endDate - now;
-            if (diff > 0) {
-                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-                subDaysLeftEl.innerHTML = `${days} <span class="countdown">kun ${hours}s ${minutes}m ${seconds}s</span>`;
-            } else {
-                subDaysLeftEl.innerHTML = `0 <span class="countdown">kun (muddati tugagan)</span>`;
-            }
-        } else if (subDaysLeftEl) {
-            subDaysLeftEl.innerHTML = `0 <span class="countdown">kun</span>`;
-        }
-    }
-}
 
 // ============================================================
 // XABAR BADGE
@@ -248,7 +157,6 @@ async function updateNotificationBadge() {
 
             const unreadCount = myNotifications.filter(n => !n.isRead).length;
 
-            // Header badge
             const badge = document.getElementById('notificationBadge');
             if (badge) {
                 if (unreadCount > 0) {
@@ -261,7 +169,6 @@ async function updateNotificationBadge() {
                 }
             }
 
-            // Sidebar badge
             const sidebarBadge = document.getElementById('sidebarBadge');
             if (sidebarBadge) {
                 if (unreadCount > 0) {
@@ -272,7 +179,6 @@ async function updateNotificationBadge() {
                 }
             }
 
-            // Yangi xabar — ovoz va toast
             if (unreadCount > lastUnreadCount && lastUnreadCount > 0) {
                 const diff = unreadCount - lastUnreadCount;
                 playNotificationSound();
@@ -353,31 +259,19 @@ async function loadDashboardStats() {
 
         const stats = data.data;
 
-        // ⭐ Global statsData - subscription uchun
-        window.statsData = stats;
-
-        // Jami xodimlar
         const totalStaff = (stats.teacherCount || 0) + (stats.studentCount || 0);
         const staffEl = document.getElementById('totalStaff');
         if (staffEl) staffEl.textContent = totalStaff;
 
-        // O'qituvchilar
         const teacherEl = document.getElementById('teacherCount');
         const activeTeacherEl = document.getElementById('activeTeachers');
         if (teacherEl) teacherEl.textContent = stats.teacherCount || 0;
         if (activeTeacherEl) activeTeacherEl.textContent = stats.activeTeachers || 0;
 
-        // O'quvchilar
         const studentEl = document.getElementById('studentCount');
         const activeStudentEl = document.getElementById('activeStudents');
         if (studentEl) studentEl.textContent = stats.studentCount || 0;
         if (activeStudentEl) activeStudentEl.textContent = stats.activeStudents || 0;
-
-        // ⭐ Subscription ma'lumotlarini yangilash
-        updateSubscriptionCountdown();
-
-        // ⭐ Chart yaratish
-        createDashboardChart(stats);
 
     } catch (error) {
         if (error.name !== 'AbortError') {
@@ -387,139 +281,12 @@ async function loadDashboardStats() {
 }
 
 // ============================================================
-// ⭐ DASHBOARD CHART - APPLE STYLE (KO'K GRADIENT)
-// ============================================================
-function createDashboardChart(stats) {
-    const ctx = document.getElementById('dashboardChart');
-    if (!ctx) return;
-
-    // Eski chartni o'chirish
-    if (dashboardChart) {
-        dashboardChart.destroy();
-        dashboardChart = null;
-    }
-
-    // Ma'lumotlar
-    const teacherCount = stats.teacherCount || 0;
-    const activeTeachers = stats.activeTeachers || 0;
-    const studentCount = stats.studentCount || 0;
-    const activeStudents = stats.activeStudents || 0;
-    const todayAttendance = stats.todayAttendance || 0;
-    const attendanceStats = stats.attendanceStats || { present: 0, absent: 0 };
-
-    const labels = [
-        'Jami o\'qituvchilar',
-        'Faol o\'qituvchilar',
-        'Jami o\'quvchilar',
-        'Faol o\'quvchilar',
-        'Bugungi davomat',
-        'Keldi',
-        'Kelmadi'
-    ];
-
-    const dataValues = [
-        teacherCount,
-        activeTeachers,
-        studentCount,
-        activeStudents,
-        todayAttendance,
-        attendanceStats.present || 0,
-        attendanceStats.absent || 0
-    ];
-
-    const colors = [
-        'rgba(0, 122, 255, 0.85)',
-        'rgba(0, 122, 255, 0.55)',
-        'rgba(52, 199, 89, 0.85)',
-        'rgba(52, 199, 89, 0.55)',
-        'rgba(255, 149, 0, 0.85)',
-        'rgba(52, 199, 89, 0.85)',
-        'rgba(255, 59, 48, 0.85)'
-    ];
-
-    const borderColors = [
-        '#007aff',
-        '#007aff',
-        '#34c759',
-        '#34c759',
-        '#ff9500',
-        '#34c759',
-        '#ff3b30'
-    ];
-
-    dashboardChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: labels,
-            datasets: [{
-                label: 'Statistika',
-                data: dataValues,
-                backgroundColor: colors,
-                borderColor: borderColors,
-                borderWidth: 2,
-                borderRadius: 8,
-                barPercentage: 0.6
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        stepSize: 1,
-                        font: {
-                            size: 11,
-                            family: 'Inter'
-                        },
-                        color: getComputedStyle(document.documentElement).getPropertyValue('--text-muted').trim() || '#8e8e93'
-                    },
-                    grid: {
-                        color: getComputedStyle(document.documentElement).getPropertyValue('--border-color').trim() || '#e5e5ea',
-                        drawBorder: false
-                    }
-                },
-                x: {
-                    ticks: {
-                        font: {
-                            size: 10,
-                            family: 'Inter'
-                        },
-                        color: getComputedStyle(document.documentElement).getPropertyValue('--text-muted').trim() || '#8e8e93',
-                        maxRotation: 30,
-                        minRotation: 20
-                    },
-                    grid: {
-                        display: false
-                    }
-                }
-            },
-            animation: {
-                duration: 800,
-                easing: 'easeInOutQuart'
-            }
-        }
-    });
-}
-
-// ============================================================
 // CLEANUP
 // ============================================================
 window.addEventListener('beforeunload', function () {
     if (refreshInterval) clearInterval(refreshInterval);
     if (notificationCheckInterval) clearInterval(notificationCheckInterval);
     if (profileCheckInterval) clearInterval(profileCheckInterval);
-    if (subscriptionUpdateInterval) clearInterval(subscriptionUpdateInterval);
-    if (dashboardChart) {
-        dashboardChart.destroy();
-        dashboardChart = null;
-    }
 });
 
-console.log('✅ dashboard.js yuklandi (Admin-Customer)');
+console.log('✅ dashboard.js yuklandi');
