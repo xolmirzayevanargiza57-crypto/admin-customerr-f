@@ -1,7 +1,5 @@
 // ============================================================
-// DASHBOARD - ADMIN-CUSTOMER (TO'LIQ)
-// Loyiha: Admin-Customer Frontend
-// Fayl: js/dashboard.js
+// DASHBOARD - ADMIN-CUSTOMER (OPTIMALLASHTIRILGAN)
 // ============================================================
 
 let dashboardLoaded = false;
@@ -15,8 +13,13 @@ let soundEnabled = true;
 let notificationRetryCount = 0;
 const maxNotificationRetry = 3;
 
+// ⭐ CACHE - MA'LUMOTLARNI ESLAB QOLISH (TEZROQ UCHUN)
+let cachedStats = null;
+let statsCacheTime = 0;
+const CACHE_DURATION = 30000; // 30 soniya
+
 // ============================================================
-// OVOZ YARATISH (PUSH NOTIFICATION UCHUN)
+// OVOZ YARATISH
 // ============================================================
 function createNotificationSound() {
     try {
@@ -32,7 +35,6 @@ function createNotificationSound() {
 
         const now = audioContext.currentTime;
 
-        // Birinchi ovoz
         const osc1 = audioContext.createOscillator();
         const gain1 = audioContext.createGain();
         osc1.connect(gain1);
@@ -44,7 +46,6 @@ function createNotificationSound() {
         osc1.start(now);
         osc1.stop(now + 0.2);
 
-        // Ikkinchi ovoz (yuqori)
         const osc2 = audioContext.createOscillator();
         const gain2 = audioContext.createGain();
         osc2.connect(gain2);
@@ -77,30 +78,25 @@ function initAudio() {
         if (audioContext.state === 'suspended') {
             audioContext.resume();
         }
-    } catch (e) {
-        // Audio qo'llab-quvvatlanmasa
-    }
+    } catch (e) {}
 }
 
 // ============================================================
-// SAHIFA YUKLANGANDA
+// SAHIFA YUKLANGANDA - TEZROQ OCHILISH UCHUN
 // ============================================================
 document.addEventListener('DOMContentLoaded', function() {
-    // Dashboard bir marta yuklanishi uchun
     if (dashboardLoaded) return;
     dashboardLoaded = true;
 
     console.log('🚀 Dashboard yuklanmoqda...');
 
-    // Token tekshirish
     const token = localStorage.getItem('customerToken') || sessionStorage.getItem('customerToken');
     if (!token) {
-        console.warn('⚠️ Token topilmadi, login sahifasiga o\'tish');
         window.location.replace('index.html');
         return;
     }
 
-    // Foydalanuvchi ma'lumotlarini ko'rsatish
+    // ⭐ 1. FOYDALANUVCHI MA'LUMOTLARINI TEZ KO'RSATISH
     const user = Auth.getUser();
     if (user) {
         const nameEl = document.getElementById('userName');
@@ -111,7 +107,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (schoolEl) schoolEl.textContent = user.schoolName || "Nurli Ta'lim Markazi";
     }
 
-    // Logout tugmasi
+    // ⭐ 2. LOGOUT TUGMASI
     const logoutBtn = document.getElementById('logoutBtn');
     if (logoutBtn) {
         const newBtn = logoutBtn.cloneNode(true);
@@ -125,7 +121,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Audio - foydalanuvchi birinchi interaksiyada init
+    // ⭐ 3. AUDIO INIT
     const initAudioOnce = function() {
         initAudio();
         document.removeEventListener('click', initAudioOnce);
@@ -136,23 +132,22 @@ document.addEventListener('DOMContentLoaded', function() {
     document.addEventListener('touchstart', initAudioOnce);
     document.addEventListener('keydown', initAudioOnce);
 
-    // Ma'lumotlarni yuklash
-    updateNotificationBadge();
+    // ⭐ 4. MA'LUMOTLARNI YUKLASH (CACHE BILAN)
     loadDashboardStats();
 
-    // Intervallar
-    refreshInterval = setInterval(loadDashboardStats, 10000);           // Har 10 soniyada statistika
-    notificationCheckInterval = setInterval(updateNotificationBadge, 3000); // Har 3 soniyada xabarlar
+    // ⭐ 5. INTERVALLAR (OPTIMALLASHTIRILGAN)
+    refreshInterval = setInterval(loadDashboardStats, 30000); // 30 soniyaga oshirildi
+    notificationCheckInterval = setInterval(updateNotificationBadge, 5000); // 5 soniyaga oshirildi
     profileCheckInterval = setInterval(function() {
         Auth.checkAuth();
-    }, 30000);                                                           // Har 30 soniyada auth
-    subscriptionUpdateInterval = setInterval(updateSubscriptionCountdown, 1000); // Har 1 soniyada countdown
+    }, 60000); // 60 soniyaga oshirildi
+    subscriptionUpdateInterval = setInterval(updateSubscriptionCountdown, 1000); // 1 soniya (real-time)
 
-    console.log('✅ Dashboard yuklandi!');
+    console.log('✅ Dashboard tez yuklandi!');
 });
 
 // ============================================================
-// ⭐ SUBSCRIPTION COUNTDOWN - REAL TIME (HAR 1 SONIYADA)
+// ⭐ SUBSCRIPTION COUNTDOWN - REAL TIME
 // ============================================================
 function updateSubscriptionCountdown() {
     const subEndDateEl = document.getElementById('subEndDate');
@@ -160,7 +155,6 @@ function updateSubscriptionCountdown() {
     const subStatusEl = document.getElementById('subStatus');
     const subTypeEl = document.getElementById('subType');
 
-    // Agar statsData mavjud bo'lmasa, hech narsa qilma
     if (typeof window.statsData === 'undefined' || !window.statsData || !window.statsData.subscription) {
         return;
     }
@@ -169,9 +163,7 @@ function updateSubscriptionCountdown() {
     const endDate = sub.endDate ? new Date(sub.endDate) : null;
     const now = new Date();
 
-    // ============================================================
-    // 1. HOLATI - SVG ICON BILAN
-    // ============================================================
+    // HOLATI
     if (subStatusEl) {
         if (sub.status === 'active' && endDate && endDate > now) {
             subStatusEl.className = 'value status-active';
@@ -204,9 +196,7 @@ function updateSubscriptionCountdown() {
         }
     }
 
-    // ============================================================
-    // 2. TURI - SVG ICON BILAN
-    // ============================================================
+    // TURI
     if (subTypeEl) {
         const typeMap = {
             'monthly': 'Oylik',
@@ -216,7 +206,6 @@ function updateSubscriptionCountdown() {
             'none': "Yo'q"
         };
         const typeLabel = typeMap[sub.type] || sub.type || "Yo'q";
-
         subTypeEl.innerHTML = `
             <svg class="status-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M12 2L2 7l10 5 10-5-10-5z"/>
@@ -227,9 +216,7 @@ function updateSubscriptionCountdown() {
         `;
     }
 
-    // ============================================================
-    // 3. TUGASH VAQTI - SANA + VAQT ALOHIDA
-    // ============================================================
+    // TUGASH VAQTI
     if (subEndDateEl && endDate) {
         const options = {
             timeZone: 'Asia/Tashkent',
@@ -248,28 +235,22 @@ function updateSubscriptionCountdown() {
 
         subEndDateEl.innerHTML = `
             <svg class="status-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                <line x1="16" y1="2" x2="16" y2="6"/>
-                <line x1="8" y1="2" x2="8" y2="6"/>
-                <line x1="3" y1="10" x2="21" y2="10"/>
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
             </svg>
             ${datePart} <span class="time-part">${timePart}</span>
         `;
     } else if (subEndDateEl) {
         subEndDateEl.innerHTML = `
             <svg class="status-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                <line x1="16" y1="2" x2="16" y2="6"/>
-                <line x1="8" y1="2" x2="8" y2="6"/>
-                <line x1="3" y1="10" x2="21" y2="10"/>
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
             </svg>
             -
         `;
     }
 
-    // ============================================================
-    // 4. QOLGAN KUN - SVG ICON BILAN (REAL TIME COUNTDOWN)
-    // ============================================================
+    // QOLGAN KUN
     if (subDaysLeftEl && endDate) {
         const diff = endDate - now;
         if (diff > 0) {
@@ -307,7 +288,7 @@ function updateSubscriptionCountdown() {
 }
 
 // ============================================================
-// XABAR BADGE (REAL TIME)
+// XABAR BADGE
 // ============================================================
 async function updateNotificationBadge() {
     try {
@@ -335,7 +316,6 @@ async function updateNotificationBadge() {
             const user = Auth.getUser();
             const userId = user?._id;
 
-            // Faqat o'ziga kelgan xabarlar
             const myNotifications = data.data.filter(function(n) {
                 if (n.recipientId) {
                     return String(n.recipientId) === String(userId);
@@ -373,7 +353,6 @@ async function updateNotificationBadge() {
                 }
             }
 
-            // Yangi xabar kelganda ovoz va toast
             if (unreadCount > lastUnreadCount && lastUnreadCount > 0) {
                 const diff = unreadCount - lastUnreadCount;
                 playNotificationSound();
@@ -435,10 +414,20 @@ function showNotificationToast(message) {
 }
 
 // ============================================================
-// DASHBOARD STATISTIKASI - 6 TA KARTA
+// DASHBOARD STATISTIKASI - CACHE BILAN (TEZROQ)
 // ============================================================
 async function loadDashboardStats() {
     try {
+        // ⭐ CACHE DAN TEKSHIRISH
+        const now = Date.now();
+        if (cachedStats && (now - statsCacheTime) < CACHE_DURATION) {
+            console.log('📊 Cache dan statistika yuklandi');
+            renderStats(cachedStats);
+            return;
+        }
+
+        console.log('📊 Serverdan statistika yuklanmoqda...');
+
         const controller = new AbortController();
         const timeoutId = setTimeout(function() {
             controller.abort();
@@ -462,81 +451,70 @@ async function loadDashboardStats() {
 
         const stats = data.data;
 
+        // ⭐ CACHE GA SAQLASH
+        cachedStats = stats;
+        statsCacheTime = Date.now();
+
         // ⭐ Global statsData - subscription uchun
         window.statsData = stats;
 
-        console.log('📊 Statistika yuklandi:', stats);
-
-        // ============================================================
-        // 1. Jami Xodimlar
-        // ============================================================
-        const totalStaff = (stats.teacherCount || 0) + (stats.studentCount || 0);
-        const staffEl = document.getElementById('totalStaff');
-        if (staffEl) staffEl.textContent = totalStaff;
-
-        // ============================================================
-        // 2. Jami O'qituvchilar
-        // ============================================================
-        const teacherEl = document.getElementById('teacherCount');
-        const activeTeacherEl = document.getElementById('activeTeachers');
-        if (teacherEl) teacherEl.textContent = stats.teacherCount || 0;
-        if (activeTeacherEl) activeTeacherEl.textContent = stats.activeTeachers || 0;
-
-        // ============================================================
-        // 3. Jami O'quvchilar
-        // ============================================================
-        const studentEl = document.getElementById('studentCount');
-        const activeStudentEl = document.getElementById('activeStudents');
-        if (studentEl) studentEl.textContent = stats.studentCount || 0;
-        if (activeStudentEl) activeStudentEl.textContent = stats.activeStudents || 0;
-
-        // ============================================================
-        // 4. Jami XP
-        // ============================================================
-        const totalXP = stats.totalXP || 0;
-        const studentCount = stats.studentCount || 0;
-        const avgXP = studentCount > 0 ? Math.round(totalXP / studentCount) : 0;
-        const totalXpEl = document.getElementById('totalXP');
-        const avgXpEl = document.getElementById('avgXPValue');
-        if (totalXpEl) totalXpEl.textContent = totalXP;
-        if (avgXpEl) avgXpEl.textContent = avgXP;
-
-        // ============================================================
-        // 5. Keldi
-        // ============================================================
-        const present = stats.attendanceStats?.present || 0;
-        const presentEl = document.getElementById('presentCount');
-        if (presentEl) presentEl.textContent = present;
-
-        // ============================================================
-        // 6. Sababli / Kelmadi
-        // ============================================================
-        const absentReason = stats.attendanceStats?.absent_reason || 0;
-        const absent = stats.attendanceStats?.absent || 0;
-        const absentReasonEl = document.getElementById('absentReasonCount');
-        const absentEl = document.getElementById('absentCount');
-        if (absentReasonEl) absentReasonEl.textContent = absentReason;
-        if (absentEl) absentEl.textContent = absent;
-
-        // ============================================================
-        // Bu oy yangi xodimlar (agar API dan kelsa)
-        // ============================================================
-        const newThisMonth = stats.newThisMonth || 0;
-        const staffNewEl = document.getElementById('staffNewThisMonth');
-        if (staffNewEl) staffNewEl.textContent = newThisMonth;
-
-        // ⭐ Subscription ma'lumotlarini yangilash
-        updateSubscriptionCountdown();
+        renderStats(stats);
 
     } catch (error) {
         if (error.name !== 'AbortError') {
             console.error('❌ Statistika xatosi:', error);
         }
+        // ⭐ Xatolik bo'lsa ham cache dan ko'rsatish
+        if (cachedStats) {
+            console.log('📊 Xatolikda cache dan ko\'rsatilmoqda');
+            renderStats(cachedStats);
+        }
     }
 }
 
 // ============================================================
-// CLEANUP - SAHIFA YOPILGANDA INTERVALLARNI TOZALASH
+// STATISTIKANI RENDER QILISH
+// ============================================================
+function renderStats(stats) {
+    // 1. Jami Xodimlar
+    const totalStaff = (stats.teacherCount || 0) + (stats.studentCount || 0);
+    document.getElementById('totalStaff').textContent = totalStaff;
+
+    // 2. Jami O'qituvchilar
+    document.getElementById('teacherCount').textContent = stats.teacherCount || 0;
+    document.getElementById('activeTeachers').textContent = stats.activeTeachers || 0;
+
+    // 3. Jami O'quvchilar
+    document.getElementById('studentCount').textContent = stats.studentCount || 0;
+    document.getElementById('activeStudents').textContent = stats.activeStudents || 0;
+
+    // 4. Jami XP
+    const totalXP = stats.totalXP || 0;
+    const studentCount = stats.studentCount || 0;
+    const avgXP = studentCount > 0 ? Math.round(totalXP / studentCount) : 0;
+    document.getElementById('totalXP').textContent = totalXP;
+    document.getElementById('avgXPValue').textContent = avgXP;
+
+    // 5. Keldi
+    const present = stats.attendanceStats?.present || 0;
+    document.getElementById('presentCount').textContent = present;
+
+    // 6. Sababli / Kelmadi
+    const absentReason = stats.attendanceStats?.absent_reason || 0;
+    const absent = stats.attendanceStats?.absent || 0;
+    document.getElementById('absentReasonCount').textContent = absentReason;
+    document.getElementById('absentCount').textContent = absent;
+
+    // Bu oy yangi xodimlar
+    const newThisMonth = stats.newThisMonth || 0;
+    document.getElementById('staffNewThisMonth').textContent = newThisMonth;
+
+    // ⭐ Subscription ma'lumotlarini yangilash
+    updateSubscriptionCountdown();
+}
+
+// ============================================================
+// CLEANUP
 // ============================================================
 window.addEventListener('beforeunload', function() {
     if (refreshInterval) {
@@ -558,11 +536,10 @@ window.addEventListener('beforeunload', function() {
     if (audioContext) {
         try {
             audioContext.close();
-        } catch (e) {
-            // Xatolikni inobatga olma
-        }
+        } catch (e) {}
         audioContext = null;
     }
+    cachedStats = null;
 });
 
-console.log('✅ dashboard.js yuklandi (Admin-Customer)');
+console.log('✅ dashboard.js yuklandi (Optimallashtirilgan)');
