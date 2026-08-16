@@ -144,17 +144,36 @@ function updateSubscriptionCountdown() {
         const endDate = sub.endDate ? new Date(sub.endDate) : null;
         const now = new Date();
 
-        // Holati
+        // Holati - SVG icon bilan
         if (subStatusEl) {
             if (sub.status === 'active' && endDate && endDate > now) {
-                subStatusEl.textContent = '✅ Faol';
                 subStatusEl.className = 'value status-active';
+                subStatusEl.innerHTML = `
+                    <svg class="status-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                        <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                    Faol
+                `;
             } else if (sub.status === 'active' && endDate && endDate <= now) {
-                subStatusEl.textContent = '⏰ Muddati tugagan';
                 subStatusEl.className = 'value status-expired';
+                subStatusEl.innerHTML = `
+                    <svg class="status-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="12" y1="8" x2="12" y2="12"/>
+                        <line x1="12" y1="16" x2="12.01" y2="16"/>
+                    </svg>
+                    Muddati tugagan
+                `;
             } else {
-                subStatusEl.textContent = '❌ Faol emas';
                 subStatusEl.className = 'value status-inactive';
+                subStatusEl.innerHTML = `
+                    <svg class="status-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="15" y1="9" x2="9" y2="15"/>
+                        <line x1="9" y1="9" x2="15" y2="15"/>
+                    </svg>
+                    Faol emas
+                `;
             }
         }
 
@@ -182,7 +201,7 @@ function updateSubscriptionCountdown() {
                 second: '2-digit',
                 hour12: false
             };
-            subEndDateEl.textContent = endDate.toLocaleString('uz-UZ', options);
+            subEndDateEl.textContent = endDate.toLocaleString('uz-UZ', options).replace(/\//g, '-');
         } else if (subEndDateEl) {
             subEndDateEl.textContent = '-';
         }
@@ -197,7 +216,7 @@ function updateSubscriptionCountdown() {
                 const seconds = Math.floor((diff % (1000 * 60)) / 1000);
                 subDaysLeftEl.innerHTML = `${days} <span class="countdown">kun ${hours}s ${minutes}m ${seconds}s</span>`;
             } else {
-                subDaysLeftEl.innerHTML = `0 <span class="countdown">kun (muddati tugagan)</span>`;
+                subDaysLeftEl.innerHTML = `0 <span class="countdown">kun</span>`;
             }
         } else if (subDaysLeftEl) {
             subDaysLeftEl.innerHTML = `0 <span class="countdown">kun</span>`;
