@@ -18,6 +18,7 @@
             --bg-primary: #f5f5f7;
             --bg-card: #ffffff;
             --bg-sidebar: #ffffff;
+            --bg-header: #ffffff;
             --bg-hover: #f1f1f3;
             --bg-active: #e8e8ed;
             --text-primary: #1c1c1e;
@@ -40,10 +41,6 @@
             --sidebar-width: 220px;
             --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
 
-            /* ⭐ GRADIENT TOP LINE */
-            --gradient-start: #007aff;
-            --gradient-end: #7c3aed;
-
             /* ⭐ APPLE STYLE GRADIENT BACKGROUND */
             --bg-gradient-start: #e8f0fe;
             --bg-gradient-end: #f5f5f7;
@@ -53,6 +50,7 @@
             --bg-primary: #1c1c1e;
             --bg-card: #2c2c2e;
             --bg-sidebar: #1c1c1e;
+            --bg-header: #1c1c1e;
             --bg-hover: #2c2c2e;
             --bg-active: #3a3a3c;
             --text-primary: #ffffff;
@@ -61,8 +59,6 @@
             --border-color: #3a3a3c;
             --shadow: 0 2px 16px rgba(0,0,0,0.3);
             --shadow-hover: 0 8px 30px rgba(0,0,0,0.4);
-            --gradient-start: #4a9aff;
-            --gradient-end: #9a6aff;
             --bg-gradient-start: #1a2a4a;
             --bg-gradient-end: #1c1c1e;
         }
@@ -105,7 +101,7 @@
             min-width: var(--sidebar-width);
             max-width: var(--sidebar-width);
             flex: 0 0 var(--sidebar-width);
-            background: var(--bg-primary);
+            background: var(--bg-sidebar);
             border-right: 1px solid var(--border-color);
             display: flex;
             flex-direction: column;
@@ -201,40 +197,23 @@
         }
 
         /* ============================================================
-           TOP HEADER - GRADIENT LINE (Teacher paneliga o'xshash)
+           TOP HEADER - SIDEBAR RANGI BILAN BIR XIL
            ============================================================ */
         .top-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 16px 32px;
-            background: transparent;
+            background: var(--bg-header);
             position: sticky;
             top: 0;
             z-index: 50;
-            border-bottom: 3px solid transparent;
-            background-image: linear-gradient(var(--bg-primary), var(--bg-primary)), 
-                              linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
-            background-origin: padding-box, border-box;
-            background-clip: padding-box, border-box;
+            border-bottom: 1px solid var(--border-color);
         }
 
         [data-theme="dark"] .top-header {
-            background-image: linear-gradient(var(--bg-primary), var(--bg-primary)), 
-                              linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
-            background-origin: padding-box, border-box;
-            background-clip: padding-box, border-box;
-        }
-
-        .header-divider {
-            position: fixed;
-            top: 73px;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
-            z-index: 99;
-            pointer-events: none;
+            background: var(--bg-header);
+            border-bottom-color: var(--border-color);
         }
 
         .header-left { display: flex; align-items: center; gap: 12px; }
@@ -243,7 +222,13 @@
             display: none;
             background: none; border: none;
             font-size: 1.2rem; color: var(--text-primary);
-            cursor: pointer; padding: 4px;
+            cursor: pointer; padding: 8px;
+            border-radius: 8px;
+            transition: var(--transition);
+        }
+
+        .menu-toggle:hover {
+            background: var(--bg-hover);
         }
 
         .header-left h2 { font-size: 1.4rem; font-weight: 700; color: var(--text-primary); letter-spacing: -0.5px; }
@@ -302,7 +287,7 @@
         .user-info .user-role { font-size: 0.7rem; color: var(--text-muted); }
 
         /* ============================================================
-           ⭐ STATS GRID - 6 TA CHIROYLI KARTA (SVG ICONLAR BILAN)
+           ⭐ STATS GRID - 6 TA CHIROYLI KARTA
            ============================================================ */
         .stats-grid {
             display: grid;
@@ -329,7 +314,6 @@
             transform: none !important;
         }
 
-        /* ⭐ SVG icon background - chiroyli ko'rinish uchun */
         .stat-card .card-bg-icon {
             position: absolute;
             right: -10px;
@@ -469,7 +453,7 @@
         }
 
         /* ============================================================
-           ⭐ SUBSCRIPTION CARD - CHIROYLI
+           ⭐ SUBSCRIPTION CARD - ALOHIDA (CARD GROUP ICHIDA EMAS)
            ============================================================ */
         .subscription-wrapper {
             padding: 0 32px;
@@ -482,7 +466,7 @@
             padding: 20px 24px;
             border: 1px solid var(--border-color);
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr 1fr;
+            grid-template-columns: repeat(4, 1fr);
             gap: 16px;
             transition: var(--transition);
             transform: none !important;
@@ -509,11 +493,12 @@
             opacity: 0.06;
         }
 
+        /* ⭐ SUBSCRIPTION ITEM - ALOHIDA */
         .sub-item {
             display: flex;
             flex-direction: column;
             gap: 4px;
-            padding: 10px 14px;
+            padding: 12px 16px;
             background: var(--bg-hover);
             border-radius: 10px;
             transition: var(--transition);
@@ -548,6 +533,15 @@
             font-size: 1.05rem;
             font-weight: 700;
             color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .sub-item .value .status-icon {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
         }
 
         .sub-item .value.status-active { color: var(--color-success); }
@@ -572,20 +566,63 @@
         @media (max-width: 768px) {
             .main-content { padding: 0; }
             .top-header { padding: 12px 16px; }
-            .stats-grid { grid-template-columns: 1fr; padding: 0 12px; margin-top: 40px; }
+
+            /* ⭐ HAMBURGER MENU - SILLIQ */
+            .menu-toggle {
+                display: flex !important;
+                align-items: center;
+                justify-content: center;
+                width: 44px;
+                height: 44px;
+            }
+
+            .sidebar {
+                transform: translateX(-100%);
+                width: 280px;
+                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .sidebar-overlay {
+                display: none;
+                position: fixed;
+                top: 0; left: 0; right: 0; bottom: 0;
+                background: rgba(0,0,0,0.4);
+                z-index: 99;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            }
+
+            .sidebar-overlay.show {
+                display: block;
+                opacity: 1;
+            }
+
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+                max-width: 100%;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+                padding: 0 12px;
+                margin-top: 40px;
+            }
+
             .stat-card { padding: 16px; }
             .stat-card .stat-icon { width: 40px; height: 40px; font-size: 1rem; }
             .stat-card .stat-info .stat-value { font-size: 1.4rem; }
+
             .header-left .text-muted { display: none; }
             .user-info { display: none; }
-            .menu-toggle { display: block !important; }
-            .sidebar { transform: translateX(-100%); width: 280px; }
-            .sidebar.open { transform: translateX(0); }
-            .main-content { margin-left: 0; width: 100%; max-width: 100%; }
 
             .subscription-wrapper { padding: 0 12px; }
             .subscription-card { grid-template-columns: 1fr 1fr; padding: 16px; gap: 10px; }
-            .sub-item { padding: 8px 12px; }
+            .sub-item { padding: 10px 14px; }
             .sub-item .value { font-size: 0.9rem; }
         }
 
@@ -595,6 +632,7 @@
             .stat-card { padding: 14px; }
             .stat-card .stat-icon { width: 36px; height: 36px; font-size: 0.9rem; }
             .stat-card .stat-info .stat-value { font-size: 1.2rem; }
+
             .header-right { gap: 8px; }
             .theme-toggle-btn { width: 34px; height: 34px; font-size: 0.9rem; }
             .notification-link { width: 34px; height: 34px; }
@@ -696,20 +734,20 @@
             </div>
         </aside>
 
+        <!-- ⭐ SIDEBAR OVERLAY -->
         <div class="sidebar-overlay" id="sidebarOverlay"></div>
-
-        <!-- ⭐ GRADIENT TOP LINE -->
-        <div class="header-divider" id="headerDivider"></div>
 
         <!-- ============================================================
              MAIN CONTENT
              ============================================================ -->
         <main class="main-content">
 
-            <!-- HEADER -->
+            <!-- HEADER - SIDEBAR RANGI BILAN BIR XIL -->
             <header class="top-header">
                 <div class="header-left">
-                    <button id="menuToggle" class="menu-toggle"><i class="fas fa-bars"></i></button>
+                    <button id="menuToggle" class="menu-toggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
                     <div>
                         <h2><i class="fas fa-chart-pie"></i> <span data-i18n="dashboard">Dashboard</span></h2>
                         <p class="text-muted" id="schoolName"><i class="fas fa-school"></i> Nurli Ta'lim Markazi</p>
@@ -729,7 +767,7 @@
                     <div class="user-profile">
                         <div class="user-avatar"><span id="userInitial">A</span></div>
                         <div class="user-info">
-                            <p class="user-name" id="userName"><i class="fas fa-user"></i> Admin</p>
+                            <p class="user-name" id="userName"><i class="fas fa-user"></i> Xoijakbar Xasan</p>
                             <p class="user-role text-muted"><i class="fas fa-user-shield"></i> Admin Customer</p>
                         </div>
                     </div>
@@ -737,7 +775,7 @@
             </header>
 
             <!-- ============================================================
-                 ⭐ STATS GRID - 6 TA CHIROYLI KARTA (SVG ICONLAR BILAN)
+                 ⭐ STATS GRID - 6 TA KARTA
                  ============================================================ -->
             <section class="stats-grid">
                 <!-- 1. Jami Xodimlar -->
@@ -797,7 +835,7 @@
                     <div class="stat-top">
                         <div class="stat-icon purple">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+                                <path d="M22 10v6M2 10l10-5 10-5 10 5z"/>
                                 <path d="M6 12v5c3 3 9 3 12 0v-5"/>
                             </svg>
                         </div>
@@ -884,7 +922,7 @@
             </section>
 
             <!-- ============================================================
-                 ⭐ SUBSCRIPTION CARD
+                 ⭐ SUBSCRIPTION CARD - ALOHIDA
                  ============================================================ -->
             <section class="subscription-wrapper">
                 <div class="subscription-card" id="subscriptionCard">
@@ -898,7 +936,12 @@
                             </svg>
                             Holati
                         </span>
-                        <span class="value status-active" id="subStatus">✅ Faol</span>
+                        <span class="value status-active" id="subStatus">
+                            <svg class="status-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                            Faol
+                        </span>
                     </div>
 
                     <!-- Turi -->
@@ -924,7 +967,7 @@
                             </svg>
                             Tugash vaqti
                         </span>
-                        <span class="value" id="subEndDate">15/09/2026, 20:59:00</span>
+                        <span class="value" id="subEndDate">2026-09-15 20:59:00</span>
                     </div>
 
                     <!-- Qolgan kun -->
@@ -962,34 +1005,55 @@
                 });
             }
 
-            // Hamburger menu
+            // ⭐ HAMBURGER MENU - SILLIQ
             var menuToggle = document.getElementById('menuToggle');
             var sidebar = document.getElementById('sidebar');
             var overlay = document.getElementById('sidebarOverlay');
 
-            if (menuToggle && sidebar && overlay) {
-                menuToggle.addEventListener('click', function() {
+            if (menuToggle && sidebar) {
+                menuToggle.addEventListener('click', function(e) {
+                    e.stopPropagation();
                     sidebar.classList.toggle('open');
-                    overlay.classList.toggle('show');
+                    if (overlay) {
+                        overlay.classList.toggle('show');
+                    }
                 });
+            }
+
+            if (overlay) {
                 overlay.addEventListener('click', function() {
                     sidebar.classList.remove('open');
                     overlay.classList.remove('show');
                 });
             }
 
-            // Header divider - gradient top line
-            function updateDivider() {
-                var brand = document.querySelector('.sidebar-brand');
-                var divider = document.getElementById('headerDivider');
-                if (brand && divider) {
-                    var h = brand.getBoundingClientRect().height;
-                    var top = brand.getBoundingClientRect().bottom;
-                    divider.style.top = top + 'px';
+            // ⭐ SIDEBAR TASHQARISIGA BOSILGANDA YOPISH
+            document.addEventListener('click', function(e) {
+                if (window.innerWidth <= 768) {
+                    var isSidebar = sidebar.contains(e.target);
+                    var isToggle = menuToggle.contains(e.target);
+                    if (!isSidebar && !isToggle && sidebar.classList.contains('open')) {
+                        sidebar.classList.remove('open');
+                        if (overlay) overlay.classList.remove('show');
+                    }
                 }
-            }
-            updateDivider();
-            window.addEventListener('resize', updateDivider);
+            });
+
+            // ⭐ ESC TUGMASI
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && sidebar.classList.contains('open')) {
+                    sidebar.classList.remove('open');
+                    if (overlay) overlay.classList.remove('show');
+                }
+            });
+
+            // ⭐ RESIZE - KATTA EKRANGA O'TGANDA YOPISH
+            window.addEventListener('resize', function() {
+                if (window.innerWidth > 768 && sidebar.classList.contains('open')) {
+                    sidebar.classList.remove('open');
+                    if (overlay) overlay.classList.remove('show');
+                }
+            });
         });
     </script>
 
