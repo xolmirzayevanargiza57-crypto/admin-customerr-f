@@ -12,7 +12,7 @@
 
     <style>
         /* ============================================================
-           ROOT VARIABLES - APPLE STYLE
+           ROOT VARIABLES
            ============================================================ */
         :root {
             --bg-primary: #f5f5f7;
@@ -40,7 +40,6 @@
             --color-warning: #ff9500;
             --sidebar-width: 220px;
             --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
-
             --bg-gradient-start: #e8f0fe;
             --bg-gradient-end: #f5f5f7;
         }
@@ -93,7 +92,7 @@
         }
 
         /* ============================================================
-           SIDEBAR
+           SIDEBAR - TO'LIQ BALANDLIKDA
            ============================================================ */
         .sidebar {
             width: var(--sidebar-width);
@@ -105,11 +104,56 @@
             display: flex;
             flex-direction: column;
             position: fixed;
-            top: 0; left: 0; bottom: 0;
+            top: 0;
+            left: 0;
+            bottom: 0;
             height: 100vh;
-            z-index: 100;
+            z-index: 1000;
             overflow-y: auto;
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow-x: hidden;
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            will-change: transform;
+        }
+
+        /* ⭐ SIDEBAR MOBILDA YASHIRIN */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: 280px;
+                min-width: 280px;
+                max-width: 280px;
+                flex: 0 0 280px;
+                box-shadow: none;
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+                box-shadow: 4px 0 30px rgba(0, 0, 0, 0.15);
+            }
+
+            .sidebar-overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.4);
+                z-index: 999;
+                opacity: 0;
+                transition: opacity 0.35s ease;
+            }
+
+            .sidebar-overlay.show {
+                display: block;
+                opacity: 1;
+            }
+
+            .main-content {
+                margin-left: 0 !important;
+                width: 100% !important;
+                max-width: 100% !important;
+            }
         }
 
         .sidebar-brand {
@@ -122,10 +166,13 @@
         }
 
         .sidebar-brand .brand-icon {
-            width: 36px; height: 36px;
+            width: 36px;
+            height: 36px;
             background: var(--text-primary);
             border-radius: 10px;
-            display: flex; align-items: center; justify-content: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             flex-shrink: 0;
         }
 
@@ -138,16 +185,21 @@
         .sidebar-nav {
             flex: 1;
             padding: 12px 10px;
-            display: flex; flex-direction: column; gap: 2px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
             overflow-y: auto;
         }
 
         .nav-link {
-            display: flex; align-items: center; gap: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
             padding: 10px 12px;
             border-radius: var(--radius-sm);
             color: var(--text-muted);
-            font-weight: 500; font-size: 0.8rem;
+            font-weight: 500;
+            font-size: 0.8rem;
             transition: var(--transition);
             text-decoration: none;
             white-space: nowrap;
@@ -162,12 +214,19 @@
         .sidebar-footer { padding: 12px 10px; border-top: 1px solid var(--border-color); flex-shrink: 0; }
 
         .btn-logout {
-            display: flex; align-items: center; gap: 10px;
-            width: 100%; padding: 10px 12px;
-            border: none; border-radius: var(--radius-sm);
-            background: transparent; color: var(--text-muted);
-            font-size: 0.8rem; font-weight: 500;
-            cursor: pointer; transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            padding: 10px 12px;
+            border: none;
+            border-radius: var(--radius-sm);
+            background: transparent;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
         }
 
         .btn-logout:hover { background: #fef2f2; color: var(--color-danger); }
@@ -176,12 +235,16 @@
         .sidebar-overlay {
             display: none;
             position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.4);
-            z-index: 99;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 999;
             opacity: 0;
-            transition: opacity 0.3s ease;
+            transition: opacity 0.35s ease;
         }
+
         .sidebar-overlay.show {
             display: block;
             opacity: 1;
@@ -222,28 +285,43 @@
             border-bottom-color: var(--border-color);
         }
 
-        .header-left { display: flex; align-items: center; gap: 12px; }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
 
-        /* ⭐ HAMBURGER MENU - TO'G'RI O'LCHAM */
+        /* ⭐ HAMBURGER MENU - TO'G'RI VA KATTA */
         .menu-toggle {
             display: none;
             background: none;
             border: none;
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             color: var(--text-primary);
             cursor: pointer;
-            padding: 8px;
-            border-radius: 8px;
+            padding: 10px;
+            border-radius: 10px;
             transition: var(--transition);
             align-items: center;
             justify-content: center;
-            width: 44px;
-            height: 44px;
+            width: 48px;
+            height: 48px;
             flex-shrink: 0;
+            line-height: 1;
         }
 
         .menu-toggle:hover {
             background: var(--bg-hover);
+        }
+
+        .menu-toggle i {
+            font-size: 1.4rem;
+        }
+
+        @media (max-width: 768px) {
+            .menu-toggle {
+                display: flex !important;
+            }
         }
 
         .header-left h2 { font-size: 1.4rem; font-weight: 700; color: var(--text-primary); letter-spacing: -0.5px; }
@@ -253,13 +331,18 @@
         .header-right { display: flex; align-items: center; gap: 12px; }
 
         .theme-toggle-btn {
-            display: inline-flex; align-items: center; justify-content: center;
-            width: 40px; height: 40px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             border: 1px solid var(--border-color);
             background: var(--bg-card);
             color: var(--text-primary);
-            cursor: pointer; transition: var(--transition); font-size: 1.1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 1.1rem;
         }
 
         .theme-toggle-btn:hover { background: var(--bg-hover); transform: scale(1.05); }
@@ -270,39 +353,58 @@
 
         .notification-link {
             position: relative;
-            display: inline-flex; align-items: center; justify-content: center;
-            width: 40px; height: 40px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             border: 1px solid var(--border-color);
             background: var(--bg-card);
             color: var(--text-primary);
-            text-decoration: none; transition: var(--transition);
+            text-decoration: none;
+            transition: var(--transition);
         }
 
         .notification-link:hover { background: var(--bg-hover); transform: scale(1.05); }
 
         #notificationBadge {
-            position: absolute; top: -2px; right: -2px;
-            background: var(--color-red); color: white;
-            font-size: 0.55rem; border-radius: 50%;
-            padding: 2px 6px; min-width: 18px; text-align: center;
-            display: none; font-weight: 700; line-height: 1.4;
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            background: var(--color-red);
+            color: white;
+            font-size: 0.55rem;
+            border-radius: 50%;
+            padding: 2px 6px;
+            min-width: 18px;
+            text-align: center;
+            display: none;
+            font-weight: 700;
+            line-height: 1.4;
         }
 
         .user-profile { display: flex; align-items: center; gap: 10px; }
 
         .user-avatar {
-            width: 36px; height: 36px; border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
             background: var(--text-primary);
-            display: flex; align-items: center; justify-content: center;
-            color: var(--bg-primary); font-weight: 600; font-size: 0.8rem; flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--bg-primary);
+            font-weight: 600;
+            font-size: 0.8rem;
+            flex-shrink: 0;
         }
 
         .user-info .user-name { font-size: 0.85rem; font-weight: 600; color: var(--text-primary); }
         .user-info .user-role { font-size: 0.7rem; color: var(--text-muted); }
 
         /* ============================================================
-           ⭐ STATS GRID - 6 TA KARTA
+           STATS GRID
            ============================================================ */
         .stats-grid {
             display: grid;
@@ -339,9 +441,7 @@
             color: var(--text-primary);
         }
 
-        [data-theme="dark"] .stat-card .card-bg-icon {
-            opacity: 0.08;
-        }
+        [data-theme="dark"] .stat-card .card-bg-icon { opacity: 0.08; }
 
         .stat-card .stat-top {
             display: flex;
@@ -419,10 +519,7 @@
             color: #4ad4e8;
         }
 
-        .stat-card .stat-info {
-            flex: 1;
-            min-width: 0;
-        }
+        .stat-card .stat-info { flex: 1; min-width: 0; }
 
         .stat-card .stat-info .stat-label {
             font-size: 0.7rem;
@@ -468,7 +565,7 @@
         }
 
         /* ============================================================
-           ⭐ SUBSCRIPTION CARD - CHIROYLI SVG ICONLAR BILAN
+           SUBSCRIPTION CARD
            ============================================================ */
         .subscription-wrapper {
             padding: 0 32px;
@@ -504,9 +601,7 @@
             color: var(--text-primary);
         }
 
-        [data-theme="dark"] .subscription-card .card-bg-icon {
-            opacity: 0.06;
-        }
+        [data-theme="dark"] .subscription-card .card-bg-icon { opacity: 0.06; }
 
         .sub-item {
             display: flex;
@@ -562,26 +657,14 @@
             flex-shrink: 0;
         }
 
-        .sub-item .value.status-active {
-            color: var(--color-success);
-        }
-        .sub-item .value.status-active .status-icon {
-            stroke: var(--color-success);
-        }
+        .sub-item .value.status-active { color: var(--color-success); }
+        .sub-item .value.status-active .status-icon { stroke: var(--color-success); }
 
-        .sub-item .value.status-inactive {
-            color: var(--text-muted);
-        }
-        .sub-item .value.status-inactive .status-icon {
-            stroke: var(--text-muted);
-        }
+        .sub-item .value.status-inactive { color: var(--text-muted); }
+        .sub-item .value.status-inactive .status-icon { stroke: var(--text-muted); }
 
-        .sub-item .value.status-expired {
-            color: var(--color-danger);
-        }
-        .sub-item .value.status-expired .status-icon {
-            stroke: var(--color-danger);
-        }
+        .sub-item .value.status-expired { color: var(--color-danger); }
+        .sub-item .value.status-expired .status-icon { stroke: var(--color-danger); }
 
         .sub-item .value .countdown {
             font-size: 0.7rem;
@@ -597,7 +680,7 @@
         }
 
         /* ============================================================
-           ⭐ RESPONSIVE
+           RESPONSIVE
            ============================================================ */
         @media (max-width: 1024px) {
             .stats-grid { grid-template-columns: repeat(2, 1fr); }
@@ -608,30 +691,22 @@
             .main-content { padding: 0; }
             .top-header { padding: 12px 16px; }
 
-            /* ⭐ HAMBURGER MENU - MOBIL UCHUN */
             .menu-toggle {
                 display: flex !important;
                 align-items: center;
                 justify-content: center;
-                width: 44px;
-                height: 44px;
+                width: 48px;
+                height: 48px;
+                padding: 10px;
+                font-size: 1.3rem;
             }
 
-            .sidebar {
-                transform: translateX(-100%);
-                width: 280px;
-                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            .menu-toggle i {
+                font-size: 1.4rem;
             }
 
-            .sidebar.open {
-                transform: translateX(0);
-            }
-
-            .main-content {
-                margin-left: 0;
-                width: 100%;
-                max-width: 100%;
-            }
+            .header-left .text-muted { display: none; }
+            .user-info { display: none; }
 
             .stats-grid {
                 grid-template-columns: 1fr;
@@ -643,9 +718,6 @@
             .stat-card .stat-icon { width: 38px; height: 38px; font-size: 1rem; }
             .stat-card .stat-icon svg { width: 18px; height: 18px; }
             .stat-card .stat-info .stat-value { font-size: 1.3rem; }
-
-            .header-left .text-muted { display: none; }
-            .user-info { display: none; }
 
             .subscription-wrapper { padding: 0 12px; }
             .subscription-card {
@@ -677,6 +749,17 @@
             .notification-link { width: 32px; height: 32px; font-size: 0.8rem; }
             .user-avatar { width: 28px; height: 28px; font-size: 0.65rem; }
 
+            .menu-toggle {
+                width: 42px;
+                height: 42px;
+                padding: 8px;
+                font-size: 1.1rem;
+            }
+
+            .menu-toggle i {
+                font-size: 1.2rem;
+            }
+
             .subscription-card {
                 grid-template-columns: 1fr 1fr;
                 padding: 8px 10px;
@@ -694,18 +777,34 @@
            NOTIFICATION TOAST
            ============================================================ */
         .notification-toast {
-            position: fixed; top: 20px; right: 20px; z-index: 99999;
-            background: #007aff; color: white;
-            padding: 14px 20px; border-radius: 12px;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 99999;
+            background: #007aff;
+            color: white;
+            padding: 14px 20px;
+            border-radius: 12px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-            font-size: 0.9rem; max-width: 380px;
-            display: flex; align-items: center; gap: 12px;
+            font-size: 0.9rem;
+            max-width: 380px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
             animation: slideDown 0.5s ease;
             cursor: pointer;
             font-family: 'Inter', sans-serif;
         }
 
-        .notification-toast button { background: none; border: none; color: white; font-size: 1.2rem; cursor: pointer; margin-left: auto; }
+        .notification-toast button {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            margin-left: auto;
+        }
+
         [data-theme="dark"] .notification-toast { background: #1a2a4a; }
 
         @keyframes slideDown {
@@ -721,10 +820,15 @@
 
         .sidebar-badge {
             margin-left: auto;
-            background: #ff3b30; color: white;
-            font-size: 0.55rem; padding: 2px 8px;
-            border-radius: 10px; display: none;
-            font-weight: 600; min-width: 18px; text-align: center;
+            background: #ff3b30;
+            color: white;
+            font-size: 0.55rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            display: none;
+            font-weight: 600;
+            min-width: 18px;
+            text-align: center;
         }
     </style>
 </head>
@@ -1062,13 +1166,17 @@
                 });
             }
 
-            // ⭐ HAMBURGER MENU - SILLIQ VA TO'G'RI
+            // ============================================================
+            // ⭐ HAMBURGER MENU - TO'G'RI ISHLASH UCHUN
+            // ============================================================
             var menuToggle = document.getElementById('menuToggle');
             var sidebar = document.getElementById('sidebar');
             var overlay = document.getElementById('sidebarOverlay');
 
             if (menuToggle && sidebar) {
+                // Menuni ochish/yopish
                 menuToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
                     e.stopPropagation();
                     sidebar.classList.toggle('open');
                     if (overlay) {
@@ -1084,7 +1192,7 @@
                 });
             }
 
-            // Tashqariga bosilganda yopish
+            // Tashqariga bosilganda yopish (mobil)
             document.addEventListener('click', function(e) {
                 if (window.innerWidth <= 768) {
                     var isSidebar = sidebar.contains(e.target);
@@ -1104,13 +1212,19 @@
                 }
             });
 
-            // Resize
+            // Katta ekranga o'tganda yopish
             window.addEventListener('resize', function() {
                 if (window.innerWidth > 768 && sidebar.classList.contains('open')) {
                     sidebar.classList.remove('open');
                     if (overlay) overlay.classList.remove('show');
                 }
             });
+
+            // ⭐ SAHIFA YUKLANGANDA MOBILDA SIDEBAR YOPIQ BO'LISHI
+            if (window.innerWidth <= 768) {
+                sidebar.classList.remove('open');
+                if (overlay) overlay.classList.remove('show');
+            }
         });
     </script>
 
