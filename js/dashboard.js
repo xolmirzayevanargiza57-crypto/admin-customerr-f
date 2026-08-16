@@ -1,5 +1,7 @@
 // ============================================================
-// DASHBOARD - ADMIN-CUSTOMER (6 TA KARTA + SUBSCRIPTION)
+// DASHBOARD - ADMIN-CUSTOMER (TO'LIQ)
+// Loyiha: Admin-Customer Frontend
+// Fayl: js/dashboard.js
 // ============================================================
 
 let dashboardLoaded = false;
@@ -14,20 +16,23 @@ let notificationRetryCount = 0;
 const maxNotificationRetry = 3;
 
 // ============================================================
-// OVOZ YARATISH
+// OVOZ YARATISH (PUSH NOTIFICATION UCHUN)
 // ============================================================
 function createNotificationSound() {
     try {
         if (!audioContext) {
             audioContext = new (window.AudioContext || window.webkitAudioContext)();
         }
-        if (audioContext.state === 'suspended') audioContext.resume();
+        if (audioContext.state === 'suspended') {
+            audioContext.resume();
+        }
         if (audioContext.state === 'closed') {
             audioContext = new (window.AudioContext || window.webkitAudioContext)();
         }
 
         const now = audioContext.currentTime;
 
+        // Birinchi ovoz
         const osc1 = audioContext.createOscillator();
         const gain1 = audioContext.createGain();
         osc1.connect(gain1);
@@ -39,6 +44,7 @@ function createNotificationSound() {
         osc1.start(now);
         osc1.stop(now + 0.2);
 
+        // Ikkinchi ovoz (yuqori)
         const osc2 = audioContext.createOscillator();
         const gain2 = audioContext.createGain();
         osc2.connect(gain2);
@@ -59,31 +65,42 @@ function createNotificationSound() {
 function playNotificationSound() {
     if (!soundEnabled) return;
     if (createNotificationSound()) return;
-    setTimeout(() => createNotificationSound(), 100);
+    setTimeout(function() {
+        createNotificationSound();
+    }, 100);
 }
 
 function initAudio() {
     if (audioContext) return;
     try {
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        if (audioContext.state === 'suspended') audioContext.resume();
-    } catch (e) {}
+        if (audioContext.state === 'suspended') {
+            audioContext.resume();
+        }
+    } catch (e) {
+        // Audio qo'llab-quvvatlanmasa
+    }
 }
 
 // ============================================================
 // SAHIFA YUKLANGANDA
 // ============================================================
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function() {
+    // Dashboard bir marta yuklanishi uchun
     if (dashboardLoaded) return;
     dashboardLoaded = true;
 
+    console.log('🚀 Dashboard yuklanmoqda...');
+
+    // Token tekshirish
     const token = localStorage.getItem('customerToken') || sessionStorage.getItem('customerToken');
     if (!token) {
+        console.warn('⚠️ Token topilmadi, login sahifasiga o\'tish');
         window.location.replace('index.html');
         return;
     }
 
-    // Foydalanuvchi ma'lumotlari
+    // Foydalanuvchi ma'lumotlarini ko'rsatish
     const user = Auth.getUser();
     if (user) {
         const nameEl = document.getElementById('userName');
@@ -94,12 +111,12 @@ document.addEventListener('DOMContentLoaded', function () {
         if (schoolEl) schoolEl.textContent = user.schoolName || "Nurli Ta'lim Markazi";
     }
 
-    // Logout
+    // Logout tugmasi
     const logoutBtn = document.getElementById('logoutBtn');
     if (logoutBtn) {
         const newBtn = logoutBtn.cloneNode(true);
         logoutBtn.parentNode.replaceChild(newBtn, logoutBtn);
-        newBtn.addEventListener('click', function (e) {
+        newBtn.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
             if (confirm('Haqiqatan ham chiqmoqchimisiz?')) {
@@ -108,8 +125,8 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Audio init
-    const initAudioOnce = function () {
+    // Audio - foydalanuvchi birinchi interaksiyada init
+    const initAudioOnce = function() {
         initAudio();
         document.removeEventListener('click', initAudioOnce);
         document.removeEventListener('touchstart', initAudioOnce);
@@ -124,14 +141,18 @@ document.addEventListener('DOMContentLoaded', function () {
     loadDashboardStats();
 
     // Intervallar
-    refreshInterval = setInterval(loadDashboardStats, 10000);
-    notificationCheckInterval = setInterval(updateNotificationBadge, 3000);
-    profileCheckInterval = setInterval(() => Auth.checkAuth(), 30000);
-    subscriptionUpdateInterval = setInterval(updateSubscriptionCountdown, 1000);
+    refreshInterval = setInterval(loadDashboardStats, 10000);           // Har 10 soniyada statistika
+    notificationCheckInterval = setInterval(updateNotificationBadge, 3000); // Har 3 soniyada xabarlar
+    profileCheckInterval = setInterval(function() {
+        Auth.checkAuth();
+    }, 30000);                                                           // Har 30 soniyada auth
+    subscriptionUpdateInterval = setInterval(updateSubscriptionCountdown, 1000); // Har 1 soniyada countdown
+
+    console.log('✅ Dashboard yuklandi!');
 });
 
 // ============================================================
-// ⭐ SUBSCRIPTION COUNTDOWN - REAL TIME
+// ⭐ SUBSCRIPTION COUNTDOWN - REAL TIME (HAR 1 SONIYADA)
 // ============================================================
 function updateSubscriptionCountdown() {
     const subEndDateEl = document.getElementById('subEndDate');
@@ -139,93 +160,154 @@ function updateSubscriptionCountdown() {
     const subStatusEl = document.getElementById('subStatus');
     const subTypeEl = document.getElementById('subType');
 
-    if (typeof window.statsData !== 'undefined' && window.statsData && window.statsData.subscription) {
-        const sub = window.statsData.subscription;
-        const endDate = sub.endDate ? new Date(sub.endDate) : null;
-        const now = new Date();
+    // Agar statsData mavjud bo'lmasa, hech narsa qilma
+    if (typeof window.statsData === 'undefined' || !window.statsData || !window.statsData.subscription) {
+        return;
+    }
 
-        // Holati - SVG icon bilan
-        if (subStatusEl) {
-            if (sub.status === 'active' && endDate && endDate > now) {
-                subStatusEl.className = 'value status-active';
-                subStatusEl.innerHTML = `
-                    <svg class="status-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-                        <polyline points="20 6 9 17 4 12"/>
-                    </svg>
-                    Faol
-                `;
-            } else if (sub.status === 'active' && endDate && endDate <= now) {
-                subStatusEl.className = 'value status-expired';
-                subStatusEl.innerHTML = `
-                    <svg class="status-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="10"/>
-                        <line x1="12" y1="8" x2="12" y2="12"/>
-                        <line x1="12" y1="16" x2="12.01" y2="16"/>
-                    </svg>
-                    Muddati tugagan
-                `;
-            } else {
-                subStatusEl.className = 'value status-inactive';
-                subStatusEl.innerHTML = `
-                    <svg class="status-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="10"/>
-                        <line x1="15" y1="9" x2="9" y2="15"/>
-                        <line x1="9" y1="9" x2="15" y2="15"/>
-                    </svg>
-                    Faol emas
-                `;
-            }
-        }
+    const sub = window.statsData.subscription;
+    const endDate = sub.endDate ? new Date(sub.endDate) : null;
+    const now = new Date();
 
-        // Turi
-        if (subTypeEl) {
-            const typeMap = {
-                'monthly': 'Oylik',
-                '6months': '6 oylik',
-                'yearly': 'Yillik',
-                'custom': 'Custom',
-                'none': 'Yo\'q'
-            };
-            subTypeEl.textContent = typeMap[sub.type] || sub.type || 'Yo\'q';
+    // ============================================================
+    // 1. HOLATI - SVG ICON BILAN
+    // ============================================================
+    if (subStatusEl) {
+        if (sub.status === 'active' && endDate && endDate > now) {
+            subStatusEl.className = 'value status-active';
+            subStatusEl.innerHTML = `
+                <svg class="status-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                    <polyline points="20 6 9 17 4 12"/>
+                </svg>
+                Faol
+            `;
+        } else if (sub.status === 'active' && endDate && endDate <= now) {
+            subStatusEl.className = 'value status-expired';
+            subStatusEl.innerHTML = `
+                <svg class="status-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="8" x2="12" y2="12"/>
+                    <line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+                Muddati tugagan
+            `;
+        } else {
+            subStatusEl.className = 'value status-inactive';
+            subStatusEl.innerHTML = `
+                <svg class="status-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="15" y1="9" x2="9" y2="15"/>
+                    <line x1="9" y1="9" x2="15" y2="15"/>
+                </svg>
+                Faol emas
+            `;
         }
+    }
 
-        // Tugash vaqti
-        if (subEndDateEl && endDate) {
-            const options = {
-                timeZone: 'Asia/Tashkent',
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit',
-                hour12: false
-            };
-            subEndDateEl.textContent = endDate.toLocaleString('uz-UZ', options).replace(/\//g, '-');
-        } else if (subEndDateEl) {
-            subEndDateEl.textContent = '-';
-        }
+    // ============================================================
+    // 2. TURI - SVG ICON BILAN
+    // ============================================================
+    if (subTypeEl) {
+        const typeMap = {
+            'monthly': 'Oylik',
+            '6months': '6 oylik',
+            'yearly': 'Yillik',
+            'custom': 'Custom',
+            'none': "Yo'q"
+        };
+        const typeLabel = typeMap[sub.type] || sub.type || "Yo'q";
 
-        // Qolgan kun
-        if (subDaysLeftEl && endDate) {
-            const diff = endDate - now;
-            if (diff > 0) {
-                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-                subDaysLeftEl.innerHTML = `${days} <span class="countdown">kun ${hours}s ${minutes}m ${seconds}s</span>`;
-            } else {
-                subDaysLeftEl.innerHTML = `0 <span class="countdown">kun</span>`;
-            }
-        } else if (subDaysLeftEl) {
-            subDaysLeftEl.innerHTML = `0 <span class="countdown">kun</span>`;
+        subTypeEl.innerHTML = `
+            <svg class="status-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                <path d="M2 17l10 5 10-5"/>
+                <path d="M2 12l10 5 10-5"/>
+            </svg>
+            ${typeLabel}
+        `;
+    }
+
+    // ============================================================
+    // 3. TUGASH VAQTI - SANA + VAQT ALOHIDA
+    // ============================================================
+    if (subEndDateEl && endDate) {
+        const options = {
+            timeZone: 'Asia/Tashkent',
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false
+        };
+        const formatted = endDate.toLocaleString('uz-UZ', options).replace(/\//g, '-');
+        const parts = formatted.split(', ');
+        const datePart = parts[0] || '';
+        const timePart = parts[1] || '';
+
+        subEndDateEl.innerHTML = `
+            <svg class="status-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                <line x1="16" y1="2" x2="16" y2="6"/>
+                <line x1="8" y1="2" x2="8" y2="6"/>
+                <line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+            ${datePart} <span class="time-part">${timePart}</span>
+        `;
+    } else if (subEndDateEl) {
+        subEndDateEl.innerHTML = `
+            <svg class="status-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                <line x1="16" y1="2" x2="16" y2="6"/>
+                <line x1="8" y1="2" x2="8" y2="6"/>
+                <line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+            -
+        `;
+    }
+
+    // ============================================================
+    // 4. QOLGAN KUN - SVG ICON BILAN (REAL TIME COUNTDOWN)
+    // ============================================================
+    if (subDaysLeftEl && endDate) {
+        const diff = endDate - now;
+        if (diff > 0) {
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+            subDaysLeftEl.innerHTML = `
+                <svg class="status-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                </svg>
+                ${days} <span class="countdown">kun ${hours}s ${minutes}m ${seconds}s</span>
+            `;
+        } else {
+            subDaysLeftEl.innerHTML = `
+                <svg class="status-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="8" x2="12" y2="12"/>
+                    <line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+                0 <span class="countdown">kun</span>
+            `;
         }
+    } else if (subDaysLeftEl) {
+        subDaysLeftEl.innerHTML = `
+            <svg class="status-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+            </svg>
+            0 <span class="countdown">kun</span>
+        `;
     }
 }
 
 // ============================================================
-// XABAR BADGE
+// XABAR BADGE (REAL TIME)
 // ============================================================
 async function updateNotificationBadge() {
     try {
@@ -233,7 +315,9 @@ async function updateNotificationBadge() {
         if (!token) return;
 
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 5000);
+        const timeoutId = setTimeout(function() {
+            controller.abort();
+        }, 5000);
 
         try {
             const response = await fetch(API.baseURL + '/api/notifications', {
@@ -251,25 +335,34 @@ async function updateNotificationBadge() {
             const user = Auth.getUser();
             const userId = user?._id;
 
-            const myNotifications = data.data.filter(n => {
-                if (n.recipientId) return String(n.recipientId) === String(userId);
+            // Faqat o'ziga kelgan xabarlar
+            const myNotifications = data.data.filter(function(n) {
+                if (n.recipientId) {
+                    return String(n.recipientId) === String(userId);
+                }
                 return n.recipientRole === 'all' || n.recipientRole === 'admin_customer';
             });
 
-            const unreadCount = myNotifications.filter(n => !n.isRead).length;
+            const unreadCount = myNotifications.filter(function(n) {
+                return !n.isRead;
+            }).length;
 
+            // Header badge
             const badge = document.getElementById('notificationBadge');
             if (badge) {
                 if (unreadCount > 0) {
                     badge.style.display = 'block';
                     badge.textContent = unreadCount > 99 ? '99+' : unreadCount;
                     badge.style.animation = 'none';
-                    setTimeout(() => { badge.style.animation = 'badgePulse 0.5s ease'; }, 10);
+                    setTimeout(function() {
+                        badge.style.animation = 'badgePulse 0.5s ease';
+                    }, 10);
                 } else {
                     badge.style.display = 'none';
                 }
             }
 
+            // Sidebar badge
             const sidebarBadge = document.getElementById('sidebarBadge');
             if (sidebarBadge) {
                 if (unreadCount > 0) {
@@ -280,10 +373,13 @@ async function updateNotificationBadge() {
                 }
             }
 
+            // Yangi xabar kelganda ovoz va toast
             if (unreadCount > lastUnreadCount && lastUnreadCount > 0) {
                 const diff = unreadCount - lastUnreadCount;
                 playNotificationSound();
-                setTimeout(playNotificationSound, 300);
+                setTimeout(function() {
+                    playNotificationSound();
+                }, 300);
                 showNotificationToast('🔔 ' + diff + ' ta yangi xabar keldi!');
             }
 
@@ -294,7 +390,9 @@ async function updateNotificationBadge() {
             if (fetchError.name === 'AbortError') {
                 if (notificationRetryCount < maxNotificationRetry) {
                     notificationRetryCount++;
-                    setTimeout(updateNotificationBadge, 1000);
+                    setTimeout(function() {
+                        updateNotificationBadge();
+                    }, 1000);
                 }
             }
         }
@@ -317,7 +415,7 @@ function showNotificationToast(message) {
         '<span>' + message + '</span>' +
         '<button onclick="this.parentElement.remove()">×</button>';
 
-    toast.addEventListener('click', function (e) {
+    toast.addEventListener('click', function(e) {
         if (e.target.tagName !== 'BUTTON') {
             window.location.href = 'notifications.html';
         }
@@ -325,11 +423,13 @@ function showNotificationToast(message) {
 
     document.body.appendChild(toast);
 
-    setTimeout(function () {
+    setTimeout(function() {
         if (toast.parentElement) {
             toast.style.opacity = '0';
             toast.style.transition = 'opacity 0.5s';
-            setTimeout(() => { if (toast.parentElement) toast.remove(); }, 500);
+            setTimeout(function() {
+                if (toast.parentElement) toast.remove();
+            }, 500);
         }
     }, 5000);
 }
@@ -340,7 +440,9 @@ function showNotificationToast(message) {
 async function loadDashboardStats() {
     try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 8000);
+        const timeoutId = setTimeout(function() {
+            controller.abort();
+        }, 8000);
 
         const response = await fetch(API.baseURL + '/api/dashboard/stats', {
             headers: API.getHeaders(),
@@ -363,57 +465,104 @@ async function loadDashboardStats() {
         // ⭐ Global statsData - subscription uchun
         window.statsData = stats;
 
+        console.log('📊 Statistika yuklandi:', stats);
+
+        // ============================================================
         // 1. Jami Xodimlar
+        // ============================================================
         const totalStaff = (stats.teacherCount || 0) + (stats.studentCount || 0);
-        document.getElementById('totalStaff').textContent = totalStaff;
+        const staffEl = document.getElementById('totalStaff');
+        if (staffEl) staffEl.textContent = totalStaff;
 
+        // ============================================================
         // 2. Jami O'qituvchilar
-        document.getElementById('teacherCount').textContent = stats.teacherCount || 0;
-        document.getElementById('activeTeachers').textContent = stats.activeTeachers || 0;
+        // ============================================================
+        const teacherEl = document.getElementById('teacherCount');
+        const activeTeacherEl = document.getElementById('activeTeachers');
+        if (teacherEl) teacherEl.textContent = stats.teacherCount || 0;
+        if (activeTeacherEl) activeTeacherEl.textContent = stats.activeTeachers || 0;
 
+        // ============================================================
         // 3. Jami O'quvchilar
-        document.getElementById('studentCount').textContent = stats.studentCount || 0;
-        document.getElementById('activeStudents').textContent = stats.activeStudents || 0;
+        // ============================================================
+        const studentEl = document.getElementById('studentCount');
+        const activeStudentEl = document.getElementById('activeStudents');
+        if (studentEl) studentEl.textContent = stats.studentCount || 0;
+        if (activeStudentEl) activeStudentEl.textContent = stats.activeStudents || 0;
 
+        // ============================================================
         // 4. Jami XP
+        // ============================================================
         const totalXP = stats.totalXP || 0;
         const studentCount = stats.studentCount || 0;
         const avgXP = studentCount > 0 ? Math.round(totalXP / studentCount) : 0;
-        document.getElementById('totalXP').textContent = totalXP;
-        document.getElementById('avgXPValue').textContent = avgXP;
+        const totalXpEl = document.getElementById('totalXP');
+        const avgXpEl = document.getElementById('avgXPValue');
+        if (totalXpEl) totalXpEl.textContent = totalXP;
+        if (avgXpEl) avgXpEl.textContent = avgXP;
 
+        // ============================================================
         // 5. Keldi
+        // ============================================================
         const present = stats.attendanceStats?.present || 0;
-        document.getElementById('presentCount').textContent = present;
+        const presentEl = document.getElementById('presentCount');
+        if (presentEl) presentEl.textContent = present;
 
+        // ============================================================
         // 6. Sababli / Kelmadi
+        // ============================================================
         const absentReason = stats.attendanceStats?.absent_reason || 0;
         const absent = stats.attendanceStats?.absent || 0;
-        document.getElementById('absentReasonCount').textContent = absentReason;
-        document.getElementById('absentCount').textContent = absent;
+        const absentReasonEl = document.getElementById('absentReasonCount');
+        const absentEl = document.getElementById('absentCount');
+        if (absentReasonEl) absentReasonEl.textContent = absentReason;
+        if (absentEl) absentEl.textContent = absent;
 
+        // ============================================================
         // Bu oy yangi xodimlar (agar API dan kelsa)
+        // ============================================================
         const newThisMonth = stats.newThisMonth || 0;
-        document.getElementById('staffNewThisMonth').textContent = newThisMonth;
+        const staffNewEl = document.getElementById('staffNewThisMonth');
+        if (staffNewEl) staffNewEl.textContent = newThisMonth;
 
         // ⭐ Subscription ma'lumotlarini yangilash
         updateSubscriptionCountdown();
 
     } catch (error) {
         if (error.name !== 'AbortError') {
-            console.error('Statistika xatosi:', error);
+            console.error('❌ Statistika xatosi:', error);
         }
     }
 }
 
 // ============================================================
-// CLEANUP
+// CLEANUP - SAHIFA YOPILGANDA INTERVALLARNI TOZALASH
 // ============================================================
-window.addEventListener('beforeunload', function () {
-    if (refreshInterval) clearInterval(refreshInterval);
-    if (notificationCheckInterval) clearInterval(notificationCheckInterval);
-    if (profileCheckInterval) clearInterval(profileCheckInterval);
-    if (subscriptionUpdateInterval) clearInterval(subscriptionUpdateInterval);
+window.addEventListener('beforeunload', function() {
+    if (refreshInterval) {
+        clearInterval(refreshInterval);
+        refreshInterval = null;
+    }
+    if (notificationCheckInterval) {
+        clearInterval(notificationCheckInterval);
+        notificationCheckInterval = null;
+    }
+    if (profileCheckInterval) {
+        clearInterval(profileCheckInterval);
+        profileCheckInterval = null;
+    }
+    if (subscriptionUpdateInterval) {
+        clearInterval(subscriptionUpdateInterval);
+        subscriptionUpdateInterval = null;
+    }
+    if (audioContext) {
+        try {
+            audioContext.close();
+        } catch (e) {
+            // Xatolikni inobatga olma
+        }
+        audioContext = null;
+    }
 });
 
-console.log('✅ dashboard.js yuklandi (6 ta karta + Subscription)');
+console.log('✅ dashboard.js yuklandi (Admin-Customer)');
