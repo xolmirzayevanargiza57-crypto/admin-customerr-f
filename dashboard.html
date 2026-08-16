@@ -10,12 +10,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
-    <!-- ⭐ Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-
     <style>
         /* ============================================================
-           ROOT - APPLE STYLE
+           ROOT VARIABLES - APPLE STYLE
            ============================================================ */
         :root {
             --bg-primary: #f5f5f7;
@@ -42,11 +39,15 @@
             --color-warning: #ff9500;
             --sidebar-width: 220px;
             --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+
+            /* ⭐ APPLE STYLE GRADIENT BACKGROUND */
+            --bg-gradient-start: #e8f0fe;
+            --bg-gradient-end: #f5f5f7;
         }
 
         [data-theme="dark"] {
-            --bg-primary: #000000;
-            --bg-card: #1c1c1e;
+            --bg-primary: #1c1c1e;
+            --bg-card: #2c2c2e;
             --bg-sidebar: #1c1c1e;
             --bg-hover: #2c2c2e;
             --bg-active: #3a3a3c;
@@ -56,13 +57,11 @@
             --border-color: #3a3a3c;
             --shadow: 0 2px 16px rgba(0,0,0,0.3);
             --shadow-hover: 0 8px 30px rgba(0,0,0,0.4);
+            --bg-gradient-start: #1a2a4a;
+            --bg-gradient-end: #1c1c1e;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         html {
             font-family: var(--font-family);
@@ -77,17 +76,14 @@
             transition: var(--transition);
         }
 
-        ::-webkit-scrollbar {
-            width: 4px;
-            height: 4px;
-        }
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: var(--border-color);
-            border-radius: 10px;
-        }
+        [data-theme="dark"] body { background: #1c1c1e !important; }
+        [data-theme="dark"] .main-content { background: #1c1c1e !important; }
+        [data-theme="dark"] .top-header { background: #1c1c1e !important; }
+        [data-theme="dark"] .sidebar { background: #1c1c1e !important; }
+
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 10px; }
 
         /* ============================================================
            APP CONTAINER
@@ -106,14 +102,12 @@
             min-width: var(--sidebar-width);
             max-width: var(--sidebar-width);
             flex: 0 0 var(--sidebar-width);
-            background: var(--bg-sidebar);
+            background: var(--bg-primary);
             border-right: 1px solid var(--border-color);
             display: flex;
             flex-direction: column;
             position: fixed;
-            top: 0;
-            left: 0;
-            bottom: 0;
+            top: 0; left: 0; bottom: 0;
             height: 100vh;
             z-index: 100;
             overflow-y: auto;
@@ -130,133 +124,66 @@
         }
 
         .sidebar-brand .brand-icon {
-            width: 36px;
-            height: 36px;
+            width: 36px; height: 36px;
             background: var(--text-primary);
             border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: flex; align-items: center; justify-content: center;
             flex-shrink: 0;
         }
 
-        .sidebar-brand .brand-icon i {
-            color: var(--bg-primary);
-            font-size: 16px;
-        }
+        .sidebar-brand .brand-icon i { color: var(--bg-primary); font-size: 16px; }
 
-        .sidebar-brand .brand-text {
-            display: flex;
-            flex-direction: column;
-            line-height: 1.2;
-        }
-
-        .sidebar-brand .brand-text .brand-name {
-            font-size: 0.9rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            letter-spacing: -0.3px;
-        }
-
-        .sidebar-brand .brand-text .brand-version {
-            font-size: 0.55rem;
-            font-weight: 400;
-            color: var(--text-muted);
-        }
+        .sidebar-brand .brand-text { display: flex; flex-direction: column; line-height: 1.2; }
+        .sidebar-brand .brand-text .brand-name { font-size: 0.9rem; font-weight: 700; color: var(--text-primary); letter-spacing: -0.3px; }
+        .sidebar-brand .brand-text .brand-version { font-size: 0.55rem; font-weight: 400; color: var(--text-muted); }
 
         .sidebar-nav {
             flex: 1;
             padding: 12px 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
+            display: flex; flex-direction: column; gap: 2px;
             overflow-y: auto;
         }
 
         .nav-link {
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            display: flex; align-items: center; gap: 10px;
             padding: 10px 12px;
             border-radius: var(--radius-sm);
             color: var(--text-muted);
-            font-weight: 500;
-            font-size: 0.8rem;
+            font-weight: 500; font-size: 0.8rem;
             transition: var(--transition);
             text-decoration: none;
             white-space: nowrap;
         }
 
-        .nav-link i {
-            width: 18px;
-            text-align: center;
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            flex-shrink: 0;
-        }
+        .nav-link i { width: 18px; text-align: center; font-size: 0.9rem; color: var(--text-muted); flex-shrink: 0; }
+        .nav-link:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .nav-link:hover i { color: var(--text-primary); }
+        .nav-link.active { background: var(--bg-hover); color: var(--text-primary); font-weight: 600; }
+        .nav-link.active i { color: var(--text-primary); }
 
-        .nav-link:hover {
-            background: var(--bg-hover);
-            color: var(--text-primary);
-        }
-        .nav-link:hover i {
-            color: var(--text-primary);
-        }
-
-        .nav-link.active {
-            background: var(--bg-hover);
-            color: var(--text-primary);
-            font-weight: 600;
-        }
-        .nav-link.active i {
-            color: var(--text-primary);
-        }
-
-        .sidebar-footer {
-            padding: 12px 10px;
-            border-top: 1px solid var(--border-color);
-            flex-shrink: 0;
-        }
+        .sidebar-footer { padding: 12px 10px; border-top: 1px solid var(--border-color); flex-shrink: 0; }
 
         .btn-logout {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            width: 100%;
-            padding: 10px 12px;
-            border: none;
-            border-radius: var(--radius-sm);
-            background: transparent;
-            color: var(--text-muted);
-            font-size: 0.8rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: var(--transition);
+            display: flex; align-items: center; gap: 10px;
+            width: 100%; padding: 10px 12px;
+            border: none; border-radius: var(--radius-sm);
+            background: transparent; color: var(--text-muted);
+            font-size: 0.8rem; font-weight: 500;
+            cursor: pointer; transition: var(--transition);
         }
 
-        .btn-logout:hover {
-            background: #fef2f2;
-            color: var(--color-danger);
-        }
-
-        [data-theme="dark"] .btn-logout:hover {
-            background: #3a1a1a;
-        }
+        .btn-logout:hover { background: #fef2f2; color: var(--color-danger); }
+        [data-theme="dark"] .btn-logout:hover { background: #3a1a1a; }
 
         .sidebar-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.3);
-            z-index: 99;
+            display: none; position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.3); z-index: 99;
         }
         .sidebar-overlay.show { display: block; }
 
         /* ============================================================
-           MAIN CONTENT
+           MAIN CONTENT - APPLE STYLE GRADIENT
            ============================================================ */
         .main-content {
             flex: 1;
@@ -265,7 +192,9 @@
             margin-left: var(--sidebar-width);
             width: calc(100% - var(--sidebar-width));
             max-width: calc(100% - var(--sidebar-width));
-            padding: 0 24px 24px 24px;
+            padding: 0 0 32px 0;
+            background: var(--bg-primary);
+            background: linear-gradient(180deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
         }
 
         /* ============================================================
@@ -275,128 +204,98 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 16px 0 20px 0;
-            background: var(--bg-primary);
+            padding: 16px 32px;
+            background: transparent;
             position: sticky;
             top: 0;
             z-index: 50;
         }
 
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 12px;
+        .header-divider {
+            position: fixed;
+            top: 73px;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: var(--border-color);
+            z-index: 99;
+            pointer-events: none;
         }
+
+        .header-left { display: flex; align-items: center; gap: 12px; }
 
         .menu-toggle {
             display: none;
-            background: none;
-            border: none;
-            font-size: 1.2rem;
-            color: var(--text-primary);
-            cursor: pointer;
-            padding: 4px;
+            background: none; border: none;
+            font-size: 1.2rem; color: var(--text-primary);
+            cursor: pointer; padding: 4px;
         }
 
-        .header-left h2 {
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            letter-spacing: -0.5px;
-        }
+        .header-left h2 { font-size: 1.4rem; font-weight: 700; color: var(--text-primary); letter-spacing: -0.5px; }
+        .header-left h2 i { margin-right: 10px; color: var(--text-muted); }
+        .header-left .text-muted { font-size: 0.8rem; color: var(--text-muted); font-weight: 400; }
 
-        .header-left h2 i {
-            margin-right: 10px;
-            color: var(--text-muted);
-        }
+        .header-right { display: flex; align-items: center; gap: 12px; }
 
-        .header-left .text-muted {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            font-weight: 400;
-        }
-
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .notification-link {
-            position: relative;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 40px;
-            height: 40px;
+        .theme-toggle-btn {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 40px; height: 40px;
             border-radius: 50%;
             border: 1px solid var(--border-color);
             background: var(--bg-card);
             color: var(--text-primary);
-            text-decoration: none;
-            transition: var(--transition);
+            cursor: pointer; transition: var(--transition); font-size: 1.1rem;
         }
 
-        .notification-link:hover {
-            background: var(--bg-hover);
-            transform: scale(1.05);
+        .theme-toggle-btn:hover { background: var(--bg-hover); transform: scale(1.05); }
+        .theme-toggle-btn .sun-icon { display: none; }
+        .theme-toggle-btn .moon-icon { display: block; }
+        [data-theme="dark"] .theme-toggle-btn .sun-icon { display: block; }
+        [data-theme="dark"] .theme-toggle-btn .moon-icon { display: none; }
+
+        .notification-link {
+            position: relative;
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            border: 1px solid var(--border-color);
+            background: var(--bg-card);
+            color: var(--text-primary);
+            text-decoration: none; transition: var(--transition);
         }
+
+        .notification-link:hover { background: var(--bg-hover); transform: scale(1.05); }
 
         #notificationBadge {
-            position: absolute;
-            top: -2px;
-            right: -2px;
-            background: var(--color-red);
-            color: white;
-            font-size: 0.55rem;
-            border-radius: 50%;
-            padding: 2px 6px;
-            min-width: 18px;
-            text-align: center;
-            display: none;
-            font-weight: 700;
-            line-height: 1.4;
+            position: absolute; top: -2px; right: -2px;
+            background: var(--color-red); color: white;
+            font-size: 0.55rem; border-radius: 50%;
+            padding: 2px 6px; min-width: 18px; text-align: center;
+            display: none; font-weight: 700; line-height: 1.4;
         }
 
-        .user-profile {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+        .user-profile { display: flex; align-items: center; gap: 10px; }
 
         .user-avatar {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
+            width: 36px; height: 36px; border-radius: 50%;
             background: var(--text-primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--bg-primary);
-            font-weight: 600;
-            font-size: 0.8rem;
-            flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--bg-primary); font-weight: 600; font-size: 0.8rem; flex-shrink: 0;
         }
 
-        .user-info .user-name {
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .user-info .user-role {
-            font-size: 0.7rem;
-            color: var(--text-muted);
-        }
+        .user-info .user-name { font-size: 0.85rem; font-weight: 600; color: var(--text-primary); }
+        .user-info .user-role { font-size: 0.7rem; color: var(--text-muted); }
 
         /* ============================================================
-           STATS GRID - 4 TA KARTA
+           ⭐ STATS GRID - 6 TA KARTA
            ============================================================ */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(3, 1fr);
             gap: 16px;
-            margin-bottom: 20px;
+            padding: 0 32px;
+            margin-top: 16px;
+            margin-bottom: 16px;
         }
 
         .stat-card {
@@ -405,29 +304,21 @@
             padding: 18px 20px;
             border: 1px solid var(--border-color);
             transition: var(--transition);
+            /* ⭐ HOVERDA SILJISH YO'Q */
+            transform: none !important;
         }
 
         .stat-card:hover {
-            transform: translateY(-2px);
             box-shadow: var(--shadow-hover);
+            transform: none !important;
         }
 
-        .stat-card .stat-top {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 8px;
-        }
+        .stat-card .stat-top { display: flex; align-items: center; gap: 12px; }
 
         .stat-card .stat-icon {
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            flex-shrink: 0;
+            width: 44px; height: 44px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem; flex-shrink: 0;
         }
 
         .stat-card .stat-icon.blue { background: #e8f0fe; color: #007aff; }
@@ -440,16 +331,16 @@
         [data-theme="dark"] .stat-card .stat-icon.purple { background: #2a1a4a; color: #9a6aff; }
         [data-theme="dark"] .stat-card .stat-icon.orange { background: #3a2a1a; color: #ff9a4a; }
 
-        .stat-card .stat-label {
+        .stat-card .stat-info .stat-label {
             font-size: 0.75rem;
             font-weight: 500;
             color: var(--text-muted);
             letter-spacing: 0.3px;
         }
 
-        .stat-card .stat-label i { margin-right: 4px; }
+        .stat-card .stat-info .stat-label i { margin-right: 4px; }
 
-        .stat-card .stat-value {
+        .stat-card .stat-info .stat-value {
             font-size: 1.6rem;
             font-weight: 700;
             color: var(--text-primary);
@@ -457,102 +348,61 @@
             letter-spacing: -0.5px;
         }
 
-        .stat-card .stat-change {
+        .stat-card .stat-info .stat-change {
             font-size: 0.7rem;
             font-weight: 500;
             display: inline-flex;
             align-items: center;
             gap: 4px;
-            margin-top: 4px;
+            margin-top: 2px;
             color: var(--text-muted);
         }
 
-        .stat-card .stat-change.positive { color: var(--color-success); }
-        .stat-card .stat-change.negative { color: var(--color-danger); }
+        .stat-card .stat-info .stat-change.positive { color: var(--color-success); }
+        .stat-card .stat-info .stat-change.negative { color: var(--color-danger); }
 
         /* ============================================================
-           ATTENDANCE CARDS
+           ⭐ SUBSCRIPTION CARD
            ============================================================ */
-        .attendance-cards {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 16px;
-            margin-bottom: 20px;
+        .subscription-wrapper {
+            padding: 0 32px;
+            margin-bottom: 16px;
         }
 
-        .attendance-card {
-            background: var(--bg-card);
-            border-radius: var(--radius);
-            padding: 16px 20px;
-            border: 1px solid var(--border-color);
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            transition: var(--transition);
-        }
-
-        .attendance-card:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-hover);
-        }
-
-        .attendance-card .icon {
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            flex-shrink: 0;
-        }
-
-        .attendance-card .icon.green { background: #e8f5e9; color: #34c759; }
-        .attendance-card .icon.orange { background: #fff3e0; color: #ff9500; }
-        .attendance-card .icon.red { background: #fef2f2; color: #ff3b30; }
-
-        [data-theme="dark"] .attendance-card .icon.green { background: #1a3a2a; color: #4ac759; }
-        [data-theme="dark"] .attendance-card .icon.orange { background: #3a2a1a; color: #ff9a4a; }
-        [data-theme="dark"] .attendance-card .icon.red { background: #3a1a1a; color: #ff3b30; }
-
-        .attendance-card .info .label {
-            font-size: 0.75rem;
-            font-weight: 500;
-            color: var(--text-muted);
-        }
-
-        .attendance-card .info .label i { margin-right: 4px; }
-
-        .attendance-card .info .value {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: var(--text-primary);
-        }
-
-        /* ============================================================
-           SUBSCRIPTION CARD
-           ============================================================ */
         .subscription-card {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 16px;
-            margin-bottom: 20px;
-        }
-
-        .subscription-card .sub-item {
             background: var(--bg-card);
             border-radius: var(--radius);
-            padding: 16px 20px;
+            padding: 20px 24px;
             border: 1px solid var(--border-color);
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 16px;
             transition: var(--transition);
+            transform: none !important;
         }
 
-        .subscription-card .sub-item:hover {
-            transform: translateY(-2px);
+        .subscription-card:hover {
             box-shadow: var(--shadow-hover);
+            transform: none !important;
         }
 
-        .subscription-card .sub-item .label {
+        .sub-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            padding: 8px 12px;
+            background: var(--bg-hover);
+            border-radius: 10px;
+            transition: var(--transition);
+            transform: none !important;
+        }
+
+        .sub-item:hover {
+            background: var(--bg-active);
+            transform: none !important;
+        }
+
+        .sub-item .label {
             font-size: 0.7rem;
             font-weight: 500;
             color: var(--text-muted);
@@ -560,159 +410,87 @@
             letter-spacing: 0.5px;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
         }
 
-        .subscription-card .sub-item .label i {
-            font-size: 0.75rem;
-        }
+        .sub-item .label i { font-size: 0.65rem; }
 
-        .subscription-card .sub-item .value {
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-top: 4px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .subscription-card .sub-item .value i {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-        }
-
-        .subscription-card .sub-item .value.status-active { color: var(--color-success); }
-        .subscription-card .sub-item .value.status-inactive { color: var(--color-danger); }
-        .subscription-card .sub-item .value.status-expired { color: var(--color-warning); }
-
-        /* ============================================================
-           ⭐ CHART CARDS
-           ============================================================ */
-        .charts-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
-        }
-
-        .chart-card {
-            background: var(--bg-card);
-            border-radius: var(--radius);
-            padding: 20px 24px;
-            border: 1px solid var(--border-color);
-            transition: var(--transition);
-        }
-
-        .chart-card:hover {
-            box-shadow: var(--shadow-hover);
-        }
-
-        .chart-card .chart-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-
-        .chart-card .chart-header h3 {
-            font-size: 0.9rem;
-            font-weight: 600;
+        .sub-item .value {
+            font-size: 1rem;
+            font-weight: 700;
             color: var(--text-primary);
         }
 
-        .chart-card .chart-header h3 i {
-            margin-right: 8px;
-            color: var(--text-muted);
-        }
+        .sub-item .value.status-active { color: var(--color-success); }
+        .sub-item .value.status-inactive { color: var(--text-muted); }
+        .sub-item .value.status-expired { color: var(--color-danger); }
 
-        .chart-card .chart-header .chart-badge {
-            font-size: 0.65rem;
+        .sub-item .value .countdown {
+            font-size: 0.8rem;
+            font-weight: 500;
             color: var(--text-muted);
-            background: var(--bg-hover);
-            padding: 2px 10px;
-            border-radius: 20px;
-        }
-
-        .chart-card canvas {
-            max-height: 220px;
-            width: 100% !important;
+            margin-left: 6px;
         }
 
         /* ============================================================
-           RESPONSIVE
+           ⭐ RESPONSIVE
            ============================================================ */
         @media (max-width: 1024px) {
             .stats-grid { grid-template-columns: repeat(2, 1fr); }
-            .attendance-cards { grid-template-columns: repeat(2, 1fr); }
-            .subscription-card { grid-template-columns: repeat(2, 1fr); }
-            .charts-grid { grid-template-columns: 1fr; }
+            .subscription-card { grid-template-columns: 1fr 1fr; }
         }
 
         @media (max-width: 768px) {
-            .main-content { padding: 0 16px 16px 16px; }
-            .stats-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+            .main-content { padding: 0; }
+            .top-header { padding: 12px 16px; }
+            .stats-grid { grid-template-columns: 1fr; padding: 0 12px; margin-top: 40px; }
             .stat-card { padding: 14px 16px; }
             .stat-card .stat-icon { width: 36px; height: 36px; font-size: 1rem; }
             .stat-card .stat-value { font-size: 1.2rem; }
-            .attendance-cards { grid-template-columns: 1fr; }
-            .subscription-card { grid-template-columns: 1fr 1fr; gap: 10px; }
-            .subscription-card .sub-item { padding: 12px 14px; }
-            .chart-card { padding: 16px; }
-            .top-header { padding: 12px 0 16px 0; }
             .header-left .text-muted { display: none; }
             .user-info { display: none; }
             .menu-toggle { display: block !important; }
             .sidebar { transform: translateX(-100%); width: 280px; }
             .sidebar.open { transform: translateX(0); }
             .main-content { margin-left: 0; width: 100%; max-width: 100%; }
+
+            .subscription-wrapper { padding: 0 12px; }
+            .subscription-card { grid-template-columns: 1fr 1fr; padding: 16px; gap: 10px; }
+            .sub-item { padding: 8px 10px; }
+            .sub-item .value { font-size: 0.85rem; }
         }
 
         @media (max-width: 480px) {
-            .stats-grid { grid-template-columns: 1fr; }
-            .subscription-card { grid-template-columns: 1fr; }
-            .attendance-cards { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: 1fr; padding: 0 12px; margin-top: 20px; }
+            .top-header { padding: 10px 12px; }
             .stat-card { padding: 12px 14px; }
             .stat-card .stat-value { font-size: 1rem; }
             .stat-card .stat-icon { width: 32px; height: 32px; font-size: 0.9rem; }
-            .attendance-card { padding: 12px 14px; }
-            .attendance-card .icon { width: 36px; height: 36px; font-size: 1rem; }
-            .attendance-card .info .value { font-size: 1rem; }
-            .chart-card { padding: 12px 14px; }
-            .chart-card .chart-header h3 { font-size: 0.8rem; }
+            .header-right { gap: 8px; }
+            .theme-toggle-btn { width: 34px; height: 34px; font-size: 0.9rem; }
+            .notification-link { width: 34px; height: 34px; }
+            .user-avatar { width: 30px; height: 30px; font-size: 0.7rem; }
+
+            .subscription-card { grid-template-columns: 1fr; }
+            .subscription-wrapper { padding: 0 10px; }
         }
 
         /* ============================================================
-           TOAST
+           NOTIFICATION TOAST
            ============================================================ */
         .notification-toast {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 99999;
-            background: #007aff;
-            color: white;
-            padding: 16px 24px;
-            border-radius: 12px;
+            position: fixed; top: 20px; right: 20px; z-index: 99999;
+            background: #007aff; color: white;
+            padding: 16px 24px; border-radius: 12px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-            font-size: 0.95rem;
-            max-width: 400px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
+            font-size: 0.95rem; max-width: 400px;
+            display: flex; align-items: center; gap: 12px;
             animation: slideDown 0.5s ease;
             cursor: pointer;
             font-family: 'Inter', sans-serif;
         }
 
-        .notification-toast button {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 1.2rem;
-            cursor: pointer;
-            margin-left: auto;
-        }
-
+        .notification-toast button { background: none; border: none; color: white; font-size: 1.2rem; cursor: pointer; margin-left: auto; }
         [data-theme="dark"] .notification-toast { background: #1a2a4a; }
 
         @keyframes slideDown {
@@ -728,21 +506,18 @@
 
         .sidebar-badge {
             margin-left: auto;
-            background: #ff3b30;
-            color: white;
-            font-size: 0.55rem;
-            padding: 2px 8px;
-            border-radius: 10px;
-            display: none;
-            font-weight: 600;
-            min-width: 18px;
-            text-align: center;
+            background: #ff3b30; color: white;
+            font-size: 0.55rem; padding: 2px 8px;
+            border-radius: 10px; display: none;
+            font-weight: 600; min-width: 18px; text-align: center;
         }
     </style>
 </head>
 <body>
     <div class="app-container">
-        <!-- ==================== SIDEBAR ==================== -->
+        <!-- ============================================================
+             SIDEBAR
+             ============================================================ -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-brand">
                 <div class="brand-icon"><i class="fas fa-crown"></i></div>
@@ -793,8 +568,13 @@
 
         <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-        <!-- ==================== MAIN CONTENT ==================== -->
+        <div class="header-divider" id="headerDivider"></div>
+
+        <!-- ============================================================
+             MAIN CONTENT
+             ============================================================ -->
         <main class="main-content">
+
             <!-- HEADER -->
             <header class="top-header">
                 <div class="header-left">
@@ -805,6 +585,11 @@
                     </div>
                 </div>
                 <div class="header-right">
+                    <button class="theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle theme">
+                        <i class="fas fa-moon moon-icon"></i>
+                        <i class="fas fa-sun sun-icon"></i>
+                    </button>
+
                     <a href="notifications.html" class="notification-link" id="notificationBell">
                         <i class="fas fa-bell" style="font-size:1.2rem;"></i>
                         <span id="notificationBadge">0</span>
@@ -820,17 +605,19 @@
                 </div>
             </header>
 
-            <!-- ==================== STATS CARDS ==================== -->
+            <!-- ============================================================
+                 ⭐ STATS GRID - 6 TA KARTA
+                 ============================================================ -->
             <section class="stats-grid">
                 <!-- 1. Jami Xodimlar -->
                 <div class="stat-card">
                     <div class="stat-top">
                         <div class="stat-icon blue"><i class="fas fa-users"></i></div>
-                        <div>
+                        <div class="stat-info">
                             <div class="stat-label"><i class="fas fa-user-tie"></i> Jami Xodimlar</div>
                             <div class="stat-value" id="totalStaff">0</div>
                             <span class="stat-change positive" id="staffChange">
-                                <i class="fas fa-arrow-up"></i> +<span id="newStaff">0</span> bu oy
+                                <i class="fas fa-arrow-up"></i> <span id="staffNewThisMonth">0</span> bu oy
                             </span>
                         </div>
                     </div>
@@ -840,7 +627,7 @@
                 <div class="stat-card">
                     <div class="stat-top">
                         <div class="stat-icon green"><i class="fas fa-chalkboard-teacher"></i></div>
-                        <div>
+                        <div class="stat-info">
                             <div class="stat-label"><i class="fas fa-users"></i> Jami O'qituvchilar</div>
                             <div class="stat-value" id="teacherCount">0</div>
                             <span class="stat-change positive" id="teacherChange">
@@ -854,7 +641,7 @@
                 <div class="stat-card">
                     <div class="stat-top">
                         <div class="stat-icon purple"><i class="fas fa-graduation-cap"></i></div>
-                        <div>
+                        <div class="stat-info">
                             <div class="stat-label"><i class="fas fa-user-graduate"></i> Jami O'quvchilar</div>
                             <div class="stat-value" id="studentCount">0</div>
                             <span class="stat-change positive" id="studentChange">
@@ -868,103 +655,125 @@
                 <div class="stat-card">
                     <div class="stat-top">
                         <div class="stat-icon orange"><i class="fas fa-star"></i></div>
-                        <div>
-                            <div class="stat-label"><i class="fas fa-trophy"></i> Jami XP</div>
+                        <div class="stat-info">
+                            <div class="stat-label"><i class="fas fa-star"></i> Jami XP</div>
                             <div class="stat-value" id="totalXP">0</div>
-                            <span class="stat-change positive" id="xpChange">
-                                <i class="fas fa-star"></i> O'rtacha: <span id="avgXP">0</span>
+                            <span class="stat-change" id="avgXP">
+                                O'rtacha: <span id="avgXPValue">0</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5. Keldi -->
+                <div class="stat-card">
+                    <div class="stat-top">
+                        <div class="stat-icon green"><i class="fas fa-check-circle"></i></div>
+                        <div class="stat-info">
+                            <div class="stat-label"><i class="fas fa-check-circle"></i> Keldi</div>
+                            <div class="stat-value" id="presentCount" style="color: var(--color-success);">0</div>
+                            <span class="stat-change positive" id="presentChange">
+                                <i class="fas fa-arrow-up"></i> Bugun
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 6. Sababli / Kelmadi -->
+                <div class="stat-card">
+                    <div class="stat-top">
+                        <div class="stat-icon orange"><i class="fas fa-clock"></i></div>
+                        <div class="stat-info">
+                            <div class="stat-label"><i class="fas fa-clock"></i> Sababli</div>
+                            <div class="stat-value" id="absentReasonCount" style="color: var(--color-warning);">0</div>
+                            <span class="stat-change negative" id="absentChange">
+                                <i class="fas fa-arrow-down"></i> Kelmadi: <span id="absentCount">0</span>
                             </span>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- ==================== ATTENDANCE CARDS ==================== -->
-            <section class="attendance-cards">
-                <div class="attendance-card">
-                    <div class="icon green"><i class="fas fa-check-circle"></i></div>
-                    <div class="info">
-                        <div class="label"><i class="fas fa-user-check"></i> Keldi</div>
-                        <div class="value" id="presentCount" style="color:var(--color-success);">0</div>
+            <!-- ============================================================
+                 ⭐ SUBSCRIPTION CARD
+                 ============================================================ -->
+            <section class="subscription-wrapper">
+                <div class="subscription-card" id="subscriptionCard">
+                    <!-- Holati -->
+                    <div class="sub-item">
+                        <span class="label"><i class="fas fa-circle"></i> Holati</span>
+                        <span class="value status-active" id="subStatus">✅ Faol</span>
                     </div>
-                </div>
-                <div class="attendance-card">
-                    <div class="icon orange"><i class="fas fa-exclamation-triangle"></i></div>
-                    <div class="info">
-                        <div class="label"><i class="fas fa-comment"></i> Sababli</div>
-                        <div class="value" id="absentReasonCount" style="color:var(--color-warning);">0</div>
+                    <!-- Turi -->
+                    <div class="sub-item">
+                        <span class="label"><i class="fas fa-tag"></i> Turi</span>
+                        <span class="value" id="subType">Oylik</span>
                     </div>
-                </div>
-                <div class="attendance-card">
-                    <div class="icon red"><i class="fas fa-times-circle"></i></div>
-                    <div class="info">
-                        <div class="label"><i class="fas fa-user-times"></i> Kelmadi</div>
-                        <div class="value" id="absentCount" style="color:var(--color-danger);">0</div>
+                    <!-- Tugash vaqti -->
+                    <div class="sub-item">
+                        <span class="label"><i class="fas fa-clock"></i> Tugash vaqti</span>
+                        <span class="value" id="subEndDate">15/09/2026, 20:59:00</span>
                     </div>
-                </div>
-            </section>
-
-            <!-- ==================== SUBSCRIPTION CARD ==================== -->
-            <section class="subscription-card">
-                <div class="sub-item">
-                    <div class="label"><i class="fas fa-circle" style="color:#34c759;"></i> Holati</div>
-                    <div class="value status-active" id="subscriptionStatus">
-                        <i class="fas fa-check-circle"></i> Yuklanmoqda...
+                    <!-- Qolgan kun -->
+                    <div class="sub-item">
+                        <span class="label"><i class="fas fa-hourglass-half"></i> Qolgan kun</span>
+                        <span class="value" id="subDaysLeft">0 <span class="countdown">kun</span></span>
                     </div>
-                </div>
-                <div class="sub-item">
-                    <div class="label"><i class="fas fa-tag"></i> Turi</div>
-                    <div class="value" id="subscriptionType">
-                        <i class="fas fa-calendar-alt"></i> Yuklanmoqda...
-                    </div>
-                </div>
-                <div class="sub-item">
-                    <div class="label"><i class="fas fa-calendar-alt"></i> Tugash vaqti</div>
-                    <div class="value" id="subscriptionEnd">
-                        <i class="fas fa-clock"></i> Yuklanmoqda...
-                    </div>
-                </div>
-                <div class="sub-item">
-                    <div class="label"><i class="fas fa-clock"></i> Qolgan kun</div>
-                    <div class="value" id="subscriptionDays" style="color:#007aff;">
-                        <i class="fas fa-hourglass-half"></i> Yuklanmoqda...
-                    </div>
-                </div>
-            </section>
-
-            <!-- ==================== ⭐ CHART CARDS ==================== -->
-            <section class="charts-grid">
-                <!-- Chart 1: Obuna statistikasi -->
-                <div class="chart-card">
-                    <div class="chart-header">
-                        <h3><i class="fas fa-chart-pie"></i> Obuna statistikasi</h3>
-                        <span class="chart-badge"><i class="fas fa-calendar"></i> Oylik</span>
-                    </div>
-                    <canvas id="subscriptionChart"></canvas>
-                </div>
-
-                <!-- Chart 2: Davomat statistikasi -->
-                <div class="chart-card">
-                    <div class="chart-header">
-                        <h3><i class="fas fa-chart-bar"></i> Davomat statistikasi</h3>
-                        <span class="chart-badge"><i class="fas fa-clock"></i> Bugun</span>
-                    </div>
-                    <canvas id="attendanceChart"></canvas>
                 </div>
             </section>
 
         </main>
     </div>
 
-    <!-- Theme Toggle -->
-    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
-        <i class="fas fa-moon moon"></i>
-        <i class="fas fa-sun sun"></i>
-    </button>
-
+    <!-- ============================================================
+         SCRIPTS
+         ============================================================ -->
     <script>
         window.__API_BASE_URL__ = 'https://admin-customerr.onrender.com';
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Theme toggle
+            var themeBtn = document.getElementById('themeToggleBtn');
+            if (themeBtn) {
+                themeBtn.addEventListener('click', function() {
+                    var html = document.documentElement;
+                    var newTheme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+                    html.setAttribute('data-theme', newTheme);
+                    localStorage.setItem('theme', newTheme);
+                });
+            }
+
+            // Hamburger menu
+            var menuToggle = document.getElementById('menuToggle');
+            var sidebar = document.getElementById('sidebar');
+            var overlay = document.getElementById('sidebarOverlay');
+
+            if (menuToggle && sidebar && overlay) {
+                menuToggle.addEventListener('click', function() {
+                    sidebar.classList.toggle('open');
+                    overlay.classList.toggle('show');
+                });
+                overlay.addEventListener('click', function() {
+                    sidebar.classList.remove('open');
+                    overlay.classList.remove('show');
+                });
+            }
+
+            // Header divider
+            function updateDivider() {
+                var brand = document.querySelector('.sidebar-brand');
+                var divider = document.getElementById('headerDivider');
+                if (brand && divider) {
+                    var h = brand.getBoundingClientRect().height;
+                    var top = brand.getBoundingClientRect().bottom;
+                    divider.style.top = top + 'px';
+                }
+            }
+            updateDivider();
+            window.addEventListener('resize', updateDivider);
+        });
     </script>
+
     <script src="js/api.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/theme.js"></script>
