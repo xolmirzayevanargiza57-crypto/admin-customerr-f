@@ -278,7 +278,7 @@
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 16px;
-            margin-top: 24px;
+            margin-top: 20px;
             margin-bottom: 20px;
             padding: 0 32px;
         }
@@ -322,72 +322,15 @@
         .stat-card .stat-change.positive { color: var(--color-success); }
         .stat-card .stat-change.negative { color: var(--color-danger); }
 
-        /* SUBSCRIPTION GRID */
-        .subscription-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 16px;
-            padding: 0 32px;
-            margin-bottom: 20px;
-        }
-
-        .sub-item {
-            background: var(--bg-card);
-            border-radius: var(--radius);
-            padding: 16px 20px;
-            border: 1px solid var(--border-color);
-            transition: var(--transition);
-        }
-
-        .sub-item:hover { transform: translateY(-2px); box-shadow: var(--shadow-hover); }
-
-        .sub-label {
-            font-size: 0.7rem;
-            font-weight: 500;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            margin-bottom: 6px;
-        }
-
-        .sub-value {
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .sub-value.status-active { color: var(--color-green); }
-        .sub-value.status-inactive { color: var(--color-red); }
-        .sub-value.status-expired { color: var(--color-orange); }
-
         /* RESPONSIVE */
         @media (max-width: 1024px) {
             .stats-grid { grid-template-columns: repeat(2, 1fr); }
-            .subscription-grid { grid-template-columns: repeat(2, 1fr); }
         }
 
         @media (max-width: 768px) {
-            .subscription-grid { grid-template-columns: repeat(2, 1fr); padding: 0 16px; gap: 10px; }
-            .main-content { padding: 0; margin-left: 0; width: 100%; max-width: 100%; }
-            .top-header {
-                padding: 12px 16px;
-                position: fixed;
-                top: 0; left: 0; right: 0;
-                z-index: 98;
-            }
-            .stats-grid {
-                grid-template-columns: 1fr 1fr;
-                gap: 10px;
-                padding: 0 16px;
-                margin-top: 80px;
-            }
-            .subscription-grid { margin-top: 0; }
+            .main-content { padding: 0; }
+            .top-header { padding: 12px 16px 12px 16px; }
+               .stats-grid { grid-template-columns: 1fr; padding: 0 12px; margin-top: 40px; }
             .stat-card { padding: 14px 16px; }
             .stat-card .stat-icon { width: 36px; height: 36px; font-size: 1rem; }
             .stat-card .stat-value { font-size: 1.2rem; }
@@ -396,10 +339,11 @@
             .menu-toggle { display: block !important; }
             .sidebar { transform: translateX(-100%); width: 280px; }
             .sidebar.open { transform: translateX(0); }
+            .main-content { margin-left: 0; width: 100%; max-width: 100%; }
         }
 
         @media (max-width: 480px) {
-            .stats-grid { grid-template-columns: 1fr 1fr; padding: 0 12px; margin-top: 75px; gap: 10px; }
+            .stats-grid { grid-template-columns: 1fr; padding: 0 12px; margin-top: 20px; }
             .top-header { padding: 10px 12px; }
             .stat-card { padding: 12px 14px; }
             .stat-card .stat-value { font-size: 1rem; }
@@ -574,26 +518,7 @@
                     </div>
                 </div>
             </section>
-
-            <!-- SUBSCRIPTION SECTION -->
-            <section class="subscription-grid">
-                <div class="sub-item">
-                    <div class="sub-label"><i class="fas fa-circle" style="color:#34c759;font-size:0.6rem;"></i> Holati</div>
-                    <div class="sub-value" id="subscriptionStatus"><i class="fas fa-spinner fa-spin"></i> Yuklanmoqda...</div>
-                </div>
-                <div class="sub-item">
-                    <div class="sub-label"><i class="fas fa-tag"></i> Turi</div>
-                    <div class="sub-value" id="subscriptionType"><i class="fas fa-spinner fa-spin"></i> Yuklanmoqda...</div>
-                </div>
-                <div class="sub-item">
-                    <div class="sub-label"><i class="fas fa-calendar-alt"></i> Tugash vaqti</div>
-                    <div class="sub-value" id="subscriptionEnd"><i class="fas fa-spinner fa-spin"></i> Yuklanmoqda...</div>
-                </div>
-                <div class="sub-item">
-                    <div class="sub-label"><i class="fas fa-clock"></i> Qolgan kun</div>
-                    <div class="sub-value" id="subscriptionDays" style="color:var(--color-blue);"><i class="fas fa-spinner fa-spin"></i> Yuklanmoqda...</div>
-                </div>
-            </section>
+            <!-- Subscription section OLIB TASHLANDI -->
 
         </main>
     </div>
@@ -634,29 +559,13 @@
                 var brand = document.querySelector('.sidebar-brand');
                 var divider = document.getElementById('headerDivider');
                 if (brand && divider) {
+                    var h = brand.getBoundingClientRect().height;
                     var top = brand.getBoundingClientRect().bottom;
                     divider.style.top = top + 'px';
                 }
             }
-
-            // Telefonda kartalarni header pastiga moslashtirish
-            function updateStatsMargin() {
-                var header = document.querySelector('.top-header');
-                var grid = document.querySelector('.stats-grid');
-                if (header && grid && window.innerWidth <= 768) {
-                    var headerH = header.getBoundingClientRect().height;
-                    grid.style.marginTop = (headerH > 0 ? 16 : 24) + 'px';
-                } else if (grid) {
-                    grid.style.marginTop = '';
-                }
-            }
-
             updateDivider();
-            updateStatsMargin();
-            window.addEventListener('resize', function() {
-                updateDivider();
-                updateStatsMargin();
-            });
+            window.addEventListener('resize', updateDivider);
         });
     </script>
 
