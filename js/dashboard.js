@@ -1,5 +1,5 @@
 // ============================================================
-// DASHBOARD - ADMIN-CUSTOMER (OPTIMALLASHTIRILGAN)
+// DASHBOARD - ADMIN-CUSTOMER (CHART BILAN)
 // ============================================================
 
 let dashboardLoaded = false;
@@ -13,10 +13,13 @@ let soundEnabled = true;
 let notificationRetryCount = 0;
 const maxNotificationRetry = 3;
 
-// ⭐ CACHE - MA'LUMOTLARNI ESLAB QOLISH (TEZROQ UCHUN)
+// ⭐ CACHE
 let cachedStats = null;
 let statsCacheTime = 0;
-const CACHE_DURATION = 30000; // 30 soniya
+const CACHE_DURATION = 30000;
+
+// ⭐ CHART
+let dashboardChart = null;
 
 // ============================================================
 // OVOZ YARATISH
@@ -82,7 +85,7 @@ function initAudio() {
 }
 
 // ============================================================
-// SAHIFA YUKLANGANDA - TEZROQ OCHILISH UCHUN
+// SAHIFA YUKLANGANDA
 // ============================================================
 document.addEventListener('DOMContentLoaded', function() {
     if (dashboardLoaded) return;
@@ -96,7 +99,6 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
     }
 
-    // ⭐ 1. FOYDALANUVCHI MA'LUMOTLARINI TEZ KO'RSATISH
     const user = Auth.getUser();
     if (user) {
         const nameEl = document.getElementById('userName');
@@ -107,7 +109,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (schoolEl) schoolEl.textContent = user.schoolName || "Nurli Ta'lim Markazi";
     }
 
-    // ⭐ 2. LOGOUT TUGMASI
     const logoutBtn = document.getElementById('logoutBtn');
     if (logoutBtn) {
         const newBtn = logoutBtn.cloneNode(true);
@@ -121,7 +122,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // ⭐ 3. AUDIO INIT
     const initAudioOnce = function() {
         initAudio();
         document.removeEventListener('click', initAudioOnce);
@@ -132,22 +132,21 @@ document.addEventListener('DOMContentLoaded', function() {
     document.addEventListener('touchstart', initAudioOnce);
     document.addEventListener('keydown', initAudioOnce);
 
-    // ⭐ 4. MA'LUMOTLARNI YUKLASH (CACHE BILAN)
+    updateNotificationBadge();
     loadDashboardStats();
 
-    // ⭐ 5. INTERVALLAR (OPTIMALLASHTIRILGAN)
-    refreshInterval = setInterval(loadDashboardStats, 30000); // 30 soniyaga oshirildi
-    notificationCheckInterval = setInterval(updateNotificationBadge, 5000); // 5 soniyaga oshirildi
+    refreshInterval = setInterval(loadDashboardStats, 30000);
+    notificationCheckInterval = setInterval(updateNotificationBadge, 5000);
     profileCheckInterval = setInterval(function() {
         Auth.checkAuth();
-    }, 60000); // 60 soniyaga oshirildi
-    subscriptionUpdateInterval = setInterval(updateSubscriptionCountdown, 1000); // 1 soniya (real-time)
+    }, 60000);
+    subscriptionUpdateInterval = setInterval(updateSubscriptionCountdown, 1000);
 
-    console.log('✅ Dashboard tez yuklandi!');
+    console.log('✅ Dashboard yuklandi!');
 });
 
 // ============================================================
-// ⭐ SUBSCRIPTION COUNTDOWN - REAL TIME
+// ⭐ SUBSCRIPTION COUNTDOWN
 // ============================================================
 function updateSubscriptionCountdown() {
     const subEndDateEl = document.getElementById('subEndDate');
@@ -327,7 +326,6 @@ async function updateNotificationBadge() {
                 return !n.isRead;
             }).length;
 
-            // Header badge
             const badge = document.getElementById('notificationBadge');
             if (badge) {
                 if (unreadCount > 0) {
@@ -342,7 +340,6 @@ async function updateNotificationBadge() {
                 }
             }
 
-            // Sidebar badge
             const sidebarBadge = document.getElementById('sidebarBadge');
             if (sidebarBadge) {
                 if (unreadCount > 0) {
@@ -414,11 +411,10 @@ function showNotificationToast(message) {
 }
 
 // ============================================================
-// DASHBOARD STATISTIKASI - CACHE BILAN (TEZROQ)
+// DASHBOARD STATISTIKASI + CHART
 // ============================================================
 async function loadDashboardStats() {
     try {
-        // ⭐ CACHE DAN TEKSHIRISH
         const now = Date.now();
         if (cachedStats && (now - statsCacheTime) < CACHE_DURATION) {
             console.log('📊 Cache dan statistika yuklandi');
@@ -451,11 +447,8 @@ async function loadDashboardStats() {
 
         const stats = data.data;
 
-        // ⭐ CACHE GA SAQLASH
         cachedStats = stats;
         statsCacheTime = Date.now();
-
-        // ⭐ Global statsData - subscription uchun
         window.statsData = stats;
 
         renderStats(stats);
@@ -464,7 +457,6 @@ async function loadDashboardStats() {
         if (error.name !== 'AbortError') {
             console.error('❌ Statistika xatosi:', error);
         }
-        // ⭐ Xatolik bo'lsa ham cache dan ko'rsatish
         if (cachedStats) {
             console.log('📊 Xatolikda cache dan ko\'rsatilmoqda');
             renderStats(cachedStats);
@@ -509,37 +501,142 @@ function renderStats(stats) {
     const newThisMonth = stats.newThisMonth || 0;
     document.getElementById('staffNewThisMonth').textContent = newThisMonth;
 
-    // ⭐ Subscription ma'lumotlarini yangilash
+    // ⭐ Subscription yangilash
     updateSubscriptionCountdown();
+
+    // ⭐ CHART yaratish
+    createDashboardChart(stats);
+}
+
+// ============================================================
+// ⭐ CHART YARATISH - RASMDAGIGA O'XSHASH
+// ============================================================
+function createDashboardChart(stats) {
+    const ctx = document.getElementById('dashboardChart');
+    if (!ctx) return;
+
+    if (dashboardChart) {
+        dashboardChart.destroy();
+        dashboardChart = null;
+    }
+
+    const teacherCount = stats.teacherCount || 0;
+    const activeTeachers = stats.activeTeachers || 0;
+    const studentCount = stats.studentCount || 0;
+    const activeStudents = stats.activeStudents || 0;
+    const present = stats.attendanceStats?.present || 0;
+    const absent = stats.attendanceStats?.absent || 0;
+
+    const labels = [
+        'Jami O\'qituvchilar',
+        'Faol O\'qituvchilar',
+        'Jami O\'quvchilar',
+        'Faol O\'quvchilar',
+        'Keldi',
+        'Kelmadi'
+    ];
+
+    const dataValues = [
+        teacherCount,
+        activeTeachers,
+        studentCount,
+        activeStudents,
+        present,
+        absent
+    ];
+
+    const colors = [
+        'rgba(0, 122, 255, 0.85)',
+        'rgba(0, 122, 255, 0.55)',
+        'rgba(52, 199, 89, 0.85)',
+        'rgba(52, 199, 89, 0.55)',
+        'rgba(52, 199, 89, 0.85)',
+        'rgba(255, 59, 48, 0.85)'
+    ];
+
+    const borderColors = [
+        '#007aff',
+        '#007aff',
+        '#34c759',
+        '#34c759',
+        '#34c759',
+        '#ff3b30'
+    ];
+
+    dashboardChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Statistika',
+                data: dataValues,
+                backgroundColor: colors,
+                borderColor: borderColors,
+                borderWidth: 2,
+                borderRadius: 8,
+                barPercentage: 0.6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1,
+                        font: {
+                            size: 11,
+                            family: 'Inter'
+                        },
+                        color: getComputedStyle(document.documentElement).getPropertyValue('--text-muted').trim() || '#8e8e93'
+                    },
+                    grid: {
+                        color: getComputedStyle(document.documentElement).getPropertyValue('--border-color').trim() || '#e5e5ea',
+                        drawBorder: false
+                    }
+                },
+                x: {
+                    ticks: {
+                        font: {
+                            size: 10,
+                            family: 'Inter'
+                        },
+                        color: getComputedStyle(document.documentElement).getPropertyValue('--text-muted').trim() || '#8e8e93',
+                        maxRotation: 30,
+                        minRotation: 20
+                    },
+                    grid: {
+                        display: false
+                    }
+                }
+            },
+            animation: {
+                duration: 800,
+                easing: 'easeInOutQuart'
+            }
+        }
+    });
 }
 
 // ============================================================
 // CLEANUP
 // ============================================================
 window.addEventListener('beforeunload', function() {
-    if (refreshInterval) {
-        clearInterval(refreshInterval);
-        refreshInterval = null;
-    }
-    if (notificationCheckInterval) {
-        clearInterval(notificationCheckInterval);
-        notificationCheckInterval = null;
-    }
-    if (profileCheckInterval) {
-        clearInterval(profileCheckInterval);
-        profileCheckInterval = null;
-    }
-    if (subscriptionUpdateInterval) {
-        clearInterval(subscriptionUpdateInterval);
-        subscriptionUpdateInterval = null;
-    }
-    if (audioContext) {
-        try {
-            audioContext.close();
-        } catch (e) {}
-        audioContext = null;
+    if (refreshInterval) clearInterval(refreshInterval);
+    if (notificationCheckInterval) clearInterval(notificationCheckInterval);
+    if (profileCheckInterval) clearInterval(profileCheckInterval);
+    if (subscriptionUpdateInterval) clearInterval(subscriptionUpdateInterval);
+    if (dashboardChart) {
+        dashboardChart.destroy();
+        dashboardChart = null;
     }
     cachedStats = null;
 });
 
-console.log('✅ dashboard.js yuklandi (Optimallashtirilgan)');
+console.log('✅ dashboard.js yuklandi');
