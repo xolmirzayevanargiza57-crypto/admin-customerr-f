@@ -10,9 +10,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
     <style>
         /* ============================================================
-           ROOT VARIABLES
+           ROOT VARIABLES - APPLE STYLE
            ============================================================ */
         :root {
             --bg-primary: #f5f5f7;
@@ -92,7 +95,7 @@
         }
 
         /* ============================================================
-           SIDEBAR - BARCHA PANELLARDA BIR XIL (HEIGHT: 100%)
+           SIDEBAR
            ============================================================ */
         .sidebar {
             width: var(--sidebar-width);
@@ -107,15 +110,14 @@
             top: 0;
             left: 0;
             bottom: 0;
-            height: 100%; /* ⬅️ 100vh emas, 100% */
+            height: 100%;
             z-index: 1000;
             overflow-y: auto;
             overflow-x: hidden;
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
             will-change: transform;
         }
 
-        /* ⭐ MOBILDA SIDEBAR */
         @media (max-width: 768px) {
             .sidebar {
                 transform: translateX(-100%);
@@ -123,7 +125,7 @@
                 min-width: 280px;
                 max-width: 280px;
                 flex: 0 0 280px;
-                height: 100vh; /* ⬅️ Mobil uchun 100vh */
+                height: 100vh;
                 box-shadow: none;
             }
 
@@ -142,7 +144,7 @@
                 background: rgba(0, 0, 0, 0.4);
                 z-index: 999;
                 opacity: 0;
-                transition: opacity 0.3s ease;
+                transition: opacity 0.35s ease;
             }
 
             .sidebar-overlay.show {
@@ -243,7 +245,7 @@
             background: rgba(0, 0, 0, 0.4);
             z-index: 999;
             opacity: 0;
-            transition: opacity 0.3s ease;
+            transition: opacity 0.35s ease;
         }
 
         .sidebar-overlay.show {
@@ -292,7 +294,6 @@
             gap: 12px;
         }
 
-        /* ⭐ HAMBURGER MENU - BARCHA PANELLARDA BIR XIL */
         .menu-toggle {
             display: none;
             background: none;
@@ -310,14 +311,10 @@
             flex-shrink: 0;
         }
 
-        .menu-toggle:hover {
-            background: var(--bg-hover);
-        }
+        .menu-toggle:hover { background: var(--bg-hover); }
 
         @media (max-width: 768px) {
-            .menu-toggle {
-                display: flex !important;
-            }
+            .menu-toggle { display: flex !important; }
         }
 
         .header-left h2 { font-size: 1.4rem; font-weight: 700; color: var(--text-primary); letter-spacing: -0.5px; }
@@ -400,7 +397,7 @@
         .user-info .user-role { font-size: 0.7rem; color: var(--text-muted); }
 
         /* ============================================================
-           STATS GRID
+           ⭐ 1. STATS GRID - 6 TA KARTA (TEPADA)
            ============================================================ */
         .stats-grid {
             display: grid;
@@ -561,7 +558,81 @@
         }
 
         /* ============================================================
-           SUBSCRIPTION CARD
+           ⭐ 2. CHART - O'RTADA
+           ============================================================ */
+        .chart-wrapper {
+            padding: 0 32px;
+            margin-bottom: 16px;
+        }
+
+        .chart-card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 20px 24px;
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+            transform: none !important;
+        }
+
+        .chart-card:hover {
+            box-shadow: var(--shadow-hover);
+            transform: none !important;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .chart-header h3 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .chart-header h3 i {
+            margin-right: 8px;
+            color: var(--text-muted);
+        }
+
+        .chart-header .chart-legend {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .chart-header .chart-legend .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .chart-header .chart-legend .legend-item .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 280px;
+            width: 100%;
+        }
+
+        .chart-container canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        /* ============================================================
+           ⭐ 3. SUBSCRIPTION CARD - PASTDA
            ============================================================ */
         .subscription-wrapper {
             padding: 0 32px;
@@ -711,6 +782,13 @@
             .stat-card .stat-icon svg { width: 18px; height: 18px; }
             .stat-card .stat-info .stat-value { font-size: 1.3rem; }
 
+            .chart-wrapper { padding: 0 12px; }
+            .chart-card { padding: 16px; }
+            .chart-container { height: 220px; }
+            .chart-header h3 { font-size: 0.85rem; }
+            .chart-header .chart-legend { gap: 10px; }
+            .chart-header .chart-legend .legend-item { font-size: 0.65rem; }
+
             .subscription-wrapper { padding: 0 12px; }
             .subscription-card {
                 grid-template-columns: 1fr 1fr;
@@ -747,6 +825,10 @@
                 padding: 6px;
                 font-size: 1rem;
             }
+
+            .chart-wrapper { padding: 0 10px; }
+            .chart-card { padding: 12px; }
+            .chart-container { height: 180px; }
 
             .subscription-card {
                 grid-template-columns: 1fr 1fr;
@@ -822,7 +904,9 @@
 </head>
 <body>
     <div class="app-container">
-        <!-- SIDEBAR -->
+        <!-- ============================================================
+             SIDEBAR
+             ============================================================ -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-brand">
                 <div class="brand-icon"><i class="fas fa-crown"></i></div>
@@ -874,7 +958,9 @@
         <!-- SIDEBAR OVERLAY -->
         <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-        <!-- MAIN CONTENT -->
+        <!-- ============================================================
+             MAIN CONTENT
+             ============================================================ -->
         <main class="main-content">
 
             <!-- HEADER -->
@@ -909,7 +995,9 @@
                 </div>
             </header>
 
-            <!-- STATS GRID -->
+            <!-- ============================================================
+                 ⭐ 1. STATS GRID - 6 TA KARTA (TEPADA)
+                 ============================================================ -->
             <section class="stats-grid">
                 <!-- 1. Jami Xodimlar -->
                 <div class="stat-card">
@@ -1054,7 +1142,34 @@
                 </div>
             </section>
 
-            <!-- SUBSCRIPTION CARD -->
+            <!-- ============================================================
+                 ⭐ 2. CHART - O'RTADA
+                 ============================================================ -->
+            <section class="chart-wrapper">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3><i class="fas fa-chart-bar"></i> <span data-i18n="reports_title">Hisobotlar grafigi</span></h3>
+                        <div class="chart-legend">
+                            <span class="legend-item">
+                                <span class="dot" style="background: #007aff;"></span> O'qituvchilar
+                            </span>
+                            <span class="legend-item">
+                                <span class="dot" style="background: #34c759;"></span> O'quvchilar
+                            </span>
+                            <span class="legend-item">
+                                <span class="dot" style="background: #ff9500;"></span> Davomat
+                            </span>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="dashboardChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============================================================
+                 ⭐ 3. SUBSCRIPTION CARD - PASTDA
+                 ============================================================ -->
             <section class="subscription-wrapper">
                 <div class="subscription-card" id="subscriptionCard">
                     <div class="card-bg-icon"><i class="fas fa-crown"></i></div>
@@ -1138,7 +1253,9 @@
         </main>
     </div>
 
-    <!-- SCRIPTS -->
+    <!-- ============================================================
+         SCRIPTS
+         ============================================================ -->
     <script>
         window.__API_BASE_URL__ = 'https://admin-customerr.onrender.com';
 
@@ -1154,7 +1271,7 @@
                 });
             }
 
-            // ⭐ HAMBURGER MENU - TO'G'RI ISHLASH UCHUN
+            // Hamburger menu
             var menuToggle = document.getElementById('menuToggle');
             var sidebar = document.getElementById('sidebar');
             var overlay = document.getElementById('sidebarOverlay');
@@ -1177,7 +1294,6 @@
                 });
             }
 
-            // Tashqariga bosilganda yopish (mobil)
             document.addEventListener('click', function(e) {
                 if (window.innerWidth <= 768) {
                     var isSidebar = sidebar.contains(e.target);
@@ -1189,7 +1305,6 @@
                 }
             });
 
-            // ESC tugmasi
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape' && sidebar.classList.contains('open')) {
                     sidebar.classList.remove('open');
@@ -1197,7 +1312,6 @@
                 }
             });
 
-            // Katta ekranga o'tganda yopish
             window.addEventListener('resize', function() {
                 if (window.innerWidth > 768 && sidebar.classList.contains('open')) {
                     sidebar.classList.remove('open');
@@ -1205,7 +1319,6 @@
                 }
             });
 
-            // ⭐ SAHIFA YUKLANGANDA MOBILDA SIDEBAR YOPIQ BO'LISHI
             if (window.innerWidth <= 768) {
                 sidebar.classList.remove('open');
                 if (overlay) overlay.classList.remove('show');
