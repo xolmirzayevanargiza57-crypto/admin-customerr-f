@@ -1,5 +1,5 @@
 // ============================================================
-// DASHBOARD - ADMIN-CUSTOMER (APPLE STYLE)
+// DASHBOARD - ADMIN-CUSTOMER (TO'LIQ TUZATILGAN)
 // ============================================================
 
 let dashboardLoaded = false;
@@ -322,11 +322,6 @@ async function loadDashboardStats() {
             var stats = data.data;
             lastDashboardStats = stats;
 
-            // ⭐ Staff stats
-            var totalStaff = (stats.teacherCount || 0) + (stats.studentCount || 0);
-            var staffEl = document.getElementById('totalStaff');
-            if (staffEl) staffEl.textContent = totalStaff;
-
             // ⭐ Teacher stats
             var teacherCount = stats.teacherCount || 0;
             var activeTeachers = stats.activeTeachers || 0;
@@ -351,32 +346,40 @@ async function loadDashboardStats() {
             if (totalXpEl) totalXpEl.textContent = totalXP;
             if (avgXpEl) avgXpEl.textContent = avgXP;
 
-            // ⭐ New staff
-            var newStaffEl = document.getElementById('newStaff');
-            if (newStaffEl) {
-                var newStaff = Math.floor(Math.random() * 5) + 1;
-                newStaffEl.textContent = newStaff;
-            }
-
             // ⭐ Attendance stats
             var present = stats.attendanceStats?.present || 0;
             var absentReason = stats.attendanceStats?.absent_reason || 0;
             var absent = stats.attendanceStats?.absent || 0;
+            var totalAttendance = present + absentReason + absent;
 
+            var todayEl = document.getElementById('todayAttendance');
             var presentEl = document.getElementById('presentCount');
             var absentReasonEl = document.getElementById('absentReasonCount');
             var absentEl = document.getElementById('absentCount');
+            if (todayEl) todayEl.textContent = totalAttendance;
             if (presentEl) presentEl.textContent = present;
             if (absentReasonEl) absentReasonEl.textContent = absentReason;
             if (absentEl) absentEl.textContent = absent;
 
-            // ⭐ Subscription
+            // ⭐ Attendance percent
+            var percentEl = document.getElementById('attendancePercent');
+            if (percentEl) {
+                if (totalAttendance > 0) {
+                    var percent = Math.round((present / totalAttendance) * 100);
+                    percentEl.textContent = percent + '%';
+                    percentEl.className = 'stat-change ' + (percent >= 70 ? 'positive' : 'negative');
+                } else {
+                    percentEl.textContent = '0%';
+                }
+            }
+
+            // ⭐ Subscription (IKONKALAR BILAN)
             if (stats.subscription) {
                 var sub = stats.subscription;
-                var statusMap = {
-                    'active': '<i class="fas fa-check-circle" style="color:#34c759;"></i> Faol',
-                    'inactive': '<i class="fas fa-times-circle" style="color:#ff3b30;"></i> Faol emas',
-                    'expired': '<i class="fas fa-exclamation-circle" style="color:#ff9500;"></i> Muddati tugagan'
+                var statusMap = { 
+                    'active': '<i class="fas fa-check-circle" style="color:#34c759;"></i> Faol', 
+                    'inactive': '<i class="fas fa-times-circle" style="color:#ff3b30;"></i> Faol emas', 
+                    'expired': '<i class="fas fa-exclamation-circle" style="color:#ff9500;"></i> Muddati tugagan' 
                 };
                 var statusEl = document.getElementById('subscriptionStatus');
                 if (statusEl) {
@@ -385,12 +388,12 @@ async function loadDashboardStats() {
                     statusEl.className = 'value ' + (sub.status === 'active' ? 'status-active' : sub.status === 'expired' ? 'status-expired' : 'status-inactive');
                 }
 
-                var typeMap = {
-                    'monthly': '<i class="fas fa-calendar-alt"></i> Oylik',
-                    '6months': '<i class="fas fa-calendar-alt"></i> 6 oylik',
-                    'yearly': '<i class="fas fa-calendar-alt"></i> Yillik',
-                    'custom': '<i class="fas fa-cogs"></i> Custom',
-                    'none': '<i class="fas fa-times"></i> Yo\'q'
+                var typeMap = { 
+                    'monthly': '<i class="fas fa-calendar-alt"></i> Oylik', 
+                    '6months': '<i class="fas fa-calendar-alt"></i> 6 oylik', 
+                    'yearly': '<i class="fas fa-calendar-alt"></i> Yillik', 
+                    'custom': '<i class="fas fa-cogs"></i> Custom', 
+                    'none': '<i class="fas fa-times"></i> Yo\'q' 
                 };
                 var typeEl = document.getElementById('subscriptionType');
                 if (typeEl) {
