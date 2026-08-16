@@ -1,5 +1,5 @@
 // ============================================================
-// DASHBOARD - ADMIN-CUSTOMER (DOUGHNUT CHART BILAN)
+// DASHBOARD - ADMIN-CUSTOMER (DOUGHNUT CHART - 3 KATEGORIYA)
 // ============================================================
 
 let dashboardLoaded = false;
@@ -504,12 +504,12 @@ function renderStats(stats) {
     // ⭐ Subscription yangilash
     updateSubscriptionCountdown();
 
-    // ⭐ DOUGHNUT CHART yaratish
+    // ⭐ DOUGHNUT CHART yaratish - FAQAT 3 KATEGORIYA
     createDashboardChart(stats);
 }
 
 // ============================================================
-// ⭐ DOUGHNUT CHART - DUMALOQ GRAFIK
+// ⭐ DOUGHNUT CHART - 3 KATEGORIYA: XODIMLAR, O'QITUVCHILAR, O'QUVCHILAR
 // ============================================================
 function createDashboardChart(stats) {
     const ctx = document.getElementById('dashboardChart');
@@ -520,53 +520,40 @@ function createDashboardChart(stats) {
         dashboardChart = null;
     }
 
+    // ⭐ MA'LUMOTLAR
     const teacherCount = stats.teacherCount || 0;
-    const activeTeachers = stats.activeTeachers || 0;
     const studentCount = stats.studentCount || 0;
-    const activeStudents = stats.activeStudents || 0;
-    const present = stats.attendanceStats?.present || 0;
-    const absent = stats.attendanceStats?.absent || 0;
+    const totalStaff = teacherCount + studentCount;
 
-    // ⭐ Ma'lumotlar
+    // ⭐ 3 TA KATEGORIYA
     const labels = [
-        'Jami O\'qituvchilar',
-        'Faol O\'qituvchilar',
-        'Jami O\'quvchilar',
-        'Faol O\'quvchilar',
-        'Keldi',
-        'Kelmadi'
+        'Xodimlar',
+        'O\'qituvchilar',
+        'O\'quvchilar'
     ];
 
     const dataValues = [
-        teacherCount,
-        activeTeachers,
-        studentCount,
-        activeStudents,
-        present,
-        absent
+        totalStaff,      // Jami xodimlar
+        teacherCount,    // Jami o'qituvchilar
+        studentCount     // Jami o'quvchilar
     ];
 
-    // ⭐ Ranglar - Apple style
+    // ⭐ RASMDAGI RANGLAR: Ko'k, Yashil, Binafsha
     const colors = [
-        '#007aff',   // Ko'k
-        '#4a9aff',   // Och ko'k
-        '#34c759',   // Yashil
-        '#4ac759',   // Och yashil
-        '#34c759',   // Yashil (Keldi)
-        '#ff3b30'    // Qizil (Kelmadi)
+        '#007aff',   // Ko'k (Xodimlar)
+        '#34c759',   // Yashil (O'qituvchilar)
+        '#7c3aed'    // Binafsha (O'quvchilar)
     ];
 
     const backgroundColors = [
         'rgba(0, 122, 255, 0.85)',
-        'rgba(74, 154, 255, 0.75)',
         'rgba(52, 199, 89, 0.85)',
-        'rgba(74, 199, 89, 0.75)',
-        'rgba(52, 199, 89, 0.85)',
-        'rgba(255, 59, 48, 0.85)'
+        'rgba(124, 58, 237, 0.85)'
     ];
 
+    // ⭐ CHART YARATISH
     dashboardChart = new Chart(ctx, {
-        type: 'doughnut', // ⭐ DUMALOQ GRAFIK
+        type: 'doughnut',
         data: {
             labels: labels,
             datasets: [{
@@ -574,24 +561,24 @@ function createDashboardChart(stats) {
                 backgroundColor: backgroundColors,
                 borderColor: colors,
                 borderWidth: 3,
-                hoverOffset: 8
+                hoverOffset: 10
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            cutout: '55%', // ⭐ Ichki teshik o'lchami (donut uslubi)
+            cutout: '55%',
             plugins: {
                 legend: {
-                    position: 'right',
+                    position: 'bottom',
                     labels: {
                         usePointStyle: true,
                         pointStyle: 'circle',
-                        padding: 16,
+                        padding: 20,
                         font: {
-                            size: 12,
+                            size: 13,
                             family: 'Inter',
-                            weight: '500'
+                            weight: '600'
                         },
                         color: getComputedStyle(document.documentElement).getPropertyValue('--text-primary').trim() || '#1c1c1e'
                     }
@@ -605,7 +592,8 @@ function createDashboardChart(stats) {
         }
     });
 
-    console.log('✅ Doughnut chart yaratildi!');
+    console.log('✅ Doughnut chart yaratildi (3 kategoriya)');
+    console.log('📊 Xodimlar:', totalStaff, 'O\'qituvchilar:', teacherCount, 'O\'quvchilar:', studentCount);
 }
 
 // ============================================================
@@ -623,4 +611,4 @@ window.addEventListener('beforeunload', function() {
     cachedStats = null;
 });
 
-console.log('✅ dashboard.js yuklandi (Doughnut Chart)');
+console.log('✅ dashboard.js yuklandi (Doughnut Chart - 3 kategoriya)');
