@@ -1,5 +1,5 @@
 // ============================================================
-// SETTINGS - SOZLAMALAR (TO'LIQ)
+// SETTINGS - SOZLAMALAR (TO'LIQ + QURILMALAR)
 // Loyiha: Admin-Customer Frontend
 // Fayl: js/settings.js
 // ============================================================
@@ -47,6 +47,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     setupListeners();
 
+    // ⭐ QURILMALARNI YUKLASH
+    loadDevices();
+
     // ⭐ HAR 10 SONIYADA PROFILNI TEKSHIRISH
     setInterval(async function() {
         const result = await Auth.syncProfile();
@@ -54,6 +57,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             loadSettings();
         }
     }, 10000);
+
+    // ⭐ HAR 30 SONIYADA QURILMALARNI YANGILASH
+    setInterval(function() {
+        loadDevices();
+    }, 30000);
 });
 
 function setupListeners() {
@@ -210,35 +218,224 @@ function showProfileMessage(msg, type) {
 }
 
 // ============================================================
-// ⭐ HISOBNI O'CHIRISH (TO'LIQ)
+// ⭐ QURILMALARNI YUKLASH
+// ============================================================
+async function loadDevices() {
+    try {
+        const response = await API.get('/auth/sessions');
+        if (response.success) {
+            renderDevices(response.data, response.currentSessionId);
+        } else {
+            console.error('❌ Qurilmalar yuklanmadi:', response.message);
+        }
+    } catch (error) {
+        console.error('❌ Qurilmalarni yuklash xatosi:', error);
+        document.getElementById('devicesList').innerHTML = `
+            <div class="devices-empty">
+                <i class="fas fa-exclamation-circle" style="color: var(--color-danger);"></i>
+                <p>Qurilmalar yuklanmadi</p>
+                <button class="btn-secondary" style="width:auto; margin-top:12px; padding:8px 20px;" onclick="loadDevices()">
+                    <i class="fas fa-sync-alt"></i> Qayta yuklash
+                </button>
+            </div>
+        `;
+    }
+}
+
+// ============================================================
+// ⭐ QURILMALARNI KO'RSATISH
+// ============================================================
+function renderDevices(sessions, currentId) {
+    const container = document.getElementById('devicesList');
+    
+    if (!sessions || sessions.length === 0) {
+        container.innerHTML = `
+            <div class="devices-empty">
+                <i class="fas fa-devices"></i>
+                <p>Boshqa qurilmalar mavjud emas</p>
+            </div>
+        `;
+        return;
+    }
+
+    // Joriy qurilmani yangilash
+    const current = sessions.find(s => s.id === currentId);
+    if (current) {
+        document.getElementById('currentDeviceName').textContent = current.deviceName || 'Bu qurilma';
+        document.getElementById('currentDeviceApp').textContent = current.appVersion || 'Admin Customer v1.0';
+        document.getElementById('currentDeviceLocation').textContent = '📍 ' + (current.location || 'Toshkent, O\'zbekiston');
+        document.getElementById('currentDeviceTime').textContent = current.lastActive ? 'Hozir faol' : 'Noma\'lum';
+        document.getElementById('currentDeviceIp').textContent = current.ip || 'Noma\'lum';
+        document.getElementById('currentDeviceMac').textContent = current.mac || 'XX:XX:XX:XX:XX:XX';
+    }
+
+    // Boshqa qurilmalar
+    const otherDevices = sessions.filter(s => s.id !== currentId);
+    
+    if (otherDevices.length === 0) {
+        container.innerHTML = `
+            <div class="devices-empty">
+                <i class="fas fa-devices"></i>
+                <p>Boshqa qurilmalar mavjud emas</p>
+            </div>
+        `;
+        return;
+    }
+
+    container.innerHTML = otherDevices.map(device => `
+        <div class="device-card">
+            <div class="device-header">
+                <div class="device-icon">${getDeviceIcon(device.deviceType)}</div>
+                <div class="device-info">
+                    <div class="device-name">${device.deviceName || 'Noma\'lum qurilma'}</div>
+                    <div class="device-details">
+                        <span class="device-app"><i class="fas fa-code"></i> ${device.appVersion || 'Admin Customer'}</span>
+                        <span class="device-location"><i class="fas fa-map-marker-alt"></i> ${device.location || 'Noma\'lum'}</span>
+                    </div>
+                </div>
+                <div class="device-actions">
+                    <button class="btn-rename" onclick="renameDevice('${device.id}')" title="Qurilma nomini o'zgartirish">
+                        <i class="fas fa-pen"></i>
+                    </button>
+                    <button class="btn-terminate" onclick="terminateSession('${device.id}')" title="Sessiyani tugatish">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="device-footer">
+                <span class="device-time"><i class="far fa-clock"></i> ${formatDate(device.lastActive)}</span>
+                <span class="device-ip"><i class="fas fa-network-wired"></i> ${device.ip || 'Noma\'lum'}</span>
+                <span class="device-mac"><i class="fas fa-code"></i> ${device.mac || 'XX:XX:XX:XX:XX:XX'}</span>
+            </div>
+        </div>
+    `).join('');
+}
+
+// ============================================================
+// ⭐ QURILMA ICON
+// ============================================================
+function getDeviceIcon(type) {
+    if (!type) return '<i class="fas fa-device"></i>';
+    if (type.includes('Mobil') || type.includes('Android') || type.includes('iPhone')) {
+        return '<i class="fas fa-mobile-alt"></i>';
+    }
+    if (type.includes('Kompyuter') || type.includes('Windows') || type.includes('macOS') || type.includes('Linux')) {
+        return '<i class="fas fa-desktop"></i>';
+    }
+    return '<i class="fas fa-device"></i>';
+}
+
+// ============================================================
+// ⭐ QURILMA NOMINI O'ZGARTIRISH
+// ============================================================
+async function renameDevice(deviceId) {
+    const currentName = deviceId === 'current' 
+        ? document.getElementById('currentDeviceName').textContent 
+        : document.querySelector(`.device-card .device-name`)?.textContent?.trim() || 'Qurilma';
+    
+    const newName = prompt('Qurilma nomini kiriting:', currentName);
+    
+    if (newName === null) return;
+    if (newName.trim() === '') {
+        showError('Qurilma nomi kiritilishi kerak!');
+        return;
+    }
+
+    try {
+        const response = await API.put(`/auth/sessions/${deviceId}/rename`, {
+            deviceName: newName.trim()
+        });
+        
+        if (response.success) {
+            showSuccess('Qurilma nomi yangilandi!');
+            loadDevices();
+        } else {
+            showError(response.message || 'Xatolik yuz berdi!');
+        }
+    } catch (error) {
+        console.error('❌ Rename error:', error);
+        showError('Server xatosi!');
+    }
+}
+
+// ============================================================
+// ⭐ SESSIYANI TUGATISH
+// ============================================================
+async function terminateSession(deviceId) {
+    if (!confirm('Haqiqatan ham bu sessiyani tugatmoqchimisiz?')) return;
+
+    try {
+        const response = await API.delete(`/auth/sessions/${deviceId}`);
+        
+        if (response.success) {
+            showSuccess('Sessiya tugatildi!');
+            loadDevices();
+        } else {
+            showError(response.message || 'Xatolik yuz berdi!');
+        }
+    } catch (error) {
+        console.error('❌ Terminate error:', error);
+        showError('Server xatosi!');
+    }
+}
+
+// ============================================================
+// ⭐ BARCHA SESSIYALARNI TUGATISH
+// ============================================================
+async function terminateAllSessions() {
+    if (!confirm('Barcha boshqa qurilmalardagi sessiyalarni tugatmoqchimisiz? (Joriy qurilma qoladi)')) return;
+
+    try {
+        const response = await API.delete('/auth/sessions/terminate-all');
+        
+        if (response.success) {
+            showSuccess('Barcha sessiyalar tugatildi!');
+            loadDevices();
+        } else {
+            showError(response.message || 'Xatolik yuz berdi!');
+        }
+    } catch (error) {
+        console.error('❌ Terminate all error:', error);
+        showError('Server xatosi!');
+    }
+}
+
+// ============================================================
+// ⭐ SANANI FORMATLASH
+// ============================================================
+function formatDate(date) {
+    if (!date) return 'Noma\'lum vaqt';
+    try {
+        const d = new Date(date);
+        return d.toLocaleString('uz-UZ', {
+            timeZone: 'Asia/Tashkent',
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    } catch (error) {
+        return 'Noma\'lum vaqt';
+    }
+}
+
+// ============================================================
+// ⭐ HISOBNI O'CHIRISH
 // ============================================================
 async function deleteAccount() {
-    // ⭐ 1. Agar o'chirish jarayoni davom etayotgan bo'lsa
-    if (deleteAccountInProgress) {
-        return;
-    }
+    if (deleteAccountInProgress) return;
 
-    // ⭐ 2. TASDIQLASH
-    if (!confirm('⚠️ Haqiqatan ham hisobingizni o\'chirmoqchimisiz?')) {
-        return;
-    }
+    if (!confirm('⚠️ Haqiqatan ham hisobingizni o\'chirmoqchimisiz?')) return;
+    if (!confirm('⛔ Bu amal qaytarib bo\'lmaydi! Barcha ma\'lumotlaringiz o\'chib ketadi. Davom etmoqchimisiz?')) return;
 
-    if (!confirm('⛔ Bu amal qaytarib bo\'lmaydi! Barcha ma\'lumotlaringiz o\'chib ketadi. Davom etmoqchimisiz?')) {
-        return;
-    }
-
-    // ⭐ 3. PAROLNI SO'RASH (xavfsizlik)
     const password = prompt('🔐 Xavfsizlik uchun parolingizni kiriting:');
-    if (password === null) {
-        return;
-    }
-
+    if (password === null) return;
     if (!password || password.trim() === '') {
         showDeleteMessage('❌ Parol kiritilmadi!', 'error');
         return;
     }
 
-    // ⭐ 4. JARAYONNI BOSHLASH
     deleteAccountInProgress = true;
     const btn = document.getElementById('deleteAccountBtn');
     if (btn) {
@@ -247,7 +444,6 @@ async function deleteAccount() {
     }
 
     try {
-        // ⭐ 4.1. Parolni tekshirish
         const checkResult = await API.post('/api/auth/check-password', { password });
         
         if (!checkResult.success) {
@@ -260,13 +456,10 @@ async function deleteAccount() {
             return;
         }
 
-        // ⭐ 4.2. Hisobni o'chirish
         const result = await API.delete('/api/auth/delete-account');
 
         if (result.success) {
             showDeleteMessage('✅ Hisobingiz muvaffaqiyatli o\'chirildi!', 'success');
-            
-            // ⭐ 4.3. Logout qilish
             setTimeout(() => {
                 Auth.logout();
             }, 2000);
@@ -295,7 +488,6 @@ async function deleteAccount() {
 function showDeleteMessage(msg, type) {
     const div = document.getElementById('deleteMessage');
     if (!div) {
-        // Toast ko'rsatish
         if (type === 'success') {
             showSuccess(msg);
         } else {
@@ -335,7 +527,6 @@ function loadSettings() {
         document.getElementById('userName').textContent = user.fullName || 'Admin';
         document.getElementById('userInitial').textContent = (user.fullName || 'A').charAt(0).toUpperCase();
         
-        // Language selector
         const languageContainer = document.getElementById('languageSelector');
         if (languageContainer && typeof I18N !== 'undefined') {
             languageContainer.innerHTML = '';
@@ -395,4 +586,4 @@ function showSuccess(msg) {
     setTimeout(() => div.remove(), 3000);
 }
 
-console.log('✅ settings.js yuklandi (Hisob o\'chirish bilan)');
+console.log('✅ settings.js yuklandi (Qurilmalar bilan)');
