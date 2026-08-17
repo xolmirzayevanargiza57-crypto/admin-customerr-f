@@ -1,10 +1,21 @@
 // ============================================================
-// SETTINGS - SOZLAMALAR
+// SETTINGS - SOZLAMALAR (REAL-TIME SINXRONIZATSIYA BILAN)
+// Loyiha: Admin-Customer Frontend
+// Fayl: js/settings.js
 // ============================================================
 
 document.addEventListener('DOMContentLoaded', async () => {
     const token = localStorage.getItem('customerToken') || sessionStorage.getItem('customerToken');
     if (!token) { window.location.href = 'index.html'; return; }
+
+    // ⭐ PROFIL O'ZGARGANDA UI YANGILASH
+    document.addEventListener('profileUpdated', function(e) {
+        const user = e.detail?.user;
+        if (user) {
+            console.log('🔄 Profil yangilandi event:', user);
+            loadSettings();
+        }
+    });
 
     const user = Auth.getUser();
     if (user) {
@@ -23,17 +34,25 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     setupListeners();
+
+    // ⭐ HAR 10 SONIYADA PROFILNI TEKSHIRISH
+    setInterval(async function() {
+        const result = await Auth.syncProfile();
+        if (result && result.changed) {
+            loadSettings();
+        }
+    }, 10000);
 });
 
 function setupListeners() {
     document.getElementById('saveProfileBtn').addEventListener('click', saveProfile);
     document.getElementById('deleteAccountBtn').addEventListener('click', deleteAccount);
     document.getElementById('logoutBtn').addEventListener('click', () => Auth.logout());
-
-    // Sidebar open/close is managed globally by js/theme.js so it does not duplicate handlers.
 }
 
-
+// ============================================================
+// ⭐ PROFILNI SAQLASH (BARCHA QURILMALARGA TARQALADI)
+// ============================================================
 async function saveProfile() {
     const fullName = document.getElementById('fullName').value.trim();
     const phone = document.getElementById('phone').value.trim();
@@ -62,6 +81,15 @@ async function saveProfile() {
             showSuccess(I18N.t('success'));
             document.getElementById('userName').textContent = fullName;
             document.getElementById('userInitial').textContent = fullName.charAt(0).toUpperCase();
+            
+            // ⭐ BOSHQA QURILMALARGA XABAR YUBORISH UCHUN EVENT
+            document.dispatchEvent(new CustomEvent('profileUpdated', { 
+                detail: { user: user } 
+            }));
+            
+            // ⭐ BOSHQA QURILMALARDA O'ZGARISH UCHUN AUTH CACHE NI TOZALASH
+            localStorage.setItem('customerLastAuth', '0');
+            
         } else {
             showError(data.message || I18N.t('error'));
         }
@@ -81,6 +109,46 @@ function deleteAccount() {
     }
 }
 
+// ============================================================
+// ⭐ PROFIL MA'LUMOTLARINI YUKLASH
+// ============================================================
+function loadSettings() {
+    try {
+        const user = Auth.getUser();
+        if (!user) {
+            console.warn('⚠️ User topilmadi');
+            return;
+        }
+        
+        console.log('👤 User ma\'lumotlari:', user);
+        
+        const nameInput = document.getElementById('settingsName');
+        const emailInput = document.getElementById('settingsEmail');
+        const phoneInput = document.getElementById('settingsPhone');
+        
+        if (nameInput) nameInput.value = user.fullName || '';
+        if (emailInput) emailInput.value = user.email || '';
+        if (phoneInput) phoneInput.value = user.phone || '';
+        
+        const nameDisplay = document.getElementById('profileNameDisplay');
+        const emailDisplay = document.getElementById('profileEmailDisplay');
+        const phoneDisplay = document.getElementById('profilePhoneDisplay');
+        
+        if (nameDisplay) nameDisplay.textContent = user.fullName || '-';
+        if (emailDisplay) emailDisplay.textContent = user.email || '-';
+        if (phoneDisplay) phoneDisplay.textContent = user.phone || '-';
+        
+        const userName = document.getElementById('userName');
+        const userInitial = document.getElementById('userInitial');
+        if (userName) userName.textContent = user.fullName || 'Admin';
+        if (userInitial) userInitial.textContent = (user.fullName || 'A').charAt(0).toUpperCase();
+        
+        console.log('✅ Settings yuklandi');
+    } catch (error) {
+        console.error('❌ loadSettings xatosi:', error);
+    }
+}
+
 function showError(msg) {
     const div = document.createElement('div');
     div.style.cssText = `position:fixed;top:20px;right:20px;z-index:9999;padding:14px 18px;background:#fef2f2;border:1px solid #fecaca;border-radius:10px;color:#dc2626;max-width:400px;box-shadow:0 10px 40px rgba(0,0,0,0.1);display:flex;align-items:center;gap:10px;font-size:0.85rem;`;
@@ -97,4 +165,4 @@ function showSuccess(msg) {
     setTimeout(() => div.remove(), 5000);
 }
 
-console.log('✅ settings.js yuklandi');
+console.log('✅ settings.js yuklandi (Real-time sinxronizatsiya bilan)');
