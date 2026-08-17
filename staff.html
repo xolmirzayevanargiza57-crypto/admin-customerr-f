@@ -65,12 +65,12 @@
         .staff-stat-card .stat-icon.blue { background: #e8f0fe; color: #007aff; }
         .staff-stat-card .stat-icon.green { background: #e8f5e9; color: #34c759; }
         .staff-stat-card .stat-icon.orange { background: #fff3e0; color: #ff9500; }
-        .staff-stat-card .stat-icon.purple { background: #f3e8ff; color: #7c3aed; }
+        .staff-stat-card .stat-icon.red { background: #fef2f2; color: #ff3b30; }
 
         [data-theme="dark"] .staff-stat-card .stat-icon.blue { background: #1a2a4a; color: #4a9aff; }
         [data-theme="dark"] .staff-stat-card .stat-icon.green { background: #1a3a2a; color: #4ac759; }
         [data-theme="dark"] .staff-stat-card .stat-icon.orange { background: #3a2a1a; color: #ff9a4a; }
-        [data-theme="dark"] .staff-stat-card .stat-icon.purple { background: #2a1a4a; color: #9a6aff; }
+        [data-theme="dark"] .staff-stat-card .stat-icon.red { background: #3a1a1a; color: #ff6b6b; }
 
         .staff-stat-card .stat-info .stat-label {
             font-size: 0.7rem;
@@ -218,6 +218,14 @@
             font-size: 0.7rem;
             padding: 3px 10px;
         }
+        .staff-table .status-badge.frozen {
+            background: #e3f2fd;
+            color: #0d47a1;
+        }
+        [data-theme="dark"] .staff-table .status-badge.frozen {
+            background: #1a2a4a;
+            color: #4a9aff;
+        }
 
         .staff-table .actions-cell {
             display: flex;
@@ -349,7 +357,6 @@
             color: var(--color-success);
         }
 
-        /* ⭐ SALARY BREAKDOWN */
         .staff-profile-card .salary-breakdown {
             margin-top: 16px;
             padding: 16px;
@@ -380,7 +387,6 @@
             color: var(--text-primary);
         }
 
-        /* ⭐ PAYMENT WARNING */
         .staff-profile-card .payment-warning {
             margin-top: 16px;
             padding: 12px 16px;
@@ -555,7 +561,7 @@
 
             <!-- STAFF CONTENT -->
             <section class="staff-container">
-                <!-- ⭐ STATS -->
+                <!-- ⭐ STATS - 4 TA KARTA (Muzlatilgan qo'shilgan) -->
                 <div class="staff-stats">
                     <div class="staff-stat-card">
                         <div class="stat-icon blue"><i class="fas fa-users"></i></div>
@@ -578,11 +584,12 @@
                             <div class="stat-value" id="inactiveStaff">0</div>
                         </div>
                     </div>
+                    <!-- ⭐ YANGI: Muzlatilgan -->
                     <div class="staff-stat-card">
-                        <div class="stat-icon purple"><i class="fas fa-money-bill"></i></div>
+                        <div class="stat-icon red"><i class="fas fa-snowflake"></i></div>
                         <div class="stat-info">
-                            <div class="stat-label">Oylik maosh jamg'armasi</div>
-                            <div class="stat-value" id="totalSalary">0 so'm</div>
+                            <div class="stat-label">❄️ Muzlatilgan</div>
+                            <div class="stat-value" id="frozenStaff">0</div>
                         </div>
                     </div>
                 </div>
@@ -620,6 +627,7 @@
                             <option value="all">Barcha holat</option>
                             <option value="active">Faol</option>
                             <option value="inactive">Faol emas</option>
+                            <option value="frozen">❄️ Muzlatilgan</option>
                         </select>
                     </div>
                     <div class="actions">
@@ -723,6 +731,7 @@
                             <select id="staffStatus">
                                 <option value="active">Faol</option>
                                 <option value="inactive">Faol emas</option>
+                                <option value="frozen">❄️ Muzlatilgan</option>
                             </select>
                         </div>
                     </div>
@@ -755,11 +764,10 @@
     </div>
 
     <!-- Theme Toggle (Floating) -->
-<!-- ⭐ THEME TOGGLE - DUMALOQ VA TO'G'RI ICONLAR -->
-<button class="theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle theme">
-    <i class="fas fa-moon moon-icon"></i>
-    <i class="fas fa-sun sun-icon"></i>
-</button>
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme" style="display:none;">
+        <i class="fas fa-moon moon"></i>
+        <i class="fas fa-sun sun"></i>
+    </button>
 
     <script>
         window.__API_BASE_URL__ = 'https://admin-customerr.onrender.com';
