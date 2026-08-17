@@ -509,7 +509,7 @@ function renderStats(stats) {
 }
 
 // ============================================================
-// ⭐ DOUGHNUT CHART - 3 KATEGORIYA: XODIMLAR, O'QITUVCHILAR, O'QUVCHILAR
+// ⭐ DOUGHNUT CHART - 3 KATEGORIYA (YANGILANGAN RANGLAR)
 // ============================================================
 function createDashboardChart(stats) {
     const ctx = document.getElementById('dashboardChart');
@@ -538,17 +538,17 @@ function createDashboardChart(stats) {
         studentCount
     ];
 
-    // ⭐ RASMDAGI RANGLAR: Ko'k, Yashil, Binafsha
+    // ⭐ RASMDAGI RANGLAR: Ko'k, Yashil, To'q sariq
     const colors = [
         '#007aff',   // Ko'k (Xodimlar)
         '#34c759',   // Yashil (O'qituvchilar)
-        '#7c3aed'    // Binafsha (O'quvchilar)
+        '#ff9500'    // To'q sariq (O'quvchilar)
     ];
 
     const backgroundColors = [
         'rgba(0, 122, 255, 0.85)',
         'rgba(52, 199, 89, 0.85)',
-        'rgba(124, 58, 237, 0.85)'
+        'rgba(255, 149, 0, 0.85)'
     ];
 
     // ⭐ CHART YARATISH
@@ -595,20 +595,3 @@ function createDashboardChart(stats) {
     console.log('✅ Doughnut chart yaratildi (3 kategoriya)');
     console.log('📊 Xodimlar:', totalStaff, 'O\'qituvchilar:', teacherCount, 'O\'quvchilar:', studentCount);
 }
-
-// ============================================================
-// CLEANUP
-// ============================================================
-window.addEventListener('beforeunload', function() {
-    if (refreshInterval) clearInterval(refreshInterval);
-    if (notificationCheckInterval) clearInterval(notificationCheckInterval);
-    if (profileCheckInterval) clearInterval(profileCheckInterval);
-    if (subscriptionUpdateInterval) clearInterval(subscriptionUpdateInterval);
-    if (dashboardChart) {
-        dashboardChart.destroy();
-        dashboardChart = null;
-    }
-    cachedStats = null;
-});
-
-console.log('✅ dashboard.js yuklandi (Doughnut Chart - 3 kategoriya)');
