@@ -34,7 +34,7 @@
             border-radius: var(--radius);
             padding: 20px 24px;
             border: 1px solid var(--border-color);
-            transition: var(--transition);
+            transition: all 0.3s ease;
             transform: none !important;
         }
 
@@ -240,7 +240,7 @@
         }
 
         /* ============================================================
-           THEME TOGGLE BTN - DUMALOQ
+           THEME TOGGLE BTN
            ============================================================ */
         .theme-toggle-btn {
             display: inline-flex;
@@ -269,14 +269,139 @@
         [data-theme="dark"] .theme-toggle-btn .sun-icon { display: block; }
         [data-theme="dark"] .theme-toggle-btn .moon-icon { display: none; }
 
-        [data-theme="dark"] .theme-toggle-btn {
-            background: var(--bg-card);
-            border-color: var(--border-color);
-            color: var(--text-primary);
+        /* ============================================================
+           FORM MESSAGE
+           ============================================================ */
+        .form-message {
+            margin-top: 12px;
+            padding: 10px 14px;
+            border-radius: 8px;
+            display: none;
+            font-size: 0.85rem;
         }
 
-        [data-theme="dark"] .theme-toggle-btn:hover {
+        .form-message.success {
+            display: block;
+            background: #e8f5e9;
+            color: var(--color-success);
+            border: 1px solid #a5d6a7;
+        }
+
+        .form-message.error {
+            display: block;
+            background: #fef2f2;
+            color: var(--color-danger);
+            border: 1px solid #fecaca;
+        }
+
+        [data-theme="dark"] .form-message.success {
+            background: #1a3a2a;
+            color: #4ac759;
+            border-color: #4ac759;
+        }
+
+        [data-theme="dark"] .form-message.error {
+            background: #3a1a1a;
+            color: #ff3b30;
+            border-color: #ff3b30;
+        }
+
+        /* ============================================================
+           HEADER DIVIDER
+           ============================================================ */
+        .header-divider {
+            position: fixed;
+            top: 73px;
+            left: 220px;
+            right: 0;
+            height: 1px;
+            background: var(--border-color);
+            z-index: 99;
+            pointer-events: none;
+        }
+
+        @media (max-width: 768px) {
+            .header-divider {
+                top: 65px;
+                left: 0;
+            }
+        }
+
+        /* ============================================================
+           TOP HEADER
+           ============================================================ */
+        .top-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 32px;
+            background: var(--bg-header);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            border-bottom: 1px solid var(--border-color);
+            height: 73px;
+            min-height: 73px;
+        }
+
+        @media (max-width: 768px) {
+            .top-header {
+                height: 65px;
+                min-height: 65px;
+                padding: 12px 16px;
+            }
+        }
+
+        /* ============================================================
+           SIDEBAR BRAND
+           ============================================================ */
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 20px 16px 16px 16px;
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
+            height: 73px;
+            min-height: 73px;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar-brand {
+                height: 65px;
+                min-height: 65px;
+                padding: 14px 16px;
+            }
+        }
+
+        /* ============================================================
+           MENU TOGGLE
+           ============================================================ */
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            color: var(--text-primary);
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            flex-shrink: 0;
+        }
+
+        .menu-toggle:hover {
             background: var(--bg-hover);
+        }
+
+        @media (max-width: 768px) {
+            .menu-toggle {
+                display: flex !important;
+            }
         }
 
         /* ============================================================
@@ -405,108 +530,6 @@
                 height: 14px;
             }
         }
-
-        /* ============================================================
-           HEADER DIVIDER - SIDEBAR BRAND BILAN TENG
-           ============================================================ */
-        .header-divider {
-            position: fixed;
-            top: 73px;
-            left: 220px;
-            right: 0;
-            height: 1px;
-            background: var(--border-color);
-            z-index: 99;
-            pointer-events: none;
-        }
-
-        @media (max-width: 768px) {
-            .header-divider {
-                top: 65px;
-                left: 0;
-            }
-        }
-
-        /* ============================================================
-           TOP HEADER - FIXED HEIGHT
-           ============================================================ */
-        .top-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 16px 32px;
-            background: var(--bg-header);
-            position: sticky;
-            top: 0;
-            z-index: 50;
-            border-bottom: 1px solid var(--border-color);
-            height: 73px;
-            min-height: 73px;
-        }
-
-        @media (max-width: 768px) {
-            .top-header {
-                height: 65px;
-                min-height: 65px;
-                padding: 12px 16px;
-            }
-        }
-
-        /* ============================================================
-           SIDEBAR BRAND - FIXED HEIGHT
-           ============================================================ */
-        .sidebar-brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 20px 16px 16px 16px;
-            border-bottom: 1px solid var(--border-color);
-            flex-shrink: 0;
-            height: 73px;
-            min-height: 73px;
-        }
-
-        @media (max-width: 768px) {
-            .sidebar-brand {
-                height: 65px;
-                min-height: 65px;
-                padding: 14px 16px;
-            }
-        }
-
-        .form-message {
-            margin-top: 12px;
-            padding: 10px 14px;
-            border-radius: 8px;
-            display: none;
-            font-size: 0.85rem;
-        }
-
-        .form-message.success {
-            display: block;
-            background: #e8f5e9;
-            color: var(--color-success);
-            border: 1px solid #a5d6a7;
-        }
-
-        .form-message.error {
-            display: block;
-            background: #fef2f2;
-            color: var(--color-danger);
-            border: 1px solid #fecaca;
-        }
-
-        [data-theme="dark"] .form-message.success {
-            background: #1a3a2a;
-            color: #4ac759;
-            border-color: #4ac759;
-        }
-
-        [data-theme="dark"] .form-message.error {
-            background: #3a1a1a;
-            color: #ff3b30;
-            border-color: #ff3b30;
-        }
     </style>
 </head>
 <body>
@@ -583,7 +606,7 @@
                     </div>
                 </div>
                 <div class="header-right">
-                    <!-- ⭐ THEME TOGGLE - DUMALOQ -->
+                    <!-- ⭐ THEME TOGGLE -->
                     <button class="theme-toggle-btn" id="themeToggle" aria-label="Toggle theme">
                         <i class="fas fa-moon moon-icon"></i>
                         <i class="fas fa-sun sun-icon"></i>
@@ -605,7 +628,6 @@
                 <div class="settings-card">
                     <h3><i class="fas fa-user"></i> <span data-i18n="profile">Profil</span></h3>
 
-                    <!-- ⭐ JORIY PROFIL MA'LUMOTLARI -->
                     <div class="profile-display">
                         <div class="field">
                             <span class="label" data-i18n="full_name">To'liq ism</span>
@@ -621,7 +643,6 @@
                         </div>
                     </div>
 
-                    <!-- ⭐ PROFIL TAHRIRLASH -->
                     <form id="profileForm">
                         <div class="form-group">
                             <label><i class="fas fa-user"></i> <span data-i18n="full_name">To'liq ism</span></label>
@@ -652,7 +673,7 @@
                     <div id="profileMessage" class="form-message"></div>
                 </div>
 
-                <!-- ⭐ TASHQI KO'RINISH (THEME) -->
+                <!-- ⭐ TASHQI KO'RINISH -->
                 <div class="settings-card">
                     <h3><i class="fas fa-palette"></i> <span data-i18n="appearance">Tashqi ko'rinish</span></h3>
                     <div class="theme-options">
@@ -699,24 +720,16 @@
         </main>
     </div>
 
-    <!-- Theme Toggle (Floating) -->
-    <button class="theme-toggle" id="themeToggleFloat" aria-label="Toggle theme" style="display:none;">
-        <i class="fas fa-moon moon"></i>
-        <i class="fas fa-sun sun"></i>
-    </button>
-
     <script>
         window.__API_BASE_URL__ = 'https://admin-customerr.onrender.com';
 
         // ============================================================
-        // ⭐ THEME - TO'G'RI ISHLASHI UCHUN
+        // ⭐ THEME
         // ============================================================
         (function() {
-            // SAQLANGAN THEMENI QO'LLASH
             const savedTheme = localStorage.getItem('theme') || 'light';
             document.documentElement.setAttribute('data-theme', savedTheme);
 
-            // THEME TOGGLE (Header dagi)
             const themeBtn = document.getElementById('themeToggle');
             if (themeBtn) {
                 function updateIcons(theme) {
@@ -743,7 +756,6 @@
                     updateIcons(newTheme);
                     updateThemeUI();
 
-                    // Serverga saqlash
                     const token = localStorage.getItem('customerToken') || sessionStorage.getItem('customerToken');
                     if (token) {
                         fetch(window.__API_BASE_URL__ + '/api/auth/theme', {
@@ -760,19 +772,20 @@
                 });
             }
 
-            // THEME OPTIONS (Settings dagi)
             document.querySelectorAll('.theme-option').forEach(function(btn) {
                 btn.addEventListener('click', function() {
                     const theme = this.dataset.theme;
                     if (theme) {
-                        document.documentElement.setAttribute('data-theme', theme === 'auto' ? 
-                            (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : 
-                            theme
-                        );
+                        const html = document.documentElement;
+                        if (theme === 'auto') {
+                            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                            html.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+                        } else {
+                            html.setAttribute('data-theme', theme);
+                        }
                         localStorage.setItem('theme', theme);
                         updateThemeUI();
                         
-                        // Header dagi iconlarni yangilash
                         const headerBtn = document.getElementById('themeToggle');
                         if (headerBtn) {
                             const actualTheme = theme === 'auto' ? 
@@ -803,7 +816,7 @@
                 const statusText = document.getElementById('themeStatus');
                 if (statusText) {
                     const themeNames = { light: 'Yorug\'', dark: 'Qorong\'u' };
-                    if (currentTheme === 'system') {
+                    if (currentTheme === 'auto') {
                         statusText.textContent = 'Hozirgi holat: Avtomatik (' + (themeNames[actualTheme] || actualTheme) + ')';
                     } else {
                         statusText.textContent = 'Hozirgi holat: ' + (themeNames[actualTheme] || actualTheme);
@@ -813,7 +826,6 @@
 
             updateThemeUI();
 
-            // System theme o'zgarishi
             window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
                 const currentTheme = localStorage.getItem('theme') || 'light';
                 if (currentTheme === 'auto') {
@@ -825,7 +837,7 @@
         })();
 
         // ============================================================
-        // ⭐ HAMBURGER MENU - TO'G'RI ISHLASHI UCHUN
+        // ⭐ HAMBURGER MENU
         // ============================================================
         (function() {
             const menuToggle = document.getElementById('menuToggle');
@@ -875,7 +887,6 @@
                 }
             });
 
-            // ⭐ HEADER DIVIDER
             function updateDivider() {
                 const brand = document.querySelector('.sidebar-brand');
                 const divider = document.getElementById('headerDivider');
