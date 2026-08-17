@@ -11,9 +11,507 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
     <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/input.css" />
+    <link rel="stylesheet" href="css/modal.css" />
+    <link rel="stylesheet" href="css/theme.css" />
+    <link rel="stylesheet" href="css/responsive.css" />
+
+    <style>
+        /* ============================================================
+           SETTINGS STYLES
+           ============================================================ */
+        .settings-container {
+            padding: 16px 24px 24px 24px;
+            max-width: 700px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .settings-card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 20px 24px;
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+            transform: none !important;
+        }
+
+        .settings-card:hover {
+            box-shadow: var(--shadow-hover);
+            transform: none !important;
+        }
+
+        .settings-card h3 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+        }
+
+        .settings-card h3 i {
+            margin-right: 8px;
+            color: var(--text-muted);
+        }
+
+        .settings-card .form-group {
+            margin-bottom: 14px;
+        }
+
+        .settings-card .form-group:last-of-type {
+            margin-bottom: 18px;
+        }
+
+        .settings-card.danger {
+            border-color: var(--color-danger);
+        }
+
+        .settings-card.danger h3 {
+            color: var(--color-danger);
+        }
+
+        .settings-card.danger p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 14px;
+        }
+
+        .settings-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .settings-actions .btn-secondary,
+        .settings-actions .btn-danger {
+            width: auto;
+            padding: 8px 20px;
+            font-size: 0.8rem;
+        }
+
+        /* ============================================================
+           THEME OPTIONS
+           ============================================================ */
+        .theme-options {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .theme-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 12px 20px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            background: var(--bg-card);
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+            min-width: 60px;
+        }
+
+        .theme-option:hover {
+            border-color: var(--text-muted);
+            transform: translateY(-2px);
+        }
+
+        .theme-option.active {
+            border-color: var(--text-primary);
+            color: var(--text-primary);
+            background: var(--bg-active);
+        }
+
+        .theme-option i {
+            font-size: 1.2rem;
+        }
+
+        .theme-option span {
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+
+        /* ============================================================
+           LANGUAGE SELECTOR
+           ============================================================ */
+        .language-selector {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            padding: 4px 0;
+        }
+
+        .lang-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            background: var(--bg-card);
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .lang-option .flag-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 20px;
+            border-radius: 4px;
+            overflow: hidden;
+            flex-shrink: 0;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+        }
+
+        .lang-option .flag-container svg {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .lang-option .lang-name {
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .lang-option:hover {
+            border-color: var(--text-muted);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .lang-option.active {
+            border-color: var(--text-primary);
+            background: var(--bg-active);
+            font-weight: 600;
+        }
+
+        [data-theme="dark"] .lang-option.active {
+            background: var(--bg-active);
+            border-color: var(--text-primary);
+        }
+
+        [data-theme="dark"] .lang-option:hover {
+            box-shadow: 0 4px 12px rgba(255,255,255,0.05);
+        }
+
+        /* ============================================================
+           PROFILE DISPLAY
+           ============================================================ */
+        .profile-display {
+            background: var(--bg-hover);
+            border-radius: var(--radius-sm);
+            padding: 14px 18px;
+            margin-bottom: 18px;
+        }
+
+        .profile-display .field {
+            display: flex;
+            padding: 6px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .profile-display .field:last-child {
+            border-bottom: none;
+        }
+
+        .profile-display .field .label {
+            font-weight: 500;
+            color: var(--text-muted);
+            width: 100px;
+            flex-shrink: 0;
+            font-size: 0.85rem;
+        }
+
+        .profile-display .field .value {
+            color: var(--text-primary);
+            font-weight: 500;
+            font-size: 0.85rem;
+            word-break: break-word;
+        }
+
+        /* ============================================================
+           THEME TOGGLE BTN - DUMALOQ
+           ============================================================ */
+        .theme-toggle-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 1px solid var(--border-color);
+            background: var(--bg-card);
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .theme-toggle-btn:hover {
+            background: var(--bg-hover);
+            transform: scale(1.05);
+        }
+
+        .theme-toggle-btn .sun-icon { display: none; }
+        .theme-toggle-btn .moon-icon { display: block; }
+
+        [data-theme="dark"] .theme-toggle-btn .sun-icon { display: block; }
+        [data-theme="dark"] .theme-toggle-btn .moon-icon { display: none; }
+
+        [data-theme="dark"] .theme-toggle-btn {
+            background: var(--bg-card);
+            border-color: var(--border-color);
+            color: var(--text-primary);
+        }
+
+        [data-theme="dark"] .theme-toggle-btn:hover {
+            background: var(--bg-hover);
+        }
+
+        /* ============================================================
+           RESPONSIVE
+           ============================================================ */
+        @media (max-width: 768px) {
+            .settings-container {
+                padding: 12px 16px 16px 16px;
+            }
+
+            .settings-card {
+                padding: 16px 18px;
+            }
+
+            .settings-actions {
+                flex-direction: column;
+            }
+
+            .settings-actions .btn-secondary,
+            .settings-actions .btn-danger {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .theme-options {
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+
+            .theme-option {
+                max-width: 100%;
+                flex: 1;
+                min-width: 60px;
+                padding: 10px 14px;
+                flex-direction: row;
+                justify-content: center;
+            }
+
+            .profile-display .field {
+                flex-direction: column;
+                gap: 2px;
+                padding: 4px 0;
+            }
+
+            .profile-display .field .label {
+                width: 100%;
+                font-size: 0.7rem;
+            }
+
+            .profile-display .field .value {
+                font-size: 0.8rem;
+            }
+
+            .top-header {
+                padding: 12px 16px;
+            }
+
+            .header-left .text-muted {
+                display: none;
+            }
+
+            .user-info {
+                display: none;
+            }
+
+            .lang-option {
+                padding: 6px 12px;
+                font-size: 0.75rem;
+            }
+
+            .lang-option .flag-container {
+                width: 24px;
+                height: 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .settings-container {
+                padding: 8px 10px;
+            }
+
+            .settings-card {
+                padding: 12px 14px;
+            }
+
+            .settings-card h3 {
+                font-size: 0.85rem;
+            }
+
+            .form-group label {
+                font-size: 0.8rem;
+            }
+
+            .input-wrapper input,
+            .input-wrapper select,
+            .input-wrapper textarea {
+                padding: 8px 12px;
+                font-size: 0.8rem;
+                border-radius: 8px;
+            }
+
+            .btn-primary,
+            .btn-secondary,
+            .btn-danger {
+                padding: 8px 14px;
+                font-size: 0.8rem;
+            }
+
+            .theme-option {
+                flex-direction: row;
+                justify-content: center;
+                padding: 8px 12px;
+            }
+
+            .theme-option i {
+                font-size: 1rem;
+            }
+
+            .lang-option {
+                padding: 4px 10px;
+                font-size: 0.7rem;
+            }
+
+            .lang-option .flag-container {
+                width: 20px;
+                height: 14px;
+            }
+        }
+
+        /* ============================================================
+           HEADER DIVIDER - SIDEBAR BRAND BILAN TENG
+           ============================================================ */
+        .header-divider {
+            position: fixed;
+            top: 73px;
+            left: 220px;
+            right: 0;
+            height: 1px;
+            background: var(--border-color);
+            z-index: 99;
+            pointer-events: none;
+        }
+
+        @media (max-width: 768px) {
+            .header-divider {
+                top: 65px;
+                left: 0;
+            }
+        }
+
+        /* ============================================================
+           TOP HEADER - FIXED HEIGHT
+           ============================================================ */
+        .top-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 32px;
+            background: var(--bg-header);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            border-bottom: 1px solid var(--border-color);
+            height: 73px;
+            min-height: 73px;
+        }
+
+        @media (max-width: 768px) {
+            .top-header {
+                height: 65px;
+                min-height: 65px;
+                padding: 12px 16px;
+            }
+        }
+
+        /* ============================================================
+           SIDEBAR BRAND - FIXED HEIGHT
+           ============================================================ */
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 20px 16px 16px 16px;
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
+            height: 73px;
+            min-height: 73px;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar-brand {
+                height: 65px;
+                min-height: 65px;
+                padding: 14px 16px;
+            }
+        }
+
+        .form-message {
+            margin-top: 12px;
+            padding: 10px 14px;
+            border-radius: 8px;
+            display: none;
+            font-size: 0.85rem;
+        }
+
+        .form-message.success {
+            display: block;
+            background: #e8f5e9;
+            color: var(--color-success);
+            border: 1px solid #a5d6a7;
+        }
+
+        .form-message.error {
+            display: block;
+            background: #fef2f2;
+            color: var(--color-danger);
+            border: 1px solid #fecaca;
+        }
+
+        [data-theme="dark"] .form-message.success {
+            background: #1a3a2a;
+            color: #4ac759;
+            border-color: #4ac759;
+        }
+
+        [data-theme="dark"] .form-message.error {
+            background: #3a1a1a;
+            color: #ff3b30;
+            border-color: #ff3b30;
+        }
+    </style>
 </head>
 <body>
     <div class="app-container">
+        <!-- SIDEBAR -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-brand">
                 <div class="brand-icon"><i class="fas fa-crown"></i></div>
@@ -26,6 +524,9 @@
                 <a href="dashboard.html" class="nav-link">
                     <i class="fas fa-chart-pie"></i> <span data-i18n="dashboard">Dashboard</span>
                 </a>
+                <a href="staff.html" class="nav-link">
+                    <i class="fas fa-users"></i> <span data-i18n="staff">Xodimlar</span>
+                </a>
                 <a href="teachers.html" class="nav-link">
                     <i class="fas fa-chalkboard-teacher"></i> <span data-i18n="teachers">O'qituvchilar</span>
                 </a>
@@ -35,7 +536,7 @@
                 <a href="payments.html" class="nav-link">
                     <i class="fas fa-money-bill"></i> <span data-i18n="payments">To'lovlar</span>
                 </a>
-                 <a href="attendance.html" class="nav-link">
+                <a href="attendance.html" class="nav-link">
                     <i class="fas fa-calendar-check"></i> <span data-i18n="attendance">Davomat</span>
                 </a>
                 <a href="reports.html" class="nav-link">
@@ -46,6 +547,10 @@
                 </a>
                 <a href="all.html" class="nav-link">
                     <i class="fas fa-th-list"></i> <span data-i18n="all">Barchasi</span>
+                </a>
+                <a href="notifications.html" class="nav-link">
+                    <i class="fas fa-bell"></i> <span data-i18n="notifications">Bildirishnomalar</span>
+                    <span class="sidebar-badge" id="sidebarBadge" style="display:none;">0</span>
                 </a>
                 <a href="settings.html" class="nav-link active">
                     <i class="fas fa-cog"></i> <span data-i18n="settings">Sozlamalar</span>
@@ -58,110 +563,341 @@
             </div>
         </aside>
 
+        <!-- SIDEBAR OVERLAY -->
         <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
+        <!-- HEADER DIVIDER -->
+        <div class="header-divider" id="headerDivider"></div>
+
+        <!-- MAIN CONTENT -->
         <main class="main-content">
+            <!-- TOP HEADER -->
             <header class="top-header">
                 <div class="header-left">
-                    <button id="menuToggle" class="menu-toggle"><i class="fas fa-bars"></i></button>
+                    <button id="menuToggle" class="menu-toggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
                     <div>
                         <h2><i class="fas fa-cog"></i> <span data-i18n="settings_title">Sozlamalar</span></h2>
+                        <p class="text-muted" data-i18n="settings_subtitle">Tizim sozlamalarini boshqaring</p>
                     </div>
                 </div>
                 <div class="header-right">
+                    <!-- ⭐ THEME TOGGLE - DUMALOQ -->
+                    <button class="theme-toggle-btn" id="themeToggle" aria-label="Toggle theme">
+                        <i class="fas fa-moon moon-icon"></i>
+                        <i class="fas fa-sun sun-icon"></i>
+                    </button>
                     <div class="user-profile">
-                        <div class="user-avatar" id="userAvatar">
-                            <span id="userInitial">C</span>
-                        </div>
+                        <div class="user-avatar"><span id="userInitial">A</span></div>
                         <div class="user-info">
-                            <p class="user-name" id="userName">Admin</p>
-                            <p class="user-role text-muted">Admin Customer</p>
+                            <p class="user-name" id="userName"><i class="fas fa-user"></i> Xoijakbar Xasan</p>
+                            <p class="user-role text-muted"><i class="fas fa-user-shield"></i> Admin Customer</p>
                         </div>
                     </div>
                 </div>
             </header>
 
+            <!-- SETTINGS CONTENT -->
             <section class="settings-container">
+
+                <!-- ⭐ PROFIL -->
+                <div class="settings-card">
+                    <h3><i class="fas fa-user"></i> <span data-i18n="profile">Profil</span></h3>
+
+                    <!-- ⭐ JORIY PROFIL MA'LUMOTLARI -->
+                    <div class="profile-display">
+                        <div class="field">
+                            <span class="label" data-i18n="full_name">To'liq ism</span>
+                            <span class="value" id="profileNameDisplay">-</span>
+                        </div>
+                        <div class="field">
+                            <span class="label" data-i18n="email">Email</span>
+                            <span class="value" id="profileEmailDisplay">-</span>
+                        </div>
+                        <div class="field">
+                            <span class="label" data-i18n="phone">Telefon</span>
+                            <span class="value" id="profilePhoneDisplay">-</span>
+                        </div>
+                    </div>
+
+                    <!-- ⭐ PROFIL TAHRIRLASH -->
+                    <form id="profileForm">
+                        <div class="form-group">
+                            <label><i class="fas fa-user"></i> <span data-i18n="full_name">To'liq ism</span></label>
+                            <div class="input-wrapper">
+                                <input type="text" id="settingsName" placeholder="To'liq ism" data-i18n-placeholder="full_name" />
+                                <i class="fas fa-check-circle input-icon success"></i>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-phone"></i> <span data-i18n="phone">Telefon</span></label>
+                            <div class="input-wrapper">
+                                <input type="text" id="settingsPhone" placeholder="+998 90 123 45 67" data-i18n-placeholder="phone" />
+                                <i class="fas fa-check-circle input-icon success"></i>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-school"></i> <span data-i18n="school_name">O'quv markazi nomi</span></label>
+                            <div class="input-wrapper">
+                                <input type="text" id="settingsSchool" placeholder="Nurli Ta'lim Markazi" data-i18n-placeholder="school_name" />
+                                <i class="fas fa-check-circle input-icon success"></i>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-primary" id="saveProfileBtn">
+                            <i class="fas fa-save"></i> <span data-i18n="save">Saqlash</span>
+                        </button>
+                    </form>
+
+                    <div id="profileMessage" class="form-message"></div>
+                </div>
+
+                <!-- ⭐ TASHQI KO'RINISH (THEME) -->
                 <div class="settings-card">
                     <h3><i class="fas fa-palette"></i> <span data-i18n="appearance">Tashqi ko'rinish</span></h3>
                     <div class="theme-options">
-                        <button class="theme-option" data-theme="light">
+                        <button class="theme-option active" data-theme="light" id="themeLight">
                             <i class="fas fa-sun"></i>
-                            <span data-i18n="light">Yoruq</span>
+                            <span data-i18n="light">Yorug'</span>
                         </button>
-                        <button class="theme-option" data-theme="dark">
+                        <button class="theme-option" data-theme="dark" id="themeDark">
                             <i class="fas fa-moon"></i>
                             <span data-i18n="dark">Qorong'u</span>
                         </button>
-                        <button class="theme-option active" data-theme="auto">
+                        <button class="theme-option" data-theme="auto" id="themeSystem">
                             <i class="fas fa-desktop"></i>
                             <span data-i18n="auto">Avto</span>
                         </button>
                     </div>
+                    <p class="text-muted" style="margin-top: 12px; font-size: 0.75rem;">
+                        <i class="fas fa-info-circle"></i> 
+                        <span id="themeStatus">Hozirgi holat: Yorug'</span>
+                    </p>
                 </div>
 
-               <!-- ⭐ TIL SELECTOR - CHIROYLI BAYROQLAR BILAN -->
-            <div class="settings-card">
-             <h3><i class="fas fa-globe"></i> <span data-i18n="language">Til</span></h3>
-            <div id="languageSelector"></div>
-            </div>
-
+                <!-- ⭐ TIL -->
                 <div class="settings-card">
-                    <h3><i class="fas fa-user"></i> <span data-i18n="profile">Profil</span></h3>
-                    <div class="form-group">
-                        <label><i class="fas fa-user"></i> <span data-i18n="full_name">To'liq ism</span></label>
-                        <div class="input-wrapper">
-                            <input type="text" id="fullName" placeholder="Admin Customer" data-i18n-placeholder="full_name" />
-                            <i class="fas fa-check-circle input-icon success"></i>
-                            <i class="fas fa-exclamation-circle input-icon error"></i>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label><i class="fas fa-phone"></i> <span data-i18n="phone">Telefon</span></label>
-                        <div class="input-wrapper">
-                            <input type="text" id="phone" placeholder="+998 90 123 45 67" data-i18n-placeholder="phone" />
-                            <i class="fas fa-check-circle input-icon success"></i>
-                            <i class="fas fa-exclamation-circle input-icon error"></i>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label><i class="fas fa-school"></i> <span data-i18n="school_name">O'quv markazi nomi</span></label>
-                        <div class="input-wrapper">
-                            <input type="text" id="schoolName" placeholder="Nurli Ta'lim Markazi" data-i18n-placeholder="school_name" />
-                            <i class="fas fa-check-circle input-icon success"></i>
-                            <i class="fas fa-exclamation-circle input-icon error"></i>
-                        </div>
-                    </div>
-                    <button class="btn-primary" id="saveProfileBtn">
-                        <i class="fas fa-save"></i> <span data-i18n="save">Saqlash</span>
-                    </button>
+                    <h3><i class="fas fa-globe"></i> <span data-i18n="language">Til</span></h3>
+                    <div id="languageSelector"></div>
                 </div>
 
-                <!-- PAROL BOSHQARISH O'CHIRILDI -->
-
+                <!-- ⭐ XAVFLI HUDUD -->
                 <div class="settings-card danger">
                     <h3><i class="fas fa-exclamation-triangle"></i> <span data-i18n="danger_zone">Xavfli hudud</span></h3>
                     <p data-i18n="delete_account_warning">Hisobingizni o'chirishni xohlaysizmi? Bu amal qaytarib bo'lmaydi!</p>
-                    <button class="btn-danger" id="deleteAccountBtn">
-                        <i class="fas fa-trash"></i> <span data-i18n="delete_account">Hisobni o'chirish</span>
-                    </button>
+                    <div class="settings-actions">
+                        <button id="settingsLogout" class="btn-secondary">
+                            <i class="fas fa-sign-out-alt"></i> <span data-i18n="logout">Chiqish</span>
+                        </button>
+                        <button id="deleteAccountBtn" class="btn-danger">
+                            <i class="fas fa-trash"></i> <span data-i18n="delete_account">Hisobni o'chirish</span>
+                        </button>
+                    </div>
                 </div>
+
             </section>
         </main>
     </div>
 
-    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+    <!-- Theme Toggle (Floating) -->
+    <button class="theme-toggle" id="themeToggleFloat" aria-label="Toggle theme" style="display:none;">
         <i class="fas fa-moon moon"></i>
         <i class="fas fa-sun sun"></i>
     </button>
 
     <script>
         window.__API_BASE_URL__ = 'https://admin-customerr.onrender.com';
+
+        // ============================================================
+        // ⭐ THEME - TO'G'RI ISHLASHI UCHUN
+        // ============================================================
+        (function() {
+            // SAQLANGAN THEMENI QO'LLASH
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+
+            // THEME TOGGLE (Header dagi)
+            const themeBtn = document.getElementById('themeToggle');
+            if (themeBtn) {
+                function updateIcons(theme) {
+                    const moon = themeBtn.querySelector('.moon-icon');
+                    const sun = themeBtn.querySelector('.sun-icon');
+                    if (theme === 'dark') {
+                        if (moon) moon.style.display = 'none';
+                        if (sun) sun.style.display = 'block';
+                    } else {
+                        if (moon) moon.style.display = 'block';
+                        if (sun) sun.style.display = 'none';
+                    }
+                }
+
+                updateIcons(savedTheme);
+
+                themeBtn.addEventListener('click', function() {
+                    const html = document.documentElement;
+                    const current = html.getAttribute('data-theme');
+                    const newTheme = current === 'dark' ? 'light' : 'dark';
+                    
+                    html.setAttribute('data-theme', newTheme);
+                    localStorage.setItem('theme', newTheme);
+                    updateIcons(newTheme);
+                    updateThemeUI();
+
+                    // Serverga saqlash
+                    const token = localStorage.getItem('customerToken') || sessionStorage.getItem('customerToken');
+                    if (token) {
+                        fetch(window.__API_BASE_URL__ + '/api/auth/theme', {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': 'Bearer ' + token
+                            },
+                            body: JSON.stringify({ theme: newTheme })
+                        }).catch(function(err) {
+                            console.error('Theme saqlash xatosi:', err);
+                        });
+                    }
+                });
+            }
+
+            // THEME OPTIONS (Settings dagi)
+            document.querySelectorAll('.theme-option').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    const theme = this.dataset.theme;
+                    if (theme) {
+                        document.documentElement.setAttribute('data-theme', theme === 'auto' ? 
+                            (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : 
+                            theme
+                        );
+                        localStorage.setItem('theme', theme);
+                        updateThemeUI();
+                        
+                        // Header dagi iconlarni yangilash
+                        const headerBtn = document.getElementById('themeToggle');
+                        if (headerBtn) {
+                            const actualTheme = theme === 'auto' ? 
+                                (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : 
+                                theme;
+                            const moon = headerBtn.querySelector('.moon-icon');
+                            const sun = headerBtn.querySelector('.sun-icon');
+                            if (actualTheme === 'dark') {
+                                if (moon) moon.style.display = 'none';
+                                if (sun) sun.style.display = 'block';
+                            } else {
+                                if (moon) moon.style.display = 'block';
+                                if (sun) sun.style.display = 'none';
+                            }
+                        }
+                    }
+                });
+            });
+
+            function updateThemeUI() {
+                const currentTheme = localStorage.getItem('theme') || 'light';
+                const actualTheme = document.documentElement.getAttribute('data-theme');
+                
+                document.querySelectorAll('.theme-option').forEach(function(btn) {
+                    btn.classList.toggle('active', btn.dataset.theme === currentTheme);
+                });
+
+                const statusText = document.getElementById('themeStatus');
+                if (statusText) {
+                    const themeNames = { light: 'Yorug\'', dark: 'Qorong\'u' };
+                    if (currentTheme === 'system') {
+                        statusText.textContent = 'Hozirgi holat: Avtomatik (' + (themeNames[actualTheme] || actualTheme) + ')';
+                    } else {
+                        statusText.textContent = 'Hozirgi holat: ' + (themeNames[actualTheme] || actualTheme);
+                    }
+                }
+            }
+
+            updateThemeUI();
+
+            // System theme o'zgarishi
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
+                const currentTheme = localStorage.getItem('theme') || 'light';
+                if (currentTheme === 'auto') {
+                    const newTheme = e.matches ? 'dark' : 'light';
+                    document.documentElement.setAttribute('data-theme', newTheme);
+                    updateThemeUI();
+                }
+            });
+        })();
+
+        // ============================================================
+        // ⭐ HAMBURGER MENU - TO'G'RI ISHLASHI UCHUN
+        // ============================================================
+        (function() {
+            const menuToggle = document.getElementById('menuToggle');
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+
+            if (menuToggle && sidebar) {
+                menuToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    sidebar.classList.toggle('open');
+                    if (overlay) {
+                        overlay.classList.toggle('show');
+                    }
+                });
+            }
+
+            if (overlay) {
+                overlay.addEventListener('click', function() {
+                    sidebar.classList.remove('open');
+                    overlay.classList.remove('show');
+                });
+            }
+
+            document.addEventListener('click', function(e) {
+                if (window.innerWidth <= 768) {
+                    const isSidebar = sidebar.contains(e.target);
+                    const isToggle = menuToggle.contains(e.target);
+                    if (!isSidebar && !isToggle && sidebar.classList.contains('open')) {
+                        sidebar.classList.remove('open');
+                        if (overlay) overlay.classList.remove('show');
+                    }
+                }
+            });
+
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && sidebar.classList.contains('open')) {
+                    sidebar.classList.remove('open');
+                    if (overlay) overlay.classList.remove('show');
+                }
+            });
+
+            window.addEventListener('resize', function() {
+                if (window.innerWidth > 768 && sidebar.classList.contains('open')) {
+                    sidebar.classList.remove('open');
+                    if (overlay) overlay.classList.remove('show');
+                }
+            });
+
+            // ⭐ HEADER DIVIDER
+            function updateDivider() {
+                const brand = document.querySelector('.sidebar-brand');
+                const divider = document.getElementById('headerDivider');
+                if (brand && divider) {
+                    const rect = brand.getBoundingClientRect();
+                    divider.style.top = rect.bottom + 'px';
+                }
+            }
+
+            updateDivider();
+            setTimeout(updateDivider, 100);
+            window.addEventListener('resize', updateDivider);
+        })();
+
+        console.log('✅ Settings sahifasi yuklandi!');
     </script>
+
     <script src="js/api.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/theme.js"></script>
     <script src="js/i18n.js"></script>
+    <script src="js/utils.js"></script>
     <script src="js/settings.js"></script>
 </body>
 </html>
