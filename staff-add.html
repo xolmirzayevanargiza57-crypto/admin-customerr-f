@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="light">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Customer - Yangi xodim</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/input.css" />
+    <link rel="stylesheet" href="css/theme.css" />
+    <link rel="stylesheet" href="css/responsive.css" />
+
+    <style>
+        .form-container {
+            padding: 20px 24px;
+            max-width: 640px;
+            margin: 0 auto;
+        }
+
+        .app-form {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 28px 32px;
+            border: 1px solid var(--border-color);
+        }
+
+        .app-form .form-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        .app-form .form-actions .btn-primary,
+        .app-form .form-actions .btn-secondary {
+            flex: 1;
+            justify-content: center;
+        }
+
+        .form-message {
+            margin-top: 16px;
+            padding: 12px 16px;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .form-message.success {
+            display: block;
+            background: #e8f5e9;
+            color: var(--color-success);
+            border: 1px solid #a5d6a7;
+        }
+
+        .form-message.error {
+            display: block;
+            background: #fef2f2;
+            color: var(--color-danger);
+            border: 1px solid #fecaca;
+        }
+
+        [data-theme="dark"] .form-message.success {
+            background: #1a3a2a;
+            color: #4ac759;
+            border-color: #4ac759;
+        }
+
+        [data-theme="dark"] .form-message.error {
+            background: #3a1a1a;
+            color: #ff3b30;
+            border-color: #ff3b30;
+        }
+
+        @media (max-width: 768px) {
+            .form-container { padding: 12px 16px; }
+            .app-form { padding: 16px 18px; }
+            .app-form .form-actions { flex-direction: column; }
+            .app-form .form-actions .btn-primary,
+            .app-form .form-actions .btn-secondary { width: 100%; }
+            .top-header { padding: 12px 16px; }
+            .header-left .text-muted { display: none; }
+            .user-info { display: none; }
+        }
+
+        @media (max-width: 480px) {
+            .app-form { padding: 12px 14px; }
+            .form-group { margin-bottom: 12px; }
+            .input-wrapper input,
+            .input-wrapper select { padding: 8px 12px; font-size: 0.8rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- SIDEBAR -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-brand">
+                <div class="brand-icon"><i class="fas fa-crown"></i></div>
+                <div class="brand-text">
+                    <span class="brand-name">Admin Customer</span>
+                    <span class="brand-version">v1.0</span>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-link">
+                    <i class="fas fa-chart-pie"></i> <span data-i18n="dashboard">Dashboard</span>
+                </a>
+                <a href="staff.html" class="nav-link active">
+                    <i class="fas fa-users"></i> <span data-i18n="staff">Xodimlar</span>
+                </a>
+                <a href="teachers.html" class="nav-link">
+                    <i class="fas fa-chalkboard-teacher"></i> <span data-i18n="teachers">O'qituvchilar</span>
+                </a>
+                <a href="students.html" class="nav-link">
+                    <i class="fas fa-graduation-cap"></i> <span data-i18n="students">O'quvchilar</span>
+                </a>
+                <a href="payments.html" class="nav-link">
+                    <i class="fas fa-money-bill"></i> <span data-i18n="payments">To'lovlar</span>
+                </a>
+                <a href="attendance.html" class="nav-link">
+                    <i class="fas fa-calendar-check"></i> <span data-i18n="attendance">Davomat</span>
+                </a>
+                <a href="reports.html" class="nav-link">
+                    <i class="fas fa-file-alt"></i> <span data-i18n="reports">Hisobotlar</span>
+                </a>
+                <a href="subjects.html" class="nav-link">
+                    <i class="fas fa-book"></i> <span data-i18n="subjects">Fanlar</span>
+                </a>
+                <a href="all.html" class="nav-link">
+                    <i class="fas fa-th-list"></i> <span data-i18n="all">Barchasi</span>
+                </a>
+                <a href="notifications.html" class="nav-link">
+                    <i class="fas fa-bell"></i> <span data-i18n="notifications">Bildirishnomalar</span>
+                    <span class="sidebar-badge" id="sidebarBadge" style="display:none;">0</span>
+                </a>
+                <a href="settings.html" class="nav-link">
+                    <i class="fas fa-cog"></i> <span data-i18n="settings">Sozlamalar</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <button id="logoutBtn" class="btn-logout">
+                    <i class="fas fa-sign-out-alt"></i> <span data-i18n="logout">Chiqish</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- SIDEBAR OVERLAY -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+            <header class="top-header">
+                <div class="header-left">
+                    <button id="menuToggle" class="menu-toggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div>
+                        <h2 id="pageTitle"><i class="fas fa-user-plus"></i> Yangi xodim</h2>
+                        <p class="text-muted"><i class="fas fa-users"></i> Yangi xodim qo'shish</p>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <button class="theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle theme">
+                        <i class="fas fa-moon moon-icon"></i>
+                        <i class="fas fa-sun sun-icon"></i>
+                    </button>
+                    <div class="user-profile">
+                        <div class="user-avatar"><span id="userInitial">A</span></div>
+                        <div class="user-info">
+                            <p class="user-name" id="userName"><i class="fas fa-user"></i> Xoijakbar Xasan</p>
+                            <p class="user-role text-muted"><i class="fas fa-user-shield"></i> Admin Customer</p>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <section class="form-container">
+                <form id="staffForm" class="app-form">
+                    <div class="form-group">
+                        <label><i class="fas fa-user"></i> F.I.SH <span style="color:var(--color-danger);">*</span></label>
+                        <div class="input-wrapper">
+                            <input type="text" id="fullName" placeholder="Aliyev Alisher Anvarovich" required />
+                            <i class="fas fa-check-circle input-icon success"></i>
+                            <i class="fas fa-exclamation-circle input-icon error"></i>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fas fa-briefcase"></i> Lavozimi <span style="color:var(--color-danger);">*</span></label>
+                        <div class="input-wrapper">
+                            <select id="position" required>
+                                <option value="">Lavozim tanlang...</option>
+                                <option value="tozalovchi">Tozalovchi</option>
+                                <option value="tamirlovchi">Tamirlovchi</option>
+                                <option value="haydovchi">Haydovchi</option>
+                                <option value="oshpaz">Oshpaz</option>
+                                <option value="farrosh">Farrosh</option>
+                                <option value="qorovul">Qorovul</option>
+                                <option value="ofitsiant">Ofitsiant</option>
+                                <option value="administrator">Administrator</option>
+                                <option value="buxgalter">Buxgalter</option>
+                                <option value="kotib">Kotib</option>
+                                <option value="menejer">Menejer</option>
+                                <option value="xodim">Xodim</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fas fa-phone"></i> Telefon</label>
+                        <div class="input-wrapper">
+                            <input type="text" id="phone" placeholder="+998 90 123 45 67" />
+                            <i class="fas fa-check-circle input-icon success"></i>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fas fa-money-bill"></i> Oylik maosh (so'm) <span style="color:var(--color-danger);">*</span></label>
+                        <div class="input-wrapper">
+                            <input type="number" id="salary" placeholder="2000000" required min="0" />
+                            <i class="fas fa-check-circle input-icon success"></i>
+                            <i class="fas fa-exclamation-circle input-icon error"></i>
+                        </div>
+                        <small class="input-help">
+                            <i class="fas fa-info-circle"></i> 
+                            Yillik: <span id="yearlySalaryDisplay">0</span> so'm | 
+                            Kunlik: <span id="dailySalaryDisplay">0</span> so'm
+                        </small>
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fas fa-circle"></i> Holati</label>
+                        <div class="input-wrapper">
+                            <select id="status">
+                                <option value="active">Faol</option>
+                                <option value="inactive">Faol emas</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" id="submitBtn" class="btn-primary"><i class="fas fa-save"></i> Saqlash</button>
+                        <a href="staff.html" class="btn-secondary">Bekor qilish</a>
+                    </div>
+                </form>
+
+                <div id="formMessage" class="form-message"></div>
+            </section>
+        </main>
+    </div>
+
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme" style="display:none;">
+        <i class="fas fa-moon moon"></i>
+        <i class="fas fa-sun sun"></i>
+    </button>
+
+    <script>
+        window.__API_BASE_URL__ = 'https://admin-customerr.onrender.com';
+    </script>
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/theme.js"></script>
+    <script src="js/i18n.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/staff-add.js"></script>
+</body>
+</html>
