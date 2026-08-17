@@ -509,7 +509,7 @@ function renderStats(stats) {
 }
 
 // ============================================================
-// ⭐ DOUGHNUT CHART - 3 KATEGORIYA (YANGILANGAN RANGLAR)
+// ⭐ DOUGHNUT CHART - 3 KATEGORIYA (RANGLAR TO'G'RI)
 // ============================================================
 function createDashboardChart(stats) {
     const ctx = document.getElementById('dashboardChart');
@@ -538,7 +538,7 @@ function createDashboardChart(stats) {
         studentCount
     ];
 
-    // ⭐ RASMDAGI RANGLAR: Ko'k, Yashil, To'q sariq
+    // ⭐ RASMDAGI RANGLAR - TO'G'RI
     const colors = [
         '#007aff',   // Ko'k (Xodimlar)
         '#34c759',   // Yashil (O'qituvchilar)
@@ -595,3 +595,20 @@ function createDashboardChart(stats) {
     console.log('✅ Doughnut chart yaratildi (3 kategoriya)');
     console.log('📊 Xodimlar:', totalStaff, 'O\'qituvchilar:', teacherCount, 'O\'quvchilar:', studentCount);
 }
+
+// ============================================================
+// CLEANUP
+// ============================================================
+window.addEventListener('beforeunload', function() {
+    if (refreshInterval) clearInterval(refreshInterval);
+    if (notificationCheckInterval) clearInterval(notificationCheckInterval);
+    if (profileCheckInterval) clearInterval(profileCheckInterval);
+    if (subscriptionUpdateInterval) clearInterval(subscriptionUpdateInterval);
+    if (dashboardChart) {
+        dashboardChart.destroy();
+        dashboardChart = null;
+    }
+    cachedStats = null;
+});
+
+console.log('✅ dashboard.js yuklandi (Doughnut Chart - 3 kategoriya)');
