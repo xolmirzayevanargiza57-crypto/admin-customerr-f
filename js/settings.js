@@ -1,8 +1,10 @@
 // ============================================================
-// SETTINGS - SOZLAMALAR (TO'LIQ TUZATILGAN)
+// SETTINGS - SOZLAMALAR (TO'LIQ)
 // Loyiha: Admin-Customer Frontend
 // Fayl: js/settings.js
 // ============================================================
+
+let deleteAccountInProgress = false;
 
 document.addEventListener('DOMContentLoaded', async () => {
     const token = localStorage.getItem('customerToken') || sessionStorage.getItem('customerToken');
@@ -28,24 +30,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('settingsPhone').value = user.phone || '';
         document.getElementById('settingsSchool').value = user.schoolName || '';
         
-        // ⭐ PROFIL DISPLAY
         document.getElementById('profileNameDisplay').textContent = user.fullName || '-';
         document.getElementById('profileEmailDisplay').textContent = user.email || '-';
         document.getElementById('profilePhoneDisplay').textContent = user.phone || '-';
     }
 
-    // ⭐ LANGUAGE SELECTOR - BU MUHIM!
+    // ⭐ LANGUAGE SELECTOR
     const languageContainer = document.getElementById('languageSelector');
     if (languageContainer && typeof I18N !== 'undefined') {
-        // Eski elementlarni tozalash
         languageContainer.innerHTML = '';
-        // Yangi selector yaratish
         const selector = I18N.createLanguageSelector();
         languageContainer.appendChild(selector);
         I18N.updateUI();
         console.log('✅ Language selector yaratildi');
-    } else {
-        console.warn('⚠️ Language selector topilmadi yoki I18N mavjud emas');
     }
 
     setupListeners();
@@ -63,7 +60,6 @@ function setupListeners() {
     // ⭐ PROFIL SAQLASH
     const saveBtn = document.getElementById('saveProfileBtn');
     if (saveBtn) {
-        // Eski eventlarni tozalash
         const newBtn = saveBtn.cloneNode(true);
         saveBtn.parentNode.replaceChild(newBtn, saveBtn);
         newBtn.addEventListener('click', saveProfile);
@@ -94,7 +90,6 @@ function setupListeners() {
         btn.addEventListener('click', function() {
             const theme = this.dataset.theme;
             if (theme) {
-                // Theme ni qo'llash
                 const html = document.documentElement;
                 if (theme === 'auto') {
                     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -103,11 +98,8 @@ function setupListeners() {
                     html.setAttribute('data-theme', theme);
                 }
                 localStorage.setItem('theme', theme);
-                
-                // Theme UI yangilash
                 updateThemeUI();
                 
-                // Serverga saqlash
                 const token = localStorage.getItem('customerToken') || sessionStorage.getItem('customerToken');
                 if (token) {
                     fetch(window.__API_BASE_URL__ + '/api/auth/theme', {
@@ -179,7 +171,6 @@ async function saveProfile(e) {
                 sessionStorage.setItem('customerUser', JSON.stringify(user));
             }
             
-            // UI yangilash
             document.getElementById('userName').textContent = fullName;
             document.getElementById('userInitial').textContent = fullName.charAt(0).toUpperCase();
             document.getElementById('profileNameDisplay').textContent = fullName;
@@ -187,7 +178,6 @@ async function saveProfile(e) {
             
             showProfileMessage('✅ Profil muvaffaqiyatli yangilandi!', 'success');
             
-            // Boshqa qurilmalarga xabar
             document.dispatchEvent(new CustomEvent('profileUpdated', { 
                 detail: { user: user } 
             }));
@@ -220,18 +210,109 @@ function showProfileMessage(msg, type) {
 }
 
 // ============================================================
-// ⭐ HISOBNI O'CHIRISH
+// ⭐ HISOBNI O'CHIRISH (TO'LIQ)
 // ============================================================
-function deleteAccount() {
-    if (confirm('Haqiqatan ham hisobingizni o\'chirmoqchimisiz?')) {
-        if (confirm('Bu amal qaytarib bo\'lmaydi! Davom etmoqchimisiz?')) {
-            alert('Bu funksiya hali ishlab chiqilmoqda.');
+async function deleteAccount() {
+    // ⭐ 1. Agar o'chirish jarayoni davom etayotgan bo'lsa
+    if (deleteAccountInProgress) {
+        return;
+    }
+
+    // ⭐ 2. TASDIQLASH
+    if (!confirm('⚠️ Haqiqatan ham hisobingizni o\'chirmoqchimisiz?')) {
+        return;
+    }
+
+    if (!confirm('⛔ Bu amal qaytarib bo\'lmaydi! Barcha ma\'lumotlaringiz o\'chib ketadi. Davom etmoqchimisiz?')) {
+        return;
+    }
+
+    // ⭐ 3. PAROLNI SO'RASH (xavfsizlik)
+    const password = prompt('🔐 Xavfsizlik uchun parolingizni kiriting:');
+    if (password === null) {
+        return;
+    }
+
+    if (!password || password.trim() === '') {
+        showDeleteMessage('❌ Parol kiritilmadi!', 'error');
+        return;
+    }
+
+    // ⭐ 4. JARAYONNI BOSHLASH
+    deleteAccountInProgress = true;
+    const btn = document.getElementById('deleteAccountBtn');
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> O\'chirilmoqda...';
+    }
+
+    try {
+        // ⭐ 4.1. Parolni tekshirish
+        const checkResult = await API.post('/api/auth/check-password', { password });
+        
+        if (!checkResult.success) {
+            showDeleteMessage('❌ Parol noto\'g\'ri!', 'error');
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-trash"></i> ' + (I18N.t('delete_account') || 'Hisobni o\'chirish');
+            }
+            deleteAccountInProgress = false;
+            return;
         }
+
+        // ⭐ 4.2. Hisobni o'chirish
+        const result = await API.delete('/api/auth/delete-account');
+
+        if (result.success) {
+            showDeleteMessage('✅ Hisobingiz muvaffaqiyatli o\'chirildi!', 'success');
+            
+            // ⭐ 4.3. Logout qilish
+            setTimeout(() => {
+                Auth.logout();
+            }, 2000);
+        } else {
+            showDeleteMessage('❌ Xatolik: ' + (result.message || 'Noma\'lum xatolik'), 'error');
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-trash"></i> ' + (I18N.t('delete_account') || 'Hisobni o\'chirish');
+            }
+            deleteAccountInProgress = false;
+        }
+    } catch (error) {
+        console.error('❌ Hisob o\'chirish xatosi:', error);
+        showDeleteMessage('❌ Server xatosi! Qayta urinib ko\'ring.', 'error');
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-trash"></i> ' + (I18N.t('delete_account') || 'Hisobni o\'chirish');
+        }
+        deleteAccountInProgress = false;
     }
 }
 
 // ============================================================
-// ⭐ PROFIL MA'LUMOTLARINI YUKLASH
+// ⭐ DELETE MESSAGE
+// ============================================================
+function showDeleteMessage(msg, type) {
+    const div = document.getElementById('deleteMessage');
+    if (!div) {
+        // Toast ko'rsatish
+        if (type === 'success') {
+            showSuccess(msg);
+        } else {
+            showError(msg);
+        }
+        return;
+    }
+    div.textContent = msg;
+    div.className = 'form-message ' + type;
+    div.style.display = 'block';
+    setTimeout(() => {
+        div.style.display = 'none';
+    }, 5000);
+}
+
+// ============================================================
+// ⭐ LOAD SETTINGS
 // ============================================================
 function loadSettings() {
     try {
@@ -254,7 +335,7 @@ function loadSettings() {
         document.getElementById('userName').textContent = user.fullName || 'Admin';
         document.getElementById('userInitial').textContent = (user.fullName || 'A').charAt(0).toUpperCase();
         
-        // ⭐ TIL SELECTOR NI YANGILASH
+        // Language selector
         const languageContainer = document.getElementById('languageSelector');
         if (languageContainer && typeof I18N !== 'undefined') {
             languageContainer.innerHTML = '';
@@ -263,7 +344,6 @@ function loadSettings() {
             I18N.updateUI();
         }
         
-        // ⭐ THEME UI YANGILASH
         updateThemeUI();
         
         console.log('✅ Settings yuklandi');
@@ -272,4 +352,47 @@ function loadSettings() {
     }
 }
 
-console.log('✅ settings.js yuklandi');
+// ============================================================
+// ⭐ TOAST FUNKSIYALARI
+// ============================================================
+function showError(msg) {
+    const div = document.createElement('div');
+    div.style.cssText = `
+        position: fixed; top: 20px; right: 20px; z-index: 99999;
+        padding: 14px 18px; background: #fef2f2;
+        border: 1px solid #fecaca; border-radius: 10px;
+        color: #dc2626; max-width: 400px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        display: flex; align-items: center; gap: 10px;
+        font-size: 0.85rem;
+    `;
+    div.innerHTML = `
+        <i class="fas fa-exclamation-circle"></i>
+        <span>${msg}</span>
+        <button onclick="this.parentElement.remove()" style="margin-left: auto; background: none; border: none; color: #dc2626; cursor: pointer; font-size: 1.1rem;">×</button>
+    `;
+    document.body.appendChild(div);
+    setTimeout(() => div.remove(), 5000);
+}
+
+function showSuccess(msg) {
+    const div = document.createElement('div');
+    div.style.cssText = `
+        position: fixed; top: 20px; right: 20px; z-index: 99999;
+        padding: 14px 18px; background: #ecfdf5;
+        border: 1px solid #a7f3d0; border-radius: 10px;
+        color: #065f46; max-width: 400px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        display: flex; align-items: center; gap: 10px;
+        font-size: 0.85rem;
+    `;
+    div.innerHTML = `
+        <i class="fas fa-check-circle"></i>
+        <span>${msg}</span>
+        <button onclick="this.parentElement.remove()" style="margin-left: auto; background: none; border: none; color: #065f46; cursor: pointer; font-size: 1.1rem;">×</button>
+    `;
+    document.body.appendChild(div);
+    setTimeout(() => div.remove(), 3000);
+}
+
+console.log('✅ settings.js yuklandi (Hisob o\'chirish bilan)');
