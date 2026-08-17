@@ -504,7 +504,7 @@ function renderStats(stats) {
     // ⭐ Subscription yangilash
     updateSubscriptionCountdown();
 
-    // ⭐ DOUGHNUT CHART yaratish - FAQAT 3 KATEGORIYA
+    // ⭐ DOUGHNUT CHART - 3 KATEGORIYA
     createDashboardChart(stats);
 }
 
@@ -533,9 +533,9 @@ function createDashboardChart(stats) {
     ];
 
     const dataValues = [
-        totalStaff,      // Jami xodimlar
-        teacherCount,    // Jami o'qituvchilar
-        studentCount     // Jami o'quvchilar
+        totalStaff,
+        teacherCount,
+        studentCount
     ];
 
     // ⭐ RASMDAGI RANGLAR: Ko'k, Yashil, Binafsha
