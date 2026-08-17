@@ -15,10 +15,12 @@
     <link rel="stylesheet" href="css/modal.css" />
     <link rel="stylesheet" href="css/theme.css" />
     <link rel="stylesheet" href="css/responsive.css" />
+    <!-- ⭐ SETTINGS CSS -->
+    <link rel="stylesheet" href="css/settings.css" />
 
     <style>
         /* ============================================================
-           SETTINGS STYLES
+           SETTINGS BASE STYLES
            ============================================================ */
         .settings-container {
             padding: 16px 24px 24px 24px;
@@ -623,7 +625,7 @@
             <!-- SETTINGS CONTENT -->
             <section class="settings-container">
 
-                <!-- ⭐ PROFIL -->
+                <!-- ⭐ 1. PROFIL -->
                 <div class="settings-card">
                     <h3><i class="fas fa-user"></i> <span data-i18n="profile">Profil</span></h3>
 
@@ -672,7 +674,7 @@
                     <div id="profileMessage" class="form-message"></div>
                 </div>
 
-                <!-- ⭐ TASHQI KO'RINISH -->
+                <!-- ⭐ 2. TASHQI KO'RINISH -->
                 <div class="settings-card">
                     <h3><i class="fas fa-palette"></i> <span data-i18n="appearance">Tashqi ko'rinish</span></h3>
                     <div class="theme-options">
@@ -695,20 +697,74 @@
                     </p>
                 </div>
 
-                <!-- ⭐ TIL -->
+                <!-- ⭐ 3. TIL -->
                 <div class="settings-card">
                     <h3><i class="fas fa-globe"></i> <span data-i18n="language">Til</span></h3>
                     <div id="languageSelector"></div>
                 </div>
 
-                <!-- ⭐ XAVFLI HUDUD (HISOBNI O'CHIRISH) -->
+                <!-- ⭐ 4. QURILMALAR (YANGI - Danger zone tepasida) -->
+                <div class="settings-card">
+                    <h3><i class="fas fa-devices"></i> <span data-i18n="devices">Qurilmalar</span></h3>
+                    <p class="text-muted" style="font-size: 0.8rem; margin-bottom: 16px;">
+                        <i class="fas fa-info-circle"></i> Sizning hisobingizga ulangan qurilmalar
+                    </p>
+
+                    <!-- Joriy qurilma -->
+                    <div id="currentDevice" class="device-card current">
+                        <div class="device-header">
+                            <div class="device-icon"><i class="fas fa-mobile-alt"></i></div>
+                            <div class="device-info">
+                                <div class="device-name">
+                                    <span id="currentDeviceName">Bu qurilma</span>
+                                    <span class="badge-current">🔵 Joriy</span>
+                                </div>
+                                <div class="device-details">
+                                    <span class="device-app" id="currentDeviceApp">Admin Customer v1.0</span>
+                                    <span class="device-location" id="currentDeviceLocation">📍 Toshkent, O'zbekiston</span>
+                                </div>
+                            </div>
+                            <div class="device-actions">
+                                <button class="btn-rename" onclick="renameDevice('current')">
+                                    <i class="fas fa-pen"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="device-footer">
+                            <span class="device-time"><i class="far fa-clock"></i> <span id="currentDeviceTime">Hozir faol</span></span>
+                            <span class="device-ip"><i class="fas fa-network-wired"></i> <span id="currentDeviceIp">192.168.1.1</span></span>
+                            <span class="device-mac"><i class="fas fa-code"></i> <span id="currentDeviceMac">XX:XX:XX:XX:XX:XX</span></span>
+                        </div>
+                    </div>
+
+                    <!-- Boshqa qurilmalar -->
+                    <div id="otherDevices">
+                        <div class="device-divider">
+                            <span>Boshqa qurilmalar</span>
+                            <button class="btn-terminate-all" onclick="terminateAllSessions()">
+                                <i class="fas fa-power-off"></i> Barchasini tugatish
+                            </button>
+                        </div>
+                        <div id="devicesList">
+                            <div class="text-muted" style="text-align:center; padding:20px 0;" data-i18n="loading">
+                                <i class="fas fa-spinner fa-spin"></i> Yuklanmoqda...
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="device-footer-note">
+                        <i class="fas fa-info-circle"></i> 
+                        <span data-i18n="device_info">Rasmiy ilova barcha qurilmalarda mavjud: Android, iPhone, iPad, Windows, macOS va Linux.</span>
+                    </div>
+                </div>
+
+                <!-- ⭐ 5. XAVFLI HUDUD (Danger zone) -->
                 <div class="settings-card danger">
                     <h3><i class="fas fa-exclamation-triangle"></i> <span data-i18n="danger_zone">Xavfli hudud</span></h3>
                     <p data-i18n="delete_account_warning">Hisobingizni o'chirishni xohlaysizmi? Bu amal qaytarib bo'lmaydi!</p>
-                    
-                    <!-- ⭐ DELETE MESSAGE -->
+
                     <div id="deleteMessage" class="form-message"></div>
-                    
+
                     <div class="settings-actions">
                         <button id="settingsLogout" class="btn-secondary">
                             <i class="fas fa-sign-out-alt"></i> <span data-i18n="logout">Chiqish</span>
