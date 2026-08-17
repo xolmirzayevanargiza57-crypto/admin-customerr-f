@@ -1,5 +1,5 @@
 // ============================================================
-// I18N - TIL (UZ, RU, EN) - TO'LIQ TUZATILGAN
+// I18N - TIL (UZ, RU, EN) - BAYROQLAR BILAN
 // ============================================================
 
 const I18N = {
@@ -10,7 +10,8 @@ const I18N = {
     languages: {
         uz: {
             name: "O'zbek",
-            flag: "🇺🇿",
+            flag: "🇺🇿",  // ⭐ Unicode flag
+            flagSvg: '<svg width="24" height="16" viewBox="0 0 24 16"><rect width="24" height="16" fill="#1eb53a"/><rect y="4" width="24" height="4" fill="#0099b5"/><rect y="12" width="24" height="4" fill="#1eb53a"/><circle cx="8" cy="8" r="3" fill="#ffffff"/><circle cx="8" cy="8" r="2" fill="#0099b5"/></svg>',
             translations: {
                 login: "Tizimga kiring",
                 email: "Email",
@@ -36,72 +37,14 @@ const I18N = {
                 all: "Barchasi",
                 attendance: "Davomat",
                 profile: "Profil",
-                total_teachers: "Jami O'qituvchilar",
-                total_students: "Jami O'quvchilar",
-                total_xp: "Jami XP",
-                today_attendance: "Bugungi davomat",
-                present: "Keldi",
-                absent: "Kelmadi",
-                absent_reason: "Sababli",
-                status: "Holati",
-                type: "Turi",
-                end_date: "Tugash vaqti",
-                days_left: "Qolgan kun",
-                active: "Faol",
-                inactive: "Faol emas",
-                expired: "Muddati tugagan",
-                monthly: "Oylik",
-                sixmonths: "6 oylik",
-                yearly: "Yillik",
-                none: "Yo'q",
-                school_name: "O'quv markazi nomi",
-                add_teacher: "Yangi qo'shish",
-                edit: "Tahrirlash",
-                delete: "O'chirish",
-                save: "Saqlash",
-                cancel: "Bekor qilish",
-                actions: "Amallar",
-                search: "Qidirish...",
-                no_data: "Ma'lumot yo'q",
-                full_name: "To'liq ism",
-                phone: "Telefon",
-                view: "Ko'rish",
-                teacher_profile: "O'qituvchi profili",
-                add_student: "Yangi qo'shish",
-                student_profile: "O'quvchi profili",
-                select_teacher: "O'qituvchi tanlang",
-                add_payment: "Yangi qo'shish",
-                payment_amount: "Summa",
-                payment_month: "Oy",
-                payment_status: "Holati",
-                paid: "To'langan",
-                pending: "Kutilmoqda",
-                unpaid: "To'lanmagan",
-                student_fee: "O'quvchi to'lovi",
-                teacher_salary: "O'qituvchi maoshi",
-                blocked: "Bloklangan",
-                add_subject: "Yangi qo'shish",
-                subject_name: "Fan nomi",
-                price: "Narxi",
-                teacher: "O'qituvchi",
-                back: "Orqaga",
-                reports_title: "Hisobotlar",
-                total: "Jami",
-                average: "O'rtacha",
-                settings_title: "Sozlamalar",
-                appearance: "Tashqi ko'rinish",
-                light: "Yorug'",
-                dark: "Qorong'u",
-                auto: "Avto",
-                language: "Til",
-                danger_zone: "Xavfli hudud",
-                delete_account_warning: "Hisobingizni o'chirishni xohlaysizmi? Bu amal qaytarib bo'lmaydi!",
-                delete_account: "Hisobni o'chirish"
+                staff: "Xodimlar",
+                notifications: "Bildirishnomalar"
             }
         },
         ru: {
             name: "Русский",
             flag: "🇷🇺",
+            flagSvg: '<svg width="24" height="16" viewBox="0 0 24 16"><rect width="24" height="16" fill="#ffffff"/><rect y="5.33" width="24" height="5.34" fill="#0039a6"/><rect y="10.67" width="24" height="5.33" fill="#d52b1e"/></svg>',
             translations: {
                 login: "Войти в систему",
                 email: "Электронная почта",
@@ -127,72 +70,14 @@ const I18N = {
                 all: "Все",
                 attendance: "Посещаемость",
                 profile: "Профиль",
-                total_teachers: "Всего учителей",
-                total_students: "Всего учеников",
-                total_xp: "Всего XP",
-                today_attendance: "Посещаемость сегодня",
-                present: "Пришел",
-                absent: "Не пришел",
-                absent_reason: "По причине",
-                status: "Статус",
-                type: "Тип",
-                end_date: "Дата окончания",
-                days_left: "Осталось дней",
-                active: "Активный",
-                inactive: "Неактивный",
-                expired: "Истек",
-                monthly: "Ежемесячный",
-                sixmonths: "6 месяцев",
-                yearly: "Годовой",
-                none: "Нет",
-                school_name: "Название учебного центра",
-                add_teacher: "Добавить",
-                edit: "Редактировать",
-                delete: "Удалить",
-                save: "Сохранить",
-                cancel: "Отмена",
-                actions: "Действия",
-                search: "Поиск...",
-                no_data: "Нет данных",
-                full_name: "Полное имя",
-                phone: "Телефон",
-                view: "Просмотр",
-                teacher_profile: "Профиль учителя",
-                add_student: "Добавить",
-                student_profile: "Профиль ученика",
-                select_teacher: "Выберите учителя",
-                add_payment: "Добавить",
-                payment_amount: "Сумма",
-                payment_month: "Месяц",
-                payment_status: "Статус",
-                paid: "Оплачен",
-                pending: "В ожидании",
-                unpaid: "Не оплачен",
-                student_fee: "Плата ученика",
-                teacher_salary: "Зарплата учителя",
-                blocked: "Заблокирован",
-                add_subject: "Добавить",
-                subject_name: "Название предмета",
-                price: "Цена",
-                teacher: "Учитель",
-                back: "Назад",
-                reports_title: "Отчеты",
-                total: "Всего",
-                average: "Среднее",
-                settings_title: "Настройки",
-                appearance: "Внешний вид",
-                light: "Светлая",
-                dark: "Темная",
-                auto: "Авто",
-                language: "Язык",
-                danger_zone: "Опасная зона",
-                delete_account_warning: "Вы уверены, что хотите удалить аккаунт? Это действие необратимо!",
-                delete_account: "Удалить аккаунт"
+                staff: "Сотрудники",
+                notifications: "Уведомления"
             }
         },
         en: {
             name: "English",
             flag: "🇬🇧",
+            flagSvg: '<svg width="24" height="16" viewBox="0 0 24 16"><rect width="24" height="16" fill="#012169"/><path d="M0 0l24 16M24 0L0 16" stroke="#ffffff" stroke-width="3.2"/><path d="M0 0l24 16M24 0L0 16" stroke="#c8102e" stroke-width="1.6"/><path d="M12 0v16M0 8h24" stroke="#ffffff" stroke-width="3.2"/><path d="M12 0v16M0 8h24" stroke="#c8102e" stroke-width="1.6"/></svg>',
             translations: {
                 login: "Login to system",
                 email: "Email",
@@ -218,67 +103,8 @@ const I18N = {
                 all: "All",
                 attendance: "Attendance",
                 profile: "Profile",
-                total_teachers: "Total Teachers",
-                total_students: "Total Students",
-                total_xp: "Total XP",
-                today_attendance: "Today's Attendance",
-                present: "Present",
-                absent: "Absent",
-                absent_reason: "Absent with reason",
-                status: "Status",
-                type: "Type",
-                end_date: "End Date",
-                days_left: "Days Left",
-                active: "Active",
-                inactive: "Inactive",
-                expired: "Expired",
-                monthly: "Monthly",
-                sixmonths: "6 Months",
-                yearly: "Yearly",
-                none: "None",
-                school_name: "School Name",
-                add_teacher: "Add",
-                edit: "Edit",
-                delete: "Delete",
-                save: "Save",
-                cancel: "Cancel",
-                actions: "Actions",
-                search: "Search...",
-                no_data: "No data",
-                full_name: "Full Name",
-                phone: "Phone",
-                view: "View",
-                teacher_profile: "Teacher Profile",
-                add_student: "Add",
-                student_profile: "Student Profile",
-                select_teacher: "Select Teacher",
-                add_payment: "Add",
-                payment_amount: "Amount",
-                payment_month: "Month",
-                payment_status: "Status",
-                paid: "Paid",
-                pending: "Pending",
-                unpaid: "Unpaid",
-                student_fee: "Student Fee",
-                teacher_salary: "Teacher Salary",
-                blocked: "Blocked",
-                add_subject: "Add",
-                subject_name: "Subject Name",
-                price: "Price",
-                teacher: "Teacher",
-                back: "Back",
-                reports_title: "Reports",
-                total: "Total",
-                average: "Average",
-                settings_title: "Settings",
-                appearance: "Appearance",
-                light: "Light",
-                dark: "Dark",
-                auto: "Auto",
-                language: "Language",
-                danger_zone: "Danger Zone",
-                delete_account_warning: "Are you sure you want to delete your account? This action cannot be undone!",
-                delete_account: "Delete Account"
+                staff: "Staff",
+                notifications: "Notifications"
             }
         }
     },
@@ -331,9 +157,25 @@ const I18N = {
                     option.textContent = translation;
                 }
             });
+            
+            // ⭐ BAYROQLARNI YANGILASH
             document.querySelectorAll('.lang-option').forEach(el => {
-                el.classList.toggle('active', el.dataset.lang === this.currentLanguage);
+                const lang = el.dataset.lang;
+                const langData = this.languages[lang];
+                if (langData) {
+                    // ⭐ SVG bayroqni ko'rsatish
+                    const flagContainer = el.querySelector('.flag-container');
+                    if (flagContainer) {
+                        flagContainer.innerHTML = langData.flagSvg || langData.flag;
+                    }
+                    const nameSpan = el.querySelector('.lang-name');
+                    if (nameSpan) {
+                        nameSpan.textContent = langData.name;
+                    }
+                }
+                el.classList.toggle('active', lang === this.currentLanguage);
             });
+            
             document.documentElement.lang = this.currentLanguage;
         });
     },
@@ -368,29 +210,129 @@ const I18N = {
         }
     },
 
+    // ⭐ CHIROYLI BAYROQLAR BILAN SELECTOR YARATISH
     createLanguageSelector() {
         const container = document.createElement('div');
         container.className = 'language-selector';
+        
         Object.keys(this.languages).forEach(lang => {
             const btn = document.createElement('button');
             btn.type = 'button';
             btn.className = `lang-option ${lang === this.currentLanguage ? 'active' : ''}`;
             btn.dataset.lang = lang;
-            btn.innerHTML = `${this.languages[lang].flag} ${this.languages[lang].name}`;
+            
+            const langData = this.languages[lang];
+            
+            btn.innerHTML = `
+                <span class="flag-container">${langData.flagSvg || langData.flag}</span>
+                <span class="lang-name">${langData.name}</span>
+            `;
+            
             btn.addEventListener('click', (event) => {
                 event.preventDefault();
                 event.stopPropagation();
                 this.setLanguage(lang);
             });
+            
             container.appendChild(btn);
         });
+        
         return container;
     }
 };
+
+// ⭐ BAYROQ STILLARI
+const style = document.createElement('style');
+style.textContent = `
+    .language-selector {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        padding: 4px 0;
+    }
+    
+    .lang-option {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border: 2px solid var(--border-color);
+        border-radius: 10px;
+        background: var(--bg-card);
+        color: var(--text-primary);
+        cursor: pointer;
+        font-size: 0.85rem;
+        transition: all 0.3s ease;
+        font-weight: 500;
+    }
+    
+    .lang-option .flag-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 20px;
+        border-radius: 4px;
+        overflow: hidden;
+        flex-shrink: 0;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    }
+    
+    .lang-option .flag-container svg {
+        width: 100%;
+        height: 100%;
+        display: block;
+    }
+    
+    .lang-option .flag-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .lang-option .lang-name {
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+    
+    .lang-option:hover {
+        border-color: var(--text-muted);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    
+    .lang-option.active {
+        border-color: var(--text-primary);
+        background: var(--bg-active);
+        font-weight: 600;
+    }
+    
+    [data-theme="dark"] .lang-option.active {
+        background: var(--bg-active);
+        border-color: var(--text-primary);
+    }
+    
+    [data-theme="dark"] .lang-option:hover {
+        box-shadow: 0 4px 12px rgba(255,255,255,0.05);
+    }
+    
+    @media (max-width: 480px) {
+        .lang-option {
+            padding: 6px 12px;
+            font-size: 0.75rem;
+        }
+        
+        .lang-option .flag-container {
+            width: 24px;
+            height: 16px;
+        }
+    }
+`;
+document.head.appendChild(style);
 
 document.addEventListener('DOMContentLoaded', async () => {
     await I18N.loadLanguageFromServer();
     I18N.updateUI();
 });
 
-console.log('✅ i18n.js yuklandi');
+console.log('✅ i18n.js yuklandi (Bayroqlar bilan)');
