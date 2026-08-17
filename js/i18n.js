@@ -10,17 +10,27 @@ const I18N = {
     languages: {
         uz: {
             name: "O'zbek",
-            flagSvg: `<svg width="24" height="16" viewBox="0 0 24 16">
-                        <rect width="24" height="16" fill="#1eb53a"/>
-                        <rect y="5.33" width="24" height="5.34" fill="#0099b5"/>
-                        <rect y="10.67" width="24" height="5.33" fill="#1eb53a"/>
-                        <circle cx="8" cy="8" r="3" fill="#ffffff"/>
-                        <circle cx="8" cy="8" r="2" fill="#0099b5"/>
-                        <circle cx="8" cy="5.5" r="0.6" fill="#ffffff"/>
-                        <circle cx="5.5" cy="8" r="0.6" fill="#ffffff"/>
-                        <circle cx="10.5" cy="8" r="0.6" fill="#ffffff"/>
-                        <circle cx="8" cy="10.5" r="0.6" fill="#ffffff"/>
-                    </svg>`,
+            flagSvg: `<svg width="24" height="16" viewBox="0 0 24 16" xmlns="http://www.w3.org/2000/svg">
+  <rect width="24" height="5.33" fill="#0099B5"/>
+  <rect y="5.33" width="24" height="5.34" fill="#ffffff"/>
+  <rect y="10.67" width="24" height="5.33" fill="#1EB53A"/>
+  <rect y="4.93" width="24" height="0.8" fill="#CE1126"/>
+  <rect y="10.27" width="24" height="0.8" fill="#CE1126"/>
+  <circle cx="4.5" cy="2.67" r="2" fill="#ffffff"/>
+  <circle cx="5.3" cy="2.67" r="1.7" fill="#0099B5"/>
+  <circle cx="8"   cy="1.2" r="0.4" fill="#ffffff"/>
+  <circle cx="9.2" cy="1.8" r="0.4" fill="#ffffff"/>
+  <circle cx="9.6" cy="3"   r="0.4" fill="#ffffff"/>
+  <circle cx="9"   cy="4.1" r="0.4" fill="#ffffff"/>
+  <circle cx="7.8" cy="4.5" r="0.4" fill="#ffffff"/>
+  <circle cx="6.9" cy="3.8" r="0.4" fill="#ffffff"/>
+  <circle cx="7.1" cy="2.5" r="0.4" fill="#ffffff"/>
+  <circle cx="8.2" cy="2"   r="0.4" fill="#ffffff"/>
+  <circle cx="8.8" cy="2.8" r="0.4" fill="#ffffff"/>
+  <circle cx="8.4" cy="3.8" r="0.4" fill="#ffffff"/>
+  <circle cx="7.4" cy="4.1" r="0.4" fill="#ffffff"/>
+  <circle cx="7"   cy="3.1" r="0.4" fill="#ffffff"/>
+</svg>`,
             translations: {
                 login: "Tizimga kiring",
                 email: "Email",
@@ -145,11 +155,11 @@ const I18N = {
         },
         ru: {
             name: "Русский",
-            flagSvg: `<svg width="24" height="16" viewBox="0 0 24 16">
-                        <rect width="24" height="16" fill="#ffffff"/>
-                        <rect y="5.33" width="24" height="5.34" fill="#0039a6"/>
-                        <rect y="10.67" width="24" height="5.33" fill="#d52b1e"/>
-                    </svg>`,
+            flagSvg: `<svg width="24" height="16" viewBox="0 0 24 16" xmlns="http://www.w3.org/2000/svg">
+  <rect width="24" height="16" fill="#ffffff"/>
+  <rect y="5.33" width="24" height="5.34" fill="#0039a6"/>
+  <rect y="10.67" width="24" height="5.33" fill="#d52b1e"/>
+</svg>`,
             translations: {
                 login: "Войти в систему",
                 email: "Электронная почта",
@@ -274,13 +284,13 @@ const I18N = {
         },
         en: {
             name: "English",
-            flagSvg: `<svg width="24" height="16" viewBox="0 0 24 16">
-                        <rect width="24" height="16" fill="#012169"/>
-                        <path d="M0 0l24 16M24 0L0 16" stroke="#ffffff" stroke-width="3.2"/>
-                        <path d="M0 0l24 16M24 0L0 16" stroke="#c8102e" stroke-width="1.6"/>
-                        <path d="M12 0v16M0 8h24" stroke="#ffffff" stroke-width="3.2"/>
-                        <path d="M12 0v16M0 8h24" stroke="#c8102e" stroke-width="1.6"/>
-                    </svg>`,
+            flagSvg: `<svg width="24" height="16" viewBox="0 0 24 16" xmlns="http://www.w3.org/2000/svg">
+  <rect width="24" height="16" fill="#012169"/>
+  <path d="M0 0l24 16M24 0L0 16" stroke="#ffffff" stroke-width="3.2"/>
+  <path d="M0 0l24 16M24 0L0 16" stroke="#c8102e" stroke-width="1.6"/>
+  <path d="M12 0v16M0 8h24" stroke="#ffffff" stroke-width="3.2"/>
+  <path d="M12 0v16M0 8h24" stroke="#c8102e" stroke-width="1.6"/>
+</svg>`,
             translations: {
                 login: "Login to system",
                 email: "Email",
@@ -428,15 +438,12 @@ const I18N = {
         localStorage.setItem('admin-language', lang);
         this._cache = {};
         
-        // UI ni yangilash
         this.updateUI();
         
-        // Event yuborish
         document.dispatchEvent(new CustomEvent('i18n:language-changed', { 
             detail: { language: lang } 
         }));
         
-        // Serverga saqlash
         this.saveLanguageToServer(lang);
         
         setTimeout(() => {
@@ -445,9 +452,7 @@ const I18N = {
     },
 
     updateUI() {
-        // Silliq UI yangilash
         requestAnimationFrame(() => {
-            // data-i18n atributlari
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.dataset.i18n;
                 const translation = this.t(key);
@@ -456,7 +461,6 @@ const I18N = {
                 }
             });
 
-            // Placeholderlar
             document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
                 const key = el.dataset.i18nPlaceholder;
                 const translation = this.t(key);
@@ -465,7 +469,6 @@ const I18N = {
                 }
             });
 
-            // Select optionlar
             document.querySelectorAll('select option').forEach(option => {
                 const key = option.dataset.i18n || option.value;
                 const translation = this.t(key);
@@ -474,7 +477,6 @@ const I18N = {
                 }
             });
 
-            // Language selector
             document.querySelectorAll('.lang-option').forEach(el => {
                 const lang = el.dataset.lang;
                 const langData = this.languages[lang];
@@ -650,7 +652,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     await I18N.loadLanguageFromServer();
     I18N.updateUI();
     
-    // ⭐ Language selector mavjudligini tekshirish
     const container = document.getElementById('languageSelector');
     if (container && container.children.length === 0) {
         const selector = I18N.createLanguageSelector();
