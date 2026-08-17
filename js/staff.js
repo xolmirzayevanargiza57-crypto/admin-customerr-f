@@ -19,171 +19,6 @@ function formatMoney(amount) {
 }
 
 // ============================================================
-// SAHIFA YUKLANGANDA
-// ============================================================
-document.addEventListener('DOMContentLoaded', function() {
-    const token = localStorage.getItem('customerToken') || sessionStorage.getItem('customerToken');
-    if (!token) {
-        window.location.href = 'index.html';
-        return;
-    }
-
-    // Foydalanuvchi ma'lumotlari
-    const user = Auth.getUser();
-    if (user) {
-        document.getElementById('userName').textContent = user.fullName || 'Admin';
-        document.getElementById('userInitial').textContent = Auth.getUserInitial();
-    }
-
-    // Theme toggle
-    const themeBtn = document.getElementById('themeToggleBtn');
-    if (themeBtn) {
-        themeBtn.addEventListener('click', function() {
-            const html = document.documentElement;
-            const newTheme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-            html.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
-        });
-    }
-
-    // Hamburger menu
-    const menuToggle = document.getElementById('menuToggle');
-    const sidebar = document.getElementById('sidebar');
-    const overlay = document.getElementById('sidebarOverlay');
-
-    if (menuToggle && sidebar) {
-        menuToggle.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            sidebar.classList.toggle('open');
-            if (overlay) overlay.classList.toggle('show');
-        });
-    }
-
-    if (overlay) {
-        overlay.addEventListener('click', function() {
-            sidebar.classList.remove('open');
-            overlay.classList.remove('show');
-        });
-    }
-
-    document.addEventListener('click', function(e) {
-        if (window.innerWidth <= 768) {
-            const isSidebar = sidebar.contains(e.target);
-            const isToggle = menuToggle.contains(e.target);
-            if (!isSidebar && !isToggle && sidebar.classList.contains('open')) {
-                sidebar.classList.remove('open');
-                if (overlay) overlay.classList.remove('show');
-            }
-        }
-    });
-
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && sidebar.classList.contains('open')) {
-            sidebar.classList.remove('open');
-            if (overlay) overlay.classList.remove('show');
-        }
-    });
-
-    window.addEventListener('resize', function() {
-        if (window.innerWidth > 768 && sidebar.classList.contains('open')) {
-            sidebar.classList.remove('open');
-            if (overlay) overlay.classList.remove('show');
-        }
-    });
-
-    if (window.innerWidth <= 768) {
-        sidebar.classList.remove('open');
-        if (overlay) overlay.classList.remove('show');
-    }
-
-    // ⭐ CTRL+K - Qidiruvga fokus
-    document.addEventListener('keydown', function(e) {
-        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-            e.preventDefault();
-            const searchInput = document.getElementById('searchInput');
-            if (searchInput) {
-                searchInput.focus();
-                searchInput.select();
-            }
-        }
-    });
-
-    // ⭐ Event listenerlar
-    document.getElementById('searchInput').addEventListener('input', function() {
-        currentFilter.search = this.value.toLowerCase();
-        filterAndRenderStaff();
-    });
-
-    document.getElementById('positionFilter').addEventListener('change', function() {
-        currentFilter.position = this.value;
-        filterAndRenderStaff();
-    });
-
-    document.getElementById('statusFilter').addEventListener('change', function() {
-        currentFilter.status = this.value;
-        filterAndRenderStaff();
-    });
-
-    document.getElementById('addStaffBtn').addEventListener('click', function() {
-        openStaffModal();
-    });
-
-    document.getElementById('closeStaffModal').addEventListener('click', function() {
-        closeStaffModal();
-    });
-
-    document.getElementById('cancelStaffModal').addEventListener('click', function() {
-        closeStaffModal();
-    });
-
-    document.getElementById('saveStaffModal').addEventListener('click', function() {
-        saveStaff();
-    });
-
-    document.getElementById('closeStaffProfileModal').addEventListener('click', function() {
-        closeStaffProfileModal();
-    });
-
-    document.getElementById('closeStaffProfileBtn').addEventListener('click', function() {
-        closeStaffProfileModal();
-    });
-
-    document.getElementById('editFromProfileBtn').addEventListener('click', function() {
-        const id = this.dataset.id;
-        if (id) {
-            closeStaffProfileModal();
-            setTimeout(function() {
-                openStaffModal(id);
-            }, 300);
-        }
-    });
-
-    document.getElementById('exportBtn').addEventListener('click', function() {
-        exportStaffData();
-    });
-
-    // ⭐ Maosh o'zgarganda yillik va kunlik hisoblash
-    document.getElementById('staffSalary').addEventListener('input', function() {
-        const salary = parseInt(this.value) || 0;
-        document.getElementById('yearlySalaryDisplay').textContent = formatMoney(salary * 12);
-        document.getElementById('dailySalaryDisplay').textContent = formatMoney(Math.round(salary / 22));
-    });
-
-    // ⭐ Modalni tashqariga bosganda yopish
-    document.getElementById('staffModal').addEventListener('click', function(e) {
-        if (e.target === this) closeStaffModal();
-    });
-
-    document.getElementById('staffProfileModal').addEventListener('click', function(e) {
-        if (e.target === this) closeStaffProfileModal();
-    });
-
-    // ⭐ Ma'lumotlarni yuklash
-    loadStaff();
-});
-
-// ============================================================
 // STAFF MA'LUMOTLARINI YUKLASH
 // ============================================================
 async function loadStaff() {
@@ -220,7 +55,7 @@ async function loadStaff() {
 }
 
 // ============================================================
-// STATISTIKANI YANGILASH (Muzlatilgan qo'shilgan)
+// STATISTIKANI YANGILASH
 // ============================================================
 function updateStats(staff) {
     const total = staff.length;
@@ -233,7 +68,6 @@ function updateStats(staff) {
     document.getElementById('inactiveStaff').textContent = inactive;
     document.getElementById('frozenStaff').textContent = frozen;
 
-    // ⭐ To'lov ogohlantirishi
     checkSalaryWarnings(staff);
 }
 
@@ -246,7 +80,8 @@ function checkSalaryWarnings(staff) {
 
     const now = new Date();
     const currentMonth = now.getMonth();
-    const currentYear = now.getFullYear();
+    const monthNames = ['Yanvar', 'Fevral', 'Mart', 'April', 'May', 'Iyun', 'Iyul', 'Avgust', 'Sentabr', 'Oktabr', 'Noyabr', 'Dekabr'];
+    const monthName = monthNames[currentMonth];
 
     let warnings = [];
 
@@ -257,18 +92,13 @@ function checkSalaryWarnings(staff) {
         const remaining = salary - paidAmount;
 
         if (remaining > 0) {
-            const monthNames = ['Yanvar', 'Fevral', 'Mart', 'April', 'May', 'Iyun', 'Iyul', 'Avgust', 'Sentabr', 'Oktabr', 'Noyabr', 'Dekabr'];
-            const monthName = monthNames[currentMonth];
-
             warnings.push({
                 name: s.fullName,
                 position: s.position,
                 salary: salary,
                 paid: paidAmount,
                 remaining: remaining,
-                month: monthName,
-                monthIndex: currentMonth,
-                year: currentYear
+                month: monthName
             });
         }
     });
@@ -280,7 +110,7 @@ function checkSalaryWarnings(staff) {
             `<strong>${w.name}</strong> (${w.position}): ` +
             `${formatMoney(w.salary)} dan ${formatMoney(w.paid)} to'langan, ` +
             `<span style="color: #d32f2f;">${formatMoney(w.remaining)} qoldi</span> ` +
-            `(${w.month} ${w.year})`
+            `(${w.month})`
         ).join('<br>');
         warningText.innerHTML = html;
     } else {
@@ -357,7 +187,6 @@ function renderStaff(staff) {
 function filterAndRenderStaff() {
     let filtered = staffData;
 
-    // Qidiruv
     if (currentFilter.search) {
         filtered = filtered.filter(s =>
             s.fullName?.toLowerCase().includes(currentFilter.search) ||
@@ -366,12 +195,10 @@ function filterAndRenderStaff() {
         );
     }
 
-    // Lavozim bo'yicha
     if (currentFilter.position !== 'all') {
         filtered = filtered.filter(s => s.position === currentFilter.position);
     }
 
-    // Holat bo'yicha
     if (currentFilter.status !== 'all') {
         filtered = filtered.filter(s => s.status === currentFilter.status);
     }
@@ -381,7 +208,7 @@ function filterAndRenderStaff() {
 }
 
 // ============================================================
-// STAFF MODAL (QO'SHISH/TAHRIRLASH)
+// STAFF MODAL
 // ============================================================
 function openStaffModal(id = null) {
     const modal = document.getElementById('staffModal');
@@ -777,5 +604,96 @@ function showSuccess(msg) {
     document.body.appendChild(div);
     setTimeout(() => div.remove(), 3000);
 }
+
+// ============================================================
+// SAHIFA YUKLANGANDA
+// ============================================================
+document.addEventListener('DOMContentLoaded', function() {
+    const token = localStorage.getItem('customerToken') || sessionStorage.getItem('customerToken');
+    if (!token) {
+        window.location.href = 'index.html';
+        return;
+    }
+
+    // Foydalanuvchi ma'lumotlari
+    const user = Auth.getUser();
+    if (user) {
+        document.getElementById('userName').textContent = user.fullName || 'Admin';
+        document.getElementById('userInitial').textContent = Auth.getUserInitial();
+    }
+
+    // Event listenerlar
+    document.getElementById('searchInput').addEventListener('input', function() {
+        currentFilter.search = this.value.toLowerCase();
+        filterAndRenderStaff();
+    });
+
+    document.getElementById('positionFilter').addEventListener('change', function() {
+        currentFilter.position = this.value;
+        filterAndRenderStaff();
+    });
+
+    document.getElementById('statusFilter').addEventListener('change', function() {
+        currentFilter.status = this.value;
+        filterAndRenderStaff();
+    });
+
+    document.getElementById('addStaffBtn').addEventListener('click', function() {
+        openStaffModal();
+    });
+
+    document.getElementById('closeStaffModal').addEventListener('click', function() {
+        closeStaffModal();
+    });
+
+    document.getElementById('cancelStaffModal').addEventListener('click', function() {
+        closeStaffModal();
+    });
+
+    document.getElementById('saveStaffModal').addEventListener('click', function() {
+        saveStaff();
+    });
+
+    document.getElementById('closeStaffProfileModal').addEventListener('click', function() {
+        closeStaffProfileModal();
+    });
+
+    document.getElementById('closeStaffProfileBtn').addEventListener('click', function() {
+        closeStaffProfileModal();
+    });
+
+    document.getElementById('editFromProfileBtn').addEventListener('click', function() {
+        const id = this.dataset.id;
+        if (id) {
+            closeStaffProfileModal();
+            setTimeout(function() {
+                openStaffModal(id);
+            }, 300);
+        }
+    });
+
+    document.getElementById('exportBtn').addEventListener('click', function() {
+        exportStaffData();
+    });
+
+    // Maosh o'zgarganda
+    document.getElementById('staffSalary').addEventListener('input', function() {
+        const salary = parseInt(this.value) || 0;
+        document.getElementById('yearlySalaryDisplay').textContent = formatMoney(salary * 12);
+        document.getElementById('dailySalaryDisplay').textContent = formatMoney(Math.round(salary / 22));
+    });
+
+    // Modalni tashqariga bosganda yopish
+    document.getElementById('staffModal').addEventListener('click', function(e) {
+        if (e.target === this) closeStaffModal();
+    });
+
+    document.getElementById('staffProfileModal').addEventListener('click', function(e) {
+        if (e.target === this) closeStaffProfileModal();
+    });
+
+    // Ma'lumotlarni yuklash
+    loadStaff();
+});
 
 console.log('✅ staff.js yuklandi (Muzlatilgan qo\'shildi)');
