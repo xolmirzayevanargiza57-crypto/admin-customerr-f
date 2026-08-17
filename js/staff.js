@@ -1,5 +1,5 @@
 // ============================================================
-// STAFF - XODIMLAR (TO'LIQ)
+// STAFF - XODIMLAR (TO'LIQ + MUZLATILGAN)
 // Loyiha: Admin-Customer Frontend
 // Fayl: js/staff.js
 // ============================================================
@@ -220,18 +220,18 @@ async function loadStaff() {
 }
 
 // ============================================================
-// STATISTIKANI YANGILASH
+// STATISTIKANI YANGILASH (Muzlatilgan qo'shilgan)
 // ============================================================
 function updateStats(staff) {
     const total = staff.length;
     const active = staff.filter(s => s.status === 'active').length;
     const inactive = staff.filter(s => s.status === 'inactive').length;
-    const totalSalary = staff.reduce((sum, s) => sum + (s.salary || 0), 0);
+    const frozen = staff.filter(s => s.status === 'frozen').length;
 
     document.getElementById('totalStaff').textContent = total;
     document.getElementById('activeStaff').textContent = active;
     document.getElementById('inactiveStaff').textContent = inactive;
-    document.getElementById('totalSalary').textContent = formatMoney(totalSalary);
+    document.getElementById('frozenStaff').textContent = frozen;
 
     // ⭐ To'lov ogohlantirishi
     checkSalaryWarnings(staff);
@@ -244,7 +244,6 @@ function checkSalaryWarnings(staff) {
     const warningEl = document.getElementById('salaryWarning');
     const warningText = document.getElementById('salaryWarningText');
 
-    // Har bir xodim uchun to'lov holatini tekshirish
     const now = new Date();
     const currentMonth = now.getMonth();
     const currentYear = now.getFullYear();
@@ -254,17 +253,8 @@ function checkSalaryWarnings(staff) {
     staff.forEach(s => {
         if (s.status !== 'active') return;
         const salary = s.salary || 0;
-        const lastPayment = s.lastPayment || null;
         const paidAmount = s.paidAmount || 0;
-
-        // Qancha to'lanishi kerak (100% to'liq)
-        const expectedAmount = salary;
-
-        // Qancha to'langan
-        const paid = paidAmount;
-
-        // Qolgan qarz
-        const remaining = expectedAmount - paid;
+        const remaining = salary - paidAmount;
 
         if (remaining > 0) {
             const monthNames = ['Yanvar', 'Fevral', 'Mart', 'April', 'May', 'Iyun', 'Iyul', 'Avgust', 'Sentabr', 'Oktabr', 'Noyabr', 'Dekabr'];
@@ -274,7 +264,7 @@ function checkSalaryWarnings(staff) {
                 name: s.fullName,
                 position: s.position,
                 salary: salary,
-                paid: paid,
+                paid: paidAmount,
                 remaining: remaining,
                 month: monthName,
                 monthIndex: currentMonth,
@@ -332,8 +322,8 @@ function renderStaff(staff) {
             'xodim': '👤 Xodim'
         };
 
-        const statusClass = s.status === 'active' ? 'active' : 'inactive';
-        const statusLabel = s.status === 'active' ? '✅ Faol' : '⛔ Faol emas';
+        const statusClass = s.status === 'active' ? 'active' : s.status === 'frozen' ? 'frozen' : 'inactive';
+        const statusLabel = s.status === 'active' ? '✅ Faol' : s.status === 'frozen' ? '❄️ Muzlatilgan' : '⛔ Faol emas';
 
         return `
             <tr>
@@ -396,7 +386,6 @@ function filterAndRenderStaff() {
 function openStaffModal(id = null) {
     const modal = document.getElementById('staffModal');
     const title = document.getElementById('staffModalTitle');
-    const form = document.getElementById('staffForm');
     const saveBtn = document.getElementById('saveStaffModal');
 
     editingStaffId = id;
@@ -405,7 +394,6 @@ function openStaffModal(id = null) {
         title.innerHTML = '<i class="fas fa-edit"></i> Xodimni tahrirlash';
         saveBtn.innerHTML = '<i class="fas fa-save"></i> Yangilash';
 
-        // Ma'lumotlarni yuklash
         const staff = staffData.find(s => s._id === id);
         if (staff) {
             document.getElementById('staffFullName').value = staff.fullName || '';
@@ -414,7 +402,6 @@ function openStaffModal(id = null) {
             document.getElementById('staffSalary').value = staff.salary || '';
             document.getElementById('staffStatus').value = staff.status || 'active';
 
-            // Maosh hisoblash
             const salary = staff.salary || 0;
             document.getElementById('yearlySalaryDisplay').textContent = formatMoney(salary * 12);
             document.getElementById('dailySalaryDisplay').textContent = formatMoney(Math.round(salary / 22));
@@ -422,7 +409,7 @@ function openStaffModal(id = null) {
     } else {
         title.innerHTML = '<i class="fas fa-user-plus"></i> Yangi xodim';
         saveBtn.innerHTML = '<i class="fas fa-save"></i> Saqlash';
-        form.reset();
+        document.getElementById('staffForm').reset();
         document.getElementById('staffStatus').value = 'active';
         document.getElementById('yearlySalaryDisplay').textContent = '0 so\'m';
         document.getElementById('dailySalaryDisplay').textContent = '0 so\'m';
@@ -431,7 +418,6 @@ function openStaffModal(id = null) {
     modal.classList.add('active');
     document.body.style.overflow = 'hidden';
 
-    // Fokus birinchi maydonga
     setTimeout(function() {
         document.getElementById('staffFullName').focus();
     }, 100);
@@ -453,7 +439,6 @@ async function saveStaff() {
     const salary = parseInt(document.getElementById('staffSalary').value) || 0;
     const status = document.getElementById('staffStatus').value;
 
-    // Validatsiya
     if (!fullName) {
         showError('F.I.SH majburiy!');
         document.getElementById('staffFullName').focus();
@@ -478,13 +463,7 @@ async function saveStaff() {
 
     try {
         const token = localStorage.getItem('customerToken') || sessionStorage.getItem('customerToken');
-        const data = {
-            fullName,
-            position,
-            phone,
-            salary,
-            status
-        };
+        const data = { fullName, position, phone, salary, status };
 
         let url = window.__API_BASE_URL__ + '/api/staff';
         let method = 'POST';
@@ -555,12 +534,14 @@ function viewStaff(id) {
     const yearly = salary * 12;
     const daily = Math.round(salary / 22);
 
-    // To'lov holati
     const now = new Date();
     const monthNames = ['Yanvar', 'Fevral', 'Mart', 'April', 'May', 'Iyun', 'Iyul', 'Avgust', 'Sentabr', 'Oktabr', 'Noyabr', 'Dekabr'];
     const currentMonth = monthNames[now.getMonth()];
     const paidAmount = staff.paidAmount || 0;
     const remaining = salary - paidAmount;
+
+    const statusLabel = staff.status === 'active' ? '✅ Faol' : staff.status === 'frozen' ? '❄️ Muzlatilgan' : '⛔ Faol emas';
+    const statusClass = staff.status === 'active' ? 'active' : staff.status === 'frozen' ? 'frozen' : 'inactive';
 
     body.innerHTML = `
         <div class="staff-profile-card">
@@ -569,8 +550,8 @@ function viewStaff(id) {
                 <div class="profile-info">
                     <h3>${staff.fullName || '-'}</h3>
                     <div class="position">${positionLabels[staff.position] || staff.position || '-'}</div>
-                    <span class="status-badge ${staff.status === 'active' ? 'active' : 'inactive'}" style="margin-top:4px;">
-                        ${staff.status === 'active' ? '✅ Faol' : '⛔ Faol emas'}
+                    <span class="status-badge ${statusClass}" style="margin-top:4px; display:inline-block;">
+                        ${statusLabel}
                     </span>
                 </div>
             </div>
@@ -657,10 +638,9 @@ async function deleteStaff(id) {
 }
 
 // ============================================================
-// EKSPORT (Excel/PDF)
+// EKSPORT
 // ============================================================
 function exportStaffData() {
-    // Eksport formatini tanlash
     const format = confirm('Excel (.csv) formatida eksport qilmoqchimisiz? "OK" - CSV, "Bekor" - PDF');
 
     if (format) {
@@ -678,7 +658,7 @@ function exportToCSV() {
         s.position || '',
         s.phone || '',
         s.salary || 0,
-        s.status === 'active' ? 'Faol' : 'Faol emas'
+        s.status === 'active' ? 'Faol' : s.status === 'frozen' ? 'Muzlatilgan' : 'Faol emas'
     ]);
 
     let csv = headers.join(',') + '\n';
@@ -695,7 +675,6 @@ function exportToCSV() {
 }
 
 function exportToPDF() {
-    // PDF eksport uchun html tayyorlash
     let html = `
         <html>
         <head>
@@ -725,6 +704,7 @@ function exportToPDF() {
     `;
 
     staffData.forEach((s, i) => {
+        const statusLabel = s.status === 'active' ? 'Faol' : s.status === 'frozen' ? 'Muzlatilgan' : 'Faol emas';
         html += `
             <tr>
                 <td>${i + 1}</td>
@@ -732,7 +712,7 @@ function exportToPDF() {
                 <td>${s.position || ''}</td>
                 <td>${s.phone || ''}</td>
                 <td>${formatMoney(s.salary || 0)}</td>
-                <td>${s.status === 'active' ? 'Faol' : 'Faol emas'}</td>
+                <td>${statusLabel}</td>
             </tr>
         `;
     });
@@ -745,7 +725,6 @@ function exportToPDF() {
         </html>
     `;
 
-    // Yangi oynada ochish
     const win = window.open('', '_blank');
     if (win) {
         win.document.write(html);
@@ -799,4 +778,4 @@ function showSuccess(msg) {
     setTimeout(() => div.remove(), 3000);
 }
 
-console.log('✅ staff.js yuklandi');
+console.log('✅ staff.js yuklandi (Muzlatilgan qo\'shildi)');
