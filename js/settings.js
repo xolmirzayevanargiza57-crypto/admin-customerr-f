@@ -222,7 +222,7 @@ function showProfileMessage(msg, type) {
 // ============================================================
 async function loadDevices() {
     try {
-        const response = await api.get('/api/auth/sessions');
+        const response = await API.get('/api/auth/sessions');
         if (response.success) {
             renderDevices(response.data, response.currentSessionId);
         } else {
@@ -342,7 +342,7 @@ async function renameDevice(deviceId) {
     }
 
     try {
-        const response = await API.put(`/auth/sessions/${deviceId}/rename`, {
+        const response = await API.put(`/api/auth/sessions/${deviceId}/rename`, {
             deviceName: newName.trim()
         });
         
@@ -365,7 +365,7 @@ async function terminateSession(deviceId) {
     if (!confirm('Haqiqatan ham bu sessiyani tugatmoqchimisiz?')) return;
 
     try {
-        const response = await API.delete(`/auth/sessions/${deviceId}`);
+        const response = await API.delete(`/api/auth/sessions/${deviceId}`);
         
         if (response.success) {
             showSuccess('Sessiya tugatildi!');
@@ -386,7 +386,7 @@ async function terminateAllSessions() {
     if (!confirm('Barcha boshqa qurilmalardagi sessiyalarni tugatmoqchimisiz? (Joriy qurilma qoladi)')) return;
 
     try {
-        const response = await API.delete('/auth/sessions/terminate-all');
+        const response = await API.delete('/api/auth/sessions/terminate-all');
         
         if (response.success) {
             showSuccess('Barcha sessiyalar tugatildi!');
