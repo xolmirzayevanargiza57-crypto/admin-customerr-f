@@ -1,12 +1,12 @@
 // ============================================================
-// I18N - TIL (UZ, RU, EN) - TO'LIQ TARJIMALAR
+// I18N - TIL (UZ, RU, EN) - TO'LIQ
 // ============================================================
 
 const I18N = {
     currentLanguage: localStorage.getItem('admin-language') || 'uz',
     _cache: {},
     _isUpdating: false,
-    
+
     languages: {
         uz: {
             name: "O'zbek",
@@ -22,7 +22,6 @@ const I18N = {
                         <circle cx="8" cy="10.5" r="0.6" fill="#ffffff"/>
                     </svg>`,
             translations: {
-                // ============ LOGIN ============
                 login: "Tizimga kiring",
                 email: "Email",
                 password: "Parol",
@@ -31,8 +30,6 @@ const I18N = {
                 password_placeholder: "••••••••",
                 copyright: "© 2026 Admin Customer",
                 version: "v1.0",
-                
-                // ============ UMUMIY ============
                 loading: "Yuklanmoqda...",
                 success: "Muvaffaqiyatli!",
                 error: "Xatolik yuz berdi!",
@@ -54,8 +51,6 @@ const I18N = {
                 frozen: "Muzlatilgan",
                 total: "Jami",
                 average: "O'rtacha",
-                
-                // ============ NAVIGATION ============
                 dashboard: "Dashboard",
                 teachers: "O'qituvchilar",
                 students: "O'quvchilar",
@@ -69,8 +64,6 @@ const I18N = {
                 profile: "Profil",
                 staff: "Xodimlar",
                 notifications: "Bildirishnomalar",
-                
-                // ============ SETTINGS ============
                 settings_title: "Sozlamalar",
                 settings_subtitle: "Tizim sozlamalarini boshqaring",
                 full_name: "To'liq ism",
@@ -84,8 +77,6 @@ const I18N = {
                 danger_zone: "Xavfli hudud",
                 delete_account_warning: "Hisobingizni o'chirishni xohlaysizmi? Bu amal qaytarib bo'lmaydi!",
                 delete_account: "Hisobni o'chirish",
-                
-                // ============ TEACHERS ============
                 teacher_profile: "O'qituvchi profili",
                 add_teacher: "Yangi qo'shish",
                 teacher_subject: "Fani",
@@ -95,15 +86,11 @@ const I18N = {
                 age: "Yosh",
                 monthly_payment: "Oylik to'lov",
                 select_teacher: "O'qituvchi tanlang",
-                
-                // ============ STUDENTS ============
                 student_profile: "O'quvchi profili",
                 add_student: "Yangi qo'shish",
                 student_teacher: "O'qituvchi",
                 total_xp_label: "XP",
                 group: "Guruh",
-                
-                // ============ PAYMENTS ============
                 add_payment: "Yangi qo'shish",
                 payment_amount: "Summa",
                 payment_month: "Oy",
@@ -113,30 +100,22 @@ const I18N = {
                 unpaid: "To'lanmagan",
                 student_fee: "O'quvchi to'lovi",
                 teacher_salary: "O'qituvchi maoshi",
-                
-                // ============ ATTENDANCE ============
                 present: "Keldi",
                 absent: "Kelmadi",
                 absent_reason: "Sababli",
                 not_marked: "Belgilanmagan",
                 reason_placeholder: "Sabab yozing...",
                 teacher_marks_attendance: "Faqat o'qituvchi belgilaydi",
-                
-                // ============ SUBJECTS ============
                 add_subject: "Yangi qo'shish",
                 subject_name: "Fan nomi",
                 price: "Narxi",
                 teacher: "O'qituvchi",
-                
-                // ============ REPORTS ============
                 reports_title: "Hisobotlar",
                 teachers_report: "O'qituvchilar hisoboti",
                 students_report: "O'quvchilar hisoboti",
                 xp_report: "XP hisoboti",
                 attendance_report: "Davomat hisoboti",
                 reports_desc: "Barcha statistik ma'lumotlar",
-                
-                // ============ STAFF ============
                 add_staff: "Yangi qo'shish",
                 staff_profile: "Xodim profili",
                 position: "Lavozimi",
@@ -146,8 +125,6 @@ const I18N = {
                 active_staff: "Faol Xodimlar",
                 inactive_staff: "Faol emas",
                 frozen_staff: "Muzlatilgan",
-                
-                // ============ DASHBOARD ============
                 total_teachers: "Jami O'qituvchilar",
                 total_students: "Jami O'quvchilar",
                 total_xp: "Jami XP",
@@ -160,8 +137,6 @@ const I18N = {
                 sixmonths: "6 oylik",
                 yearly: "Yillik",
                 none: "Yo'q",
-                
-                // ============ SUBSCRIPTION ============
                 subscription_status: "Holati",
                 subscription_type: "Turi",
                 subscription_end: "Tugash vaqti",
@@ -176,7 +151,6 @@ const I18N = {
                         <rect y="10.67" width="24" height="5.33" fill="#d52b1e"/>
                     </svg>`,
             translations: {
-                // ============ LOGIN ============
                 login: "Войти в систему",
                 email: "Электронная почта",
                 password: "Пароль",
@@ -185,8 +159,6 @@ const I18N = {
                 password_placeholder: "••••••••",
                 copyright: "© 2026 Admin Customer",
                 version: "v1.0",
-                
-                // ============ UMUMIY ============
                 loading: "Загрузка...",
                 success: "Успешно!",
                 error: "Произошла ошибка!",
@@ -208,8 +180,6 @@ const I18N = {
                 frozen: "Заморожен",
                 total: "Всего",
                 average: "Среднее",
-                
-                // ============ NAVIGATION ============
                 dashboard: "Панель управления",
                 teachers: "Учителя",
                 students: "Ученики",
@@ -223,8 +193,6 @@ const I18N = {
                 profile: "Профиль",
                 staff: "Сотрудники",
                 notifications: "Уведомления",
-                
-                // ============ SETTINGS ============
                 settings_title: "Настройки",
                 settings_subtitle: "Управление настройками системы",
                 full_name: "Полное имя",
@@ -238,8 +206,6 @@ const I18N = {
                 danger_zone: "Опасная зона",
                 delete_account_warning: "Вы уверены, что хотите удалить аккаунт? Это действие необратимо!",
                 delete_account: "Удалить аккаунт",
-                
-                // ============ TEACHERS ============
                 teacher_profile: "Профиль учителя",
                 add_teacher: "Добавить",
                 teacher_subject: "Предмет",
@@ -249,15 +215,11 @@ const I18N = {
                 age: "Возраст",
                 monthly_payment: "Ежемесячный платёж",
                 select_teacher: "Выберите учителя",
-                
-                // ============ STUDENTS ============
                 student_profile: "Профиль ученика",
                 add_student: "Добавить",
                 student_teacher: "Учитель",
                 total_xp_label: "XP",
                 group: "Группа",
-                
-                // ============ PAYMENTS ============
                 add_payment: "Добавить",
                 payment_amount: "Сумма",
                 payment_month: "Месяц",
@@ -267,30 +229,22 @@ const I18N = {
                 unpaid: "Не оплачен",
                 student_fee: "Плата ученика",
                 teacher_salary: "Зарплата учителя",
-                
-                // ============ ATTENDANCE ============
                 present: "Пришёл",
                 absent: "Не пришёл",
                 absent_reason: "По причине",
                 not_marked: "Не отмечен",
                 reason_placeholder: "Напишите причину...",
                 teacher_marks_attendance: "Только учитель отмечает",
-                
-                // ============ SUBJECTS ============
                 add_subject: "Добавить",
                 subject_name: "Название предмета",
                 price: "Цена",
                 teacher: "Учитель",
-                
-                // ============ REPORTS ============
                 reports_title: "Отчеты",
                 teachers_report: "Отчет по учителям",
                 students_report: "Отчет по ученикам",
                 xp_report: "Отчет по XP",
                 attendance_report: "Отчет по посещаемости",
                 reports_desc: "Вся статистическая информация",
-                
-                // ============ STAFF ============
                 add_staff: "Добавить",
                 staff_profile: "Профиль сотрудника",
                 position: "Должность",
@@ -300,8 +254,6 @@ const I18N = {
                 active_staff: "Активные сотрудники",
                 inactive_staff: "Неактивные",
                 frozen_staff: "Замороженные",
-                
-                // ============ DASHBOARD ============
                 total_teachers: "Всего учителей",
                 total_students: "Всего учеников",
                 total_xp: "Всего XP",
@@ -314,8 +266,6 @@ const I18N = {
                 sixmonths: "6 месяцев",
                 yearly: "Годовой",
                 none: "Нет",
-                
-                // ============ SUBSCRIPTION ============
                 subscription_status: "Статус",
                 subscription_type: "Тип",
                 subscription_end: "Дата окончания",
@@ -332,7 +282,6 @@ const I18N = {
                         <path d="M12 0v16M0 8h24" stroke="#c8102e" stroke-width="1.6"/>
                     </svg>`,
             translations: {
-                // ============ LOGIN ============
                 login: "Login to system",
                 email: "Email",
                 password: "Password",
@@ -341,8 +290,6 @@ const I18N = {
                 password_placeholder: "••••••••",
                 copyright: "© 2026 Admin Customer",
                 version: "v1.0",
-                
-                // ============ UMUMIY ============
                 loading: "Loading...",
                 success: "Success!",
                 error: "An error occurred!",
@@ -364,8 +311,6 @@ const I18N = {
                 frozen: "Frozen",
                 total: "Total",
                 average: "Average",
-                
-                // ============ NAVIGATION ============
                 dashboard: "Dashboard",
                 teachers: "Teachers",
                 students: "Students",
@@ -379,8 +324,6 @@ const I18N = {
                 profile: "Profile",
                 staff: "Staff",
                 notifications: "Notifications",
-                
-                // ============ SETTINGS ============
                 settings_title: "Settings",
                 settings_subtitle: "Manage system settings",
                 full_name: "Full name",
@@ -394,8 +337,6 @@ const I18N = {
                 danger_zone: "Danger zone",
                 delete_account_warning: "Are you sure you want to delete your account? This action cannot be undone!",
                 delete_account: "Delete account",
-                
-                // ============ TEACHERS ============
                 teacher_profile: "Teacher Profile",
                 add_teacher: "Add",
                 teacher_subject: "Subject",
@@ -405,15 +346,11 @@ const I18N = {
                 age: "Age",
                 monthly_payment: "Monthly payment",
                 select_teacher: "Select Teacher",
-                
-                // ============ STUDENTS ============
                 student_profile: "Student Profile",
                 add_student: "Add",
                 student_teacher: "Teacher",
                 total_xp_label: "XP",
                 group: "Group",
-                
-                // ============ PAYMENTS ============
                 add_payment: "Add",
                 payment_amount: "Amount",
                 payment_month: "Month",
@@ -423,30 +360,22 @@ const I18N = {
                 unpaid: "Unpaid",
                 student_fee: "Student Fee",
                 teacher_salary: "Teacher Salary",
-                
-                // ============ ATTENDANCE ============
                 present: "Present",
                 absent: "Absent",
                 absent_reason: "Absent with reason",
                 not_marked: "Not marked",
                 reason_placeholder: "Write reason...",
                 teacher_marks_attendance: "Only teacher marks",
-                
-                // ============ SUBJECTS ============
                 add_subject: "Add",
                 subject_name: "Subject name",
                 price: "Price",
                 teacher: "Teacher",
-                
-                // ============ REPORTS ============
                 reports_title: "Reports",
                 teachers_report: "Teachers report",
                 students_report: "Students report",
                 xp_report: "XP report",
                 attendance_report: "Attendance report",
                 reports_desc: "All statistical information",
-                
-                // ============ STAFF ============
                 add_staff: "Add",
                 staff_profile: "Staff Profile",
                 position: "Position",
@@ -456,8 +385,6 @@ const I18N = {
                 active_staff: "Active Staff",
                 inactive_staff: "Inactive",
                 frozen_staff: "Frozen",
-                
-                // ============ DASHBOARD ============
                 total_teachers: "Total Teachers",
                 total_students: "Total Students",
                 total_xp: "Total XP",
@@ -470,8 +397,6 @@ const I18N = {
                 sixmonths: "6 Months",
                 yearly: "Yearly",
                 none: "None",
-                
-                // ============ SUBSCRIPTION ============
                 subscription_status: "Status",
                 subscription_type: "Type",
                 subscription_end: "End Date",
@@ -480,7 +405,9 @@ const I18N = {
         }
     },
 
-    getLanguage() { return this.currentLanguage; },
+    getLanguage() {
+        return this.currentLanguage;
+    },
 
     t(key) {
         if (this._cache[key]) {
@@ -495,18 +422,32 @@ const I18N = {
     setLanguage(lang) {
         if (!this.languages[lang] || this._isUpdating) return;
         if (lang === this.currentLanguage) return;
+        
         this._isUpdating = true;
         this.currentLanguage = lang;
         localStorage.setItem('admin-language', lang);
         this._cache = {};
+        
+        // UI ni yangilash
         this.updateUI();
-        document.dispatchEvent(new CustomEvent('i18n:language-changed', { detail: { language: lang } }));
+        
+        // Event yuborish
+        document.dispatchEvent(new CustomEvent('i18n:language-changed', { 
+            detail: { language: lang } 
+        }));
+        
+        // Serverga saqlash
         this.saveLanguageToServer(lang);
-        setTimeout(() => { this._isUpdating = false; }, 100);
+        
+        setTimeout(() => {
+            this._isUpdating = false;
+        }, 100);
     },
 
     updateUI() {
+        // Silliq UI yangilash
         requestAnimationFrame(() => {
+            // data-i18n atributlari
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.dataset.i18n;
                 const translation = this.t(key);
@@ -514,6 +455,8 @@ const I18N = {
                     el.textContent = translation;
                 }
             });
+
+            // Placeholderlar
             document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
                 const key = el.dataset.i18nPlaceholder;
                 const translation = this.t(key);
@@ -521,6 +464,8 @@ const I18N = {
                     el.placeholder = translation;
                 }
             });
+
+            // Select optionlar
             document.querySelectorAll('select option').forEach(option => {
                 const key = option.dataset.i18n || option.value;
                 const translation = this.t(key);
@@ -528,7 +473,8 @@ const I18N = {
                     option.textContent = translation;
                 }
             });
-            
+
+            // Language selector
             document.querySelectorAll('.lang-option').forEach(el => {
                 const lang = el.dataset.lang;
                 const langData = this.languages[lang];
@@ -544,7 +490,7 @@ const I18N = {
                 }
                 el.classList.toggle('active', lang === this.currentLanguage);
             });
-            
+
             document.documentElement.lang = this.currentLanguage;
         });
     },
@@ -571,7 +517,9 @@ const I18N = {
                     localStorage.setItem('admin-language', lang);
                     this._cache = {};
                     this.updateUI();
-                    document.dispatchEvent(new CustomEvent('i18n:language-changed', { detail: { language: lang } }));
+                    document.dispatchEvent(new CustomEvent('i18n:language-changed', { 
+                        detail: { language: lang } 
+                    }));
                 }
             }
         } catch (error) {
@@ -582,6 +530,7 @@ const I18N = {
     createLanguageSelector() {
         const container = document.createElement('div');
         container.className = 'language-selector';
+        container.id = 'languageSelectorContainer';
         
         Object.keys(this.languages).forEach(lang => {
             const btn = document.createElement('button');
@@ -592,7 +541,7 @@ const I18N = {
             const langData = this.languages[lang];
             
             btn.innerHTML = `
-                <span class="flag-container">${langData.flagSvg || langData.flag}</span>
+                <span class="flag-container">${langData.flagSvg || langData.flag || '🏳️'}</span>
                 <span class="lang-name">${langData.name}</span>
             `;
             
@@ -609,7 +558,9 @@ const I18N = {
     }
 };
 
+// ============================================================
 // ⭐ BAYROQ STILLARI
+// ============================================================
 const style = document.createElement('style');
 style.textContent = `
     .language-selector {
@@ -692,9 +643,21 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
+// ============================================================
+// ⭐ SAHIFA YUKLANGANDA
+// ============================================================
 document.addEventListener('DOMContentLoaded', async () => {
     await I18N.loadLanguageFromServer();
     I18N.updateUI();
+    
+    // ⭐ Language selector mavjudligini tekshirish
+    const container = document.getElementById('languageSelector');
+    if (container && container.children.length === 0) {
+        const selector = I18N.createLanguageSelector();
+        container.appendChild(selector);
+    }
+    
+    console.log('✅ I18N yuklandi!');
 });
 
 console.log('✅ i18n.js yuklandi (To\'liq tarjimalar bilan)');
