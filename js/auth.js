@@ -1,5 +1,5 @@
 // ============================================================
-// AUTH - ADMIN-CUSTOMER (TO'LIQ)
+// AUTH - ADMIN-CUSTOMER (REAL-TIME PROFIL SINXRONIZATSIYASI BILAN)
 // Loyiha: Admin-Customer Frontend
 // Fayl: js/auth.js
 // ============================================================
@@ -136,28 +136,23 @@ const Auth = {
     },
     
     // ============================================================
-    // CHECK AUTH - PROFIL O'ZGARGANDA LOGOUT QILADI
+    // ⭐ REAL-TIME PROFIL SINXRONIZATSIYASI
     // ============================================================
     getLastAuthAge() {
         const last = localStorage.getItem('customerLastAuth');
         return last ? Date.now() - parseInt(last) : Infinity;
     },
 
-    async checkAuth() {
+    // ⭐ PROFILNI YANGILASH (BOSHQA QURILMALARDA O'ZGARSA)
+    async syncProfile() {
         const token = this.getToken();
         if (!token) return { valid: false, reason: 'no_token' };
-
-        const CACHE = 5 * 60 * 1000; // 5 daqiqa
-        if (this.getLastAuthAge() < CACHE) {
-            console.log('✅ Auth cache — server chaqirilmadi');
-            return { valid: true, reason: null };
-        }
 
         try {
             const data = await API.get('/api/auth/me');
             
             if (data.status === 0) {
-                console.warn('⚠️ Server javob bermadi — sahifada qolindi');
+                console.warn('⚠️ Server javob bermadi');
                 return { valid: true, reason: null };
             }
             
@@ -169,66 +164,103 @@ const Auth = {
                 return { valid: true, reason: null };
             }
 
-            const user = data.user;
-            if (!user) return { valid: false, reason: 'no_user' };
+            const serverUser = data.user;
+            if (!serverUser) return { valid: false, reason: 'no_user' };
 
-            // ⭐ LOCALDA SAQLANGAN USER BILAN SERVERDAGI USERNI SOLISHTIRISH
+            // ⭐ LOCALDA SAQLANGAN USER BILAN SOLISHTIRISH
             const localUser = this.getUser();
+            let changed = false;
+
             if (localUser) {
                 // Email o'zgarganmi?
-                if (localUser.email !== user.email) {
-                    console.warn('⚠️ Email o\'zgargan, logout qilinmoqda...');
-                    localStorage.setItem('authMessage', '📧 Profilingizdagi email manzil o\'zgartirilgan. Iltimos, qayta kiring.');
-                    this.logout();
-                    return { valid: false, reason: 'email_changed' };
+                if (localUser.email !== serverUser.email) {
+                    console.log('📧 Email o\'zgargan:', localUser.email, '→', serverUser.email);
+                    changed = true;
+                }
+                
+                // Ism o'zgarganmi?
+                if (localUser.fullName !== serverUser.fullName) {
+                    console.log('👤 Ism o\'zgargan:', localUser.fullName, '→', serverUser.fullName);
+                    changed = true;
+                }
+                
+                // Telefon o'zgarganmi?
+                if (localUser.phone !== serverUser.phone) {
+                    console.log('📱 Telefon o\'zgargan:', localUser.phone, '→', serverUser.phone);
+                    changed = true;
+                }
+                
+                // School name o'zgarganmi?
+                if (localUser.schoolName !== serverUser.schoolName) {
+                    console.log('🏫 O\'quv markazi o\'zgargan:', localUser.schoolName, '→', serverUser.schoolName);
+                    changed = true;
                 }
                 
                 // Status o'zgarganmi?
-                if (localUser.status !== user.status) {
-                    console.warn('⚠️ Status o\'zgargan, logout qilinmoqda...');
-                    let msg = '📌 Hisobingiz holati o\'zgargan. ';
-                    if (user.status === 'blocked') msg += '⛔ Siz bloklangansiz!';
-                    else if (user.status === 'inactive') msg += '❌ Hisobingiz faol emas.';
-                    else if (user.status === 'active') msg += '✅ Hisobingiz faollashtirilgan.';
-                    localStorage.setItem('authMessage', msg + ' Iltimos, qayta kiring.');
-                    this.logout();
-                    return { valid: false, reason: 'status_changed' };
+                if (localUser.status !== serverUser.status) {
+                    console.log('📌 Status o\'zgargan:', localUser.status, '→', serverUser.status);
+                    changed = true;
                 }
                 
                 // Subscription o'zgarganmi?
-                if (localUser.subscription?.status !== user.subscription?.status) {
-                    console.warn('⚠️ Subscription o\'zgargan, logout qilinmoqda...');
-                    localStorage.setItem('authMessage', '💰 Obuna holatingiz o\'zgargan. Iltimos, qayta kiring.');
-                    this.logout();
-                    return { valid: false, reason: 'subscription_changed' };
+                if (localUser.subscription?.status !== serverUser.subscription?.status) {
+                    console.log('💰 Subscription o\'zgargan');
+                    changed = true;
                 }
+            }
+
+            // ⭐ AGAR O'ZGARGAN BO'LSA, LOCALNI YANGILASH
+            if (changed || !localUser) {
+                console.log('🔄 Profil yangilanmoqda...');
                 
-                // Parol o'zgarganligini token yaroqliligini tekshirish orqali aniqlash
-                // Agar token yaroqsiz bo'lsa, logout qilamiz
-                if (data.message && data.message.includes('token')) {
-                    console.warn('⚠️ Token yaroqsiz, logout qilinmoqda...');
-                    localStorage.setItem('authMessage', '🔑 Parol o\'zgartirilgan yoki sessiya tugagan. Iltimos, qayta kiring.');
-                    this.logout();
-                    return { valid: false, reason: 'token_invalid' };
+                const updatedUser = {
+                    id: serverUser._id || serverUser.id,
+                    fullName: serverUser.fullName,
+                    email: serverUser.email,
+                    phone: serverUser.phone || '',
+                    role: serverUser.role,
+                    status: serverUser.status,
+                    subscription: serverUser.subscription,
+                    schoolName: serverUser.schoolName || '',
+                    language: serverUser.language || 'uz',
+                    theme: serverUser.theme || 'auto'
+                };
+                
+                // ⭐ LOCAL STORAGE NI YANGILASH
+                if (localStorage.getItem('customerToken')) {
+                    localStorage.setItem('customerUser', JSON.stringify(updatedUser));
+                } else {
+                    sessionStorage.setItem('customerUser', JSON.stringify(updatedUser));
                 }
+                localStorage.setItem('customerLastAuth', Date.now().toString());
+                
+                // ⭐ UI NI YANGILASH UCHUN EVENT
+                document.dispatchEvent(new CustomEvent('profileUpdated', { 
+                    detail: { user: updatedUser } 
+                }));
+                
+                // ⭐ SAHIFADAGI ELEMENTLARNI YANGILASH
+                this.updateUI(updatedUser);
+                
+                return { valid: true, reason: null, changed: true };
             }
 
             // Persist fresh user
             if (localStorage.getItem('customerToken')) {
-                localStorage.setItem('customerUser', JSON.stringify(user));
+                localStorage.setItem('customerUser', JSON.stringify(serverUser));
             } else {
-                sessionStorage.setItem('customerUser', JSON.stringify(user));
+                sessionStorage.setItem('customerUser', JSON.stringify(serverUser));
             }
             localStorage.setItem('customerLastAuth', Date.now().toString());
 
             // Account active check
-            if (user.active === false || user.isActive === false || user.status === 'inactive' || user.status === 'blocked') {
+            if (serverUser.active === false || serverUser.isActive === false || serverUser.status === 'inactive' || serverUser.status === 'blocked') {
                 this.logout();
                 return { valid: false, reason: 'inactive' };
             }
 
             // Subscription check
-            if (user.isSubscribed === false || user.subscription?.status === 'expired' || user.subscription?.status === 'inactive') {
+            if (serverUser.isSubscribed === false || serverUser.subscription?.status === 'expired' || serverUser.subscription?.status === 'inactive') {
                 this.logout();
                 return { valid: false, reason: 'expired' };
             }
@@ -238,11 +270,88 @@ const Auth = {
             console.warn('⚠️ Auth check xatosi:', error.message);
             return { valid: true, reason: null };
         }
+    },
+
+    // ⭐ UI NI YANGILASH
+    updateUI(user) {
+        if (!user) return;
+        
+        // User name
+        const nameEl = document.getElementById('userName');
+        if (nameEl) {
+            nameEl.textContent = user.fullName || 'Admin';
+        }
+        
+        // User initial
+        const initialEl = document.getElementById('userInitial');
+        if (initialEl) {
+            const name = user.fullName || 'Admin';
+            if (name && name.length > 0) {
+                const parts = name.split(/\s+/).filter(Boolean);
+                if (parts.length >= 2) {
+                    initialEl.textContent = (parts[0][0] + parts[1][0]).toUpperCase();
+                } else {
+                    initialEl.textContent = name[0].toUpperCase();
+                }
+            }
+        }
+        
+        // School name
+        const schoolEl = document.getElementById('schoolName');
+        if (schoolEl) {
+            schoolEl.textContent = user.schoolName || "Nurli Ta'lim Markazi";
+        }
+        
+        console.log('✅ UI yangilandi:', user.fullName);
+    },
+
+    // ⭐ REAL-TIME SINXRONIZATSIYA (HAR 10 SONIYADA)
+    startRealtimeSync() {
+        if (this._syncInterval) {
+            clearInterval(this._syncInterval);
+        }
+        
+        this._syncInterval = setInterval(async () => {
+            const token = this.getToken();
+            if (!token) return;
+            
+            const result = await this.syncProfile();
+            if (result && result.changed) {
+                console.log('🔄 Profil real-time yangilandi!');
+            }
+        }, 10000); // Har 10 soniyada
+        
+        console.log('✅ Real-time sinxronizatsiya boshlandi (10 soniyada)');
+    },
+
+    // ⭐ REAL-TIME SINXRONIZATSIYANI TO'XTATISH
+    stopRealtimeSync() {
+        if (this._syncInterval) {
+            clearInterval(this._syncInterval);
+            this._syncInterval = null;
+            console.log('❌ Real-time sinxronizatsiya to\'xtatildi');
+        }
+    },
+
+    // ============================================================
+    // CHECK AUTH - PROFIL O'ZGARGANDA LOGOUT QILADI
+    // ============================================================
+    async checkAuth() {
+        const token = this.getToken();
+        if (!token) return { valid: false, reason: 'no_token' };
+
+        const CACHE = 5 * 60 * 1000; // 5 daqiqa
+        if (this.getLastAuthAge() < CACHE) {
+            console.log('✅ Auth cache — server chaqirilmadi');
+            return { valid: true, reason: null };
+        }
+
+        return this.syncProfile();
     }
 };
 
 // ============================================================
-// AUTO-REDIRECT
+// ⭐ REAL-TIME SINXRONIZATSIYANI AVTOMATIK BOSHLASH
 // ============================================================
 document.addEventListener('DOMContentLoaded', async () => {
     const path = window.location.pathname;
@@ -256,6 +365,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             window.location.replace(basePath + 'index.html');
             return;
         }
+
+        // ⭐ REAL-TIME SINXRONIZATSIYANI BOSHLASH
+        Auth.startRealtimeSync();
 
         const result = await Auth.checkAuth();
         if (!result || result.valid !== true) {
@@ -271,4 +383,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
-console.log('✅ auth.js yuklandi (Admin-Customer)');
+// ⭐ SAHIFA YOPILGANDA SINXRONIZATSIYANI TO'XTATISH
+window.addEventListener('beforeunload', function() {
+    Auth.stopRealtimeSync();
+});
+
+console.log('✅ auth.js yuklandi (Real-time sinxronizatsiya bilan)');
