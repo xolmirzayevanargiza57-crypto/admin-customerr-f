@@ -538,3 +538,74 @@
 [data-theme="dark"] .user-info .user-role {
     color: var(--text-muted);
 }
+
+/* ============================================================
+   THEME TOGGLE BTN - DUMALOQ VA TO'G'RI ICONLAR
+   ============================================================ */
+
+.theme-toggle-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid var(--border-color);
+    background: var(--bg-card);
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+
+.theme-toggle-btn:hover {
+    background: var(--bg-hover);
+    transform: scale(1.05);
+}
+
+/* ⭐ LIGHT THEME - OY KO'RINADI, QUYOSH YASHIRIN */
+.theme-toggle-btn .sun-icon {
+    display: none;
+}
+.theme-toggle-btn .moon-icon {
+    display: block;
+}
+
+/* ⭐ DARK THEME - QUYOSH KO'RINADI, OY YASHIRIN */
+[data-theme="dark"] .theme-toggle-btn .sun-icon {
+    display: block;
+}
+[data-theme="dark"] .theme-toggle-btn .moon-icon {
+    display: none;
+}
+
+/* ⭐ DARK THEME UCHUN TUGMA RANGI */
+[data-theme="dark"] .theme-toggle-btn {
+    background: var(--bg-card);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .theme-toggle-btn:hover {
+    background: var(--bg-hover);
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 768px) {
+    .theme-toggle-btn {
+        width: 36px;
+        height: 36px;
+        font-size: 0.95rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .theme-toggle-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 0.85rem;
+    }
+}
