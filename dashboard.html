@@ -110,7 +110,7 @@
             top: 0;
             left: 0;
             bottom: 0;
-            height: 100%;
+            height: 100vh;
             z-index: 1000;
             overflow-y: auto;
             overflow-x: hidden;
@@ -118,47 +118,7 @@
             will-change: transform;
         }
 
-        @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-                width: 280px;
-                min-width: 280px;
-                max-width: 280px;
-                flex: 0 0 280px;
-                height: 100vh;
-                box-shadow: none;
-            }
-
-            .sidebar.open {
-                transform: translateX(0);
-                box-shadow: 4px 0 30px rgba(0, 0, 0, 0.15);
-            }
-
-            .sidebar-overlay {
-                display: none;
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background: rgba(0, 0, 0, 0.4);
-                z-index: 999;
-                opacity: 0;
-                transition: opacity 0.35s ease;
-            }
-
-            .sidebar-overlay.show {
-                display: block;
-                opacity: 1;
-            }
-
-            .main-content {
-                margin-left: 0 !important;
-                width: 100% !important;
-                max-width: 100% !important;
-            }
-        }
-
+        /* ⭐ SIDEBAR BRAND - FIXED HEIGHT */
         .sidebar-brand {
             display: flex;
             align-items: center;
@@ -166,6 +126,8 @@
             padding: 20px 16px 16px 16px;
             border-bottom: 1px solid var(--border-color);
             flex-shrink: 0;
+            height: 73px;
+            min-height: 73px;
         }
 
         .sidebar-brand .brand-icon {
@@ -247,10 +209,37 @@
             opacity: 0;
             transition: opacity 0.35s ease;
         }
-
         .sidebar-overlay.show {
             display: block;
             opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: 280px;
+                min-width: 280px;
+                max-width: 280px;
+                flex: 0 0 280px;
+                height: 100vh;
+                box-shadow: none;
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+                box-shadow: 4px 0 30px rgba(0, 0, 0, 0.15);
+            }
+
+            .main-content {
+                margin-left: 0 !important;
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+
+            .sidebar-overlay.show {
+                display: block;
+                opacity: 1;
+            }
         }
 
         /* ============================================================
@@ -269,7 +258,21 @@
         }
 
         /* ============================================================
-           TOP HEADER
+           ⭐ HEADER DIVIDER - SIDEBAR BRAND BILAN TENG
+           ============================================================ */
+        .header-divider {
+            position: fixed;
+            top: 73px;
+            left: var(--sidebar-width);
+            right: 0;
+            height: 1px;
+            background: var(--border-color);
+            z-index: 99;
+            pointer-events: none;
+        }
+
+        /* ============================================================
+           TOP HEADER - FIXED HEIGHT (SIDEBAR BILAN TENG)
            ============================================================ */
         .top-header {
             display: flex;
@@ -281,6 +284,8 @@
             top: 0;
             z-index: 50;
             border-bottom: 1px solid var(--border-color);
+            height: 73px;
+            min-height: 73px;
         }
 
         [data-theme="dark"] .top-header {
@@ -315,6 +320,9 @@
 
         @media (max-width: 768px) {
             .menu-toggle { display: flex !important; }
+            .top-header { padding: 12px 16px; height: 65px; min-height: 65px; }
+            .header-divider { top: 65px; }
+            .sidebar-brand { height: 65px; min-height: 65px; }
         }
 
         .header-left h2 { font-size: 1.4rem; font-weight: 700; color: var(--text-primary); letter-spacing: -0.5px; }
@@ -397,7 +405,7 @@
         .user-info .user-role { font-size: 0.7rem; color: var(--text-muted); }
 
         /* ============================================================
-           ⭐ 1. STATS GRID - 6 TA KARTA (TEPADA)
+           ⭐ STATS GRID - 6 TA KARTA
            ============================================================ */
         .stats-grid {
             display: grid;
@@ -551,14 +559,9 @@
 
         .stat-card .stat-info .stat-change.positive { color: var(--color-success); }
         .stat-card .stat-info .stat-change.negative { color: var(--color-danger); }
-        .stat-card .stat-info .stat-change svg {
-            width: 12px;
-            height: 12px;
-            fill: currentColor;
-        }
 
         /* ============================================================
-           ⭐ 2. CHART - O'RTADA (DOUGHNUT)
+           ⭐ CHART - DOUGHNUT
            ============================================================ */
         .chart-wrapper {
             padding: 0 32px;
@@ -632,7 +635,7 @@
         }
 
         /* ============================================================
-           ⭐ 3. SUBSCRIPTION CARD - PASTDA
+           ⭐ SUBSCRIPTION CARD
            ============================================================ */
         .subscription-wrapper {
             padding: 0 32px;
@@ -756,18 +759,6 @@
 
         @media (max-width: 768px) {
             .main-content { padding: 0; }
-            .top-header { padding: 12px 16px; }
-
-            .menu-toggle {
-                display: flex !important;
-                align-items: center;
-                justify-content: center;
-                width: 44px;
-                height: 44px;
-                padding: 8px;
-                font-size: 1.2rem;
-            }
-
             .header-left .text-muted { display: none; }
             .user-info { display: none; }
 
@@ -785,9 +776,6 @@
             .chart-wrapper { padding: 0 12px; }
             .chart-card { padding: 16px; }
             .chart-container { height: 220px; }
-            .chart-header h3 { font-size: 0.85rem; }
-            .chart-header .chart-legend { gap: 10px; }
-            .chart-header .chart-legend .legend-item { font-size: 0.65rem; }
 
             .subscription-wrapper { padding: 0 12px; }
             .subscription-card {
@@ -808,7 +796,10 @@
                 margin-top: 20px;
             }
 
-            .top-header { padding: 10px 12px; }
+            .top-header { padding: 10px 12px; height: 58px; min-height: 58px; }
+            .header-divider { top: 58px; }
+            .sidebar-brand { height: 58px; min-height: 58px; }
+
             .stat-card { padding: 12px 14px; }
             .stat-card .stat-icon { width: 34px; height: 34px; font-size: 0.9rem; }
             .stat-card .stat-icon svg { width: 16px; height: 16px; }
@@ -839,8 +830,6 @@
             .sub-item .value { font-size: 0.75rem; }
             .sub-item .value .countdown { font-size: 0.6rem; }
             .sub-item .label { font-size: 0.45rem; }
-            .sub-item .label svg { width: 10px; height: 10px; }
-            .sub-item .value .status-icon { width: 14px; height: 14px; }
         }
 
         /* ============================================================
@@ -904,9 +893,7 @@
 </head>
 <body>
     <div class="app-container">
-        <!-- ============================================================
-             SIDEBAR
-             ============================================================ -->
+        <!-- SIDEBAR -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-brand">
                 <div class="brand-icon"><i class="fas fa-crown"></i></div>
@@ -958,12 +945,13 @@
         <!-- SIDEBAR OVERLAY -->
         <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-        <!-- ============================================================
-             MAIN CONTENT
-             ============================================================ -->
+        <!-- ⭐ HEADER DIVIDER - SIDEBAR BRAND BILAN TENG -->
+        <div class="header-divider" id="headerDivider"></div>
+
+        <!-- MAIN CONTENT -->
         <main class="main-content">
 
-            <!-- HEADER -->
+            <!-- TOP HEADER -->
             <header class="top-header">
                 <div class="header-left">
                     <button id="menuToggle" class="menu-toggle">
@@ -995,9 +983,7 @@
                 </div>
             </header>
 
-            <!-- ============================================================
-                 ⭐ 1. STATS GRID - 6 TA KARTA (TEPADA)
-                 ============================================================ -->
+            <!-- STATS GRID -->
             <section class="stats-grid">
                 <!-- 1. Jami Xodimlar -->
                 <div class="stat-card">
@@ -1142,9 +1128,7 @@
                 </div>
             </section>
 
-            <!-- ============================================================
-                 ⭐ 2. CHART - O'RTADA (DOUGHNUT - 3 KATEGORIYA)
-                 ============================================================ -->
+            <!-- CHART - DOUGHNUT -->
             <section class="chart-wrapper">
                 <div class="chart-card">
                     <div class="chart-header">
@@ -1157,8 +1141,8 @@
                                 <span class="dot" style="background: #34c759;"></span> O'qituvchilar
                             </span>
                             <span class="legend-item">
-                           <span class="dot" style="background: #ff9500;"></span> O'quvchilar
-<!--                              ^  bitta # -->
+                                <span class="dot" style="background: #ff9500;"></span> O'quvchilar
+                            </span>
                         </div>
                     </div>
                     <div class="chart-container">
@@ -1167,14 +1151,11 @@
                 </div>
             </section>
 
-            <!-- ============================================================
-                 ⭐ 3. SUBSCRIPTION CARD - PASTDA
-                 ============================================================ -->
+            <!-- SUBSCRIPTION CARD -->
             <section class="subscription-wrapper">
                 <div class="subscription-card" id="subscriptionCard">
                     <div class="card-bg-icon"><i class="fas fa-crown"></i></div>
 
-                    <!-- 1. HOLATI -->
                     <div class="sub-item">
                         <span class="label">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
@@ -1191,7 +1172,6 @@
                         </span>
                     </div>
 
-                    <!-- 2. TURI -->
                     <div class="sub-item">
                         <span class="label">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1210,7 +1190,6 @@
                         </span>
                     </div>
 
-                    <!-- 3. TUGASH VAQTI -->
                     <div class="sub-item">
                         <span class="label">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1230,7 +1209,6 @@
                         </span>
                     </div>
 
-                    <!-- 4. QOLGAN KUN -->
                     <div class="sub-item">
                         <span class="label">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1253,9 +1231,7 @@
         </main>
     </div>
 
-    <!-- ============================================================
-         SCRIPTS
-         ============================================================ -->
+    <!-- SCRIPTS -->
     <script>
         window.__API_BASE_URL__ = 'https://admin-customerr.onrender.com';
 
@@ -1269,6 +1245,16 @@
                     html.setAttribute('data-theme', newTheme);
                     localStorage.setItem('theme', newTheme);
                 });
+            }
+
+            // ⭐ HEADER DIVIDER - SIDEBAR BRAND BILAN TENG
+            function updateDivider() {
+                var brand = document.querySelector('.sidebar-brand');
+                var divider = document.getElementById('headerDivider');
+                if (brand && divider) {
+                    var brandRect = brand.getBoundingClientRect();
+                    divider.style.top = brandRect.bottom + 'px';
+                }
             }
 
             // Hamburger menu
@@ -1317,12 +1303,17 @@
                     sidebar.classList.remove('open');
                     if (overlay) overlay.classList.remove('show');
                 }
+                updateDivider();
             });
 
             if (window.innerWidth <= 768) {
                 sidebar.classList.remove('open');
                 if (overlay) overlay.classList.remove('show');
             }
+
+            // ⭐ Divider ni yangilash
+            updateDivider();
+            setTimeout(updateDivider, 100);
         });
     </script>
 
