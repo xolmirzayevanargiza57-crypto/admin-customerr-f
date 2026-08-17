@@ -1,12 +1,15 @@
 // ============================================================
-// SETTINGS - SOZLAMALAR (REAL-TIME SINXRONIZATSIYA BILAN)
+// SETTINGS - SOZLAMALAR (TO'LIQ TUZATILGAN)
 // Loyiha: Admin-Customer Frontend
 // Fayl: js/settings.js
 // ============================================================
 
 document.addEventListener('DOMContentLoaded', async () => {
     const token = localStorage.getItem('customerToken') || sessionStorage.getItem('customerToken');
-    if (!token) { window.location.href = 'index.html'; return; }
+    if (!token) { 
+        window.location.href = 'index.html'; 
+        return; 
+    }
 
     // ⭐ PROFIL O'ZGARGANDA UI YANGILASH
     document.addEventListener('profileUpdated', function(e) {
@@ -21,16 +24,28 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (user) {
         document.getElementById('userName').textContent = user.fullName || 'Admin';
         document.getElementById('userInitial').textContent = Auth.getUserInitial();
-        document.getElementById('fullName').value = user.fullName || '';
-        document.getElementById('phone').value = user.phone || '';
-        document.getElementById('schoolName').value = user.schoolName || '';
+        document.getElementById('settingsName').value = user.fullName || '';
+        document.getElementById('settingsPhone').value = user.phone || '';
+        document.getElementById('settingsSchool').value = user.schoolName || '';
+        
+        // ⭐ PROFIL DISPLAY
+        document.getElementById('profileNameDisplay').textContent = user.fullName || '-';
+        document.getElementById('profileEmailDisplay').textContent = user.email || '-';
+        document.getElementById('profilePhoneDisplay').textContent = user.phone || '-';
     }
 
+    // ⭐ LANGUAGE SELECTOR - BU MUHIM!
     const languageContainer = document.getElementById('languageSelector');
     if (languageContainer && typeof I18N !== 'undefined') {
+        // Eski elementlarni tozalash
+        languageContainer.innerHTML = '';
+        // Yangi selector yaratish
         const selector = I18N.createLanguageSelector();
         languageContainer.appendChild(selector);
         I18N.updateUI();
+        console.log('✅ Language selector yaratildi');
+    } else {
+        console.warn('⚠️ Language selector topilmadi yoki I18N mavjud emas');
     }
 
     setupListeners();
@@ -45,27 +60,112 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 function setupListeners() {
-    document.getElementById('saveProfileBtn').addEventListener('click', saveProfile);
-    document.getElementById('deleteAccountBtn').addEventListener('click', deleteAccount);
-    document.getElementById('logoutBtn').addEventListener('click', () => Auth.logout());
+    // ⭐ PROFIL SAQLASH
+    const saveBtn = document.getElementById('saveProfileBtn');
+    if (saveBtn) {
+        // Eski eventlarni tozalash
+        const newBtn = saveBtn.cloneNode(true);
+        saveBtn.parentNode.replaceChild(newBtn, saveBtn);
+        newBtn.addEventListener('click', saveProfile);
+    }
+
+    // ⭐ CHIQISH
+    const logoutBtn = document.getElementById('settingsLogout');
+    if (logoutBtn) {
+        const newBtn = logoutBtn.cloneNode(true);
+        logoutBtn.parentNode.replaceChild(newBtn, logoutBtn);
+        newBtn.addEventListener('click', function() {
+            if (confirm('Haqiqatan ham chiqmoqchimisiz?')) {
+                Auth.logout();
+            }
+        });
+    }
+
+    // ⭐ HISOBNI O'CHIRISH
+    const deleteBtn = document.getElementById('deleteAccountBtn');
+    if (deleteBtn) {
+        const newBtn = deleteBtn.cloneNode(true);
+        deleteBtn.parentNode.replaceChild(newBtn, deleteBtn);
+        newBtn.addEventListener('click', deleteAccount);
+    }
+
+    // ⭐ THEME OPTIONS
+    document.querySelectorAll('.theme-option').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            const theme = this.dataset.theme;
+            if (theme) {
+                // Theme ni qo'llash
+                const html = document.documentElement;
+                if (theme === 'auto') {
+                    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                    html.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+                } else {
+                    html.setAttribute('data-theme', theme);
+                }
+                localStorage.setItem('theme', theme);
+                
+                // Theme UI yangilash
+                updateThemeUI();
+                
+                // Serverga saqlash
+                const token = localStorage.getItem('customerToken') || sessionStorage.getItem('customerToken');
+                if (token) {
+                    fetch(window.__API_BASE_URL__ + '/api/auth/theme', {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer ' + token
+                        },
+                        body: JSON.stringify({ theme: theme })
+                    }).catch(function(err) {
+                        console.error('Theme saqlash xatosi:', err);
+                    });
+                }
+            }
+        });
+    });
 }
 
 // ============================================================
-// ⭐ PROFILNI SAQLASH (BARCHA QURILMALARGA TARQALADI)
+// ⭐ THEME UI YANGILASH
 // ============================================================
-async function saveProfile() {
-    const fullName = document.getElementById('fullName').value.trim();
-    const phone = document.getElementById('phone').value.trim();
-    const schoolName = document.getElementById('schoolName').value.trim();
+function updateThemeUI() {
+    const currentTheme = localStorage.getItem('theme') || 'light';
+    const actualTheme = document.documentElement.getAttribute('data-theme');
+    
+    document.querySelectorAll('.theme-option').forEach(function(btn) {
+        btn.classList.toggle('active', btn.dataset.theme === currentTheme);
+    });
+
+    const statusText = document.getElementById('themeStatus');
+    if (statusText) {
+        const themeNames = { light: 'Yorug\'', dark: 'Qorong\'u' };
+        if (currentTheme === 'auto') {
+            statusText.textContent = 'Hozirgi holat: Avtomatik (' + (themeNames[actualTheme] || actualTheme) + ')';
+        } else {
+            statusText.textContent = 'Hozirgi holat: ' + (themeNames[actualTheme] || actualTheme);
+        }
+    }
+}
+
+// ============================================================
+// ⭐ PROFILNI SAQLASH
+// ============================================================
+async function saveProfile(e) {
+    e.preventDefault();
+    
+    const fullName = document.getElementById('settingsName').value.trim();
+    const phone = document.getElementById('settingsPhone').value.trim();
+    const schoolName = document.getElementById('settingsSchool').value.trim();
 
     if (!fullName) {
-        showError(I18N.t('all_fields_required'));
+        showProfileMessage('To\'liq ism majburiy!', 'error');
         return;
     }
 
     const btn = document.getElementById('saveProfileBtn');
     btn.disabled = true;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ' + I18N.t('loading');
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saqlanmoqda...';
 
     try {
         const data = await API.put('/api/auth/profile', { fullName, phone, schoolName });
@@ -78,32 +178,53 @@ async function saveProfile() {
                 localStorage.setItem('customerUser', JSON.stringify(user));
                 sessionStorage.setItem('customerUser', JSON.stringify(user));
             }
-            showSuccess(I18N.t('success'));
+            
+            // UI yangilash
             document.getElementById('userName').textContent = fullName;
             document.getElementById('userInitial').textContent = fullName.charAt(0).toUpperCase();
+            document.getElementById('profileNameDisplay').textContent = fullName;
+            document.getElementById('profilePhoneDisplay').textContent = phone || '-';
             
-            // ⭐ BOSHQA QURILMALARGA XABAR YUBORISH UCHUN EVENT
+            showProfileMessage('✅ Profil muvaffaqiyatli yangilandi!', 'success');
+            
+            // Boshqa qurilmalarga xabar
             document.dispatchEvent(new CustomEvent('profileUpdated', { 
                 detail: { user: user } 
             }));
-            
-            // ⭐ BOSHQA QURILMALARDA O'ZGARISH UCHUN AUTH CACHE NI TOZALASH
             localStorage.setItem('customerLastAuth', '0');
             
         } else {
-            showError(data.message || I18N.t('error'));
+            showProfileMessage(data.message || 'Xatolik yuz berdi!', 'error');
         }
     } catch (error) {
-        showError(I18N.t('network_error'));
+        console.error('❌ Profil saqlash xatosi:', error);
+        showProfileMessage('Server xatosi! Qayta urinib ko\'ring.', 'error');
     } finally {
         btn.disabled = false;
-        btn.innerHTML = '<i class="fas fa-save"></i> ' + I18N.t('save');
+        btn.innerHTML = '<i class="fas fa-save"></i> Saqlash';
     }
 }
 
+// ============================================================
+// ⭐ PROFIL XABARI
+// ============================================================
+function showProfileMessage(msg, type) {
+    const div = document.getElementById('profileMessage');
+    if (!div) return;
+    div.textContent = msg;
+    div.className = 'form-message ' + type;
+    div.style.display = 'block';
+    setTimeout(function() {
+        div.style.display = 'none';
+    }, 5000);
+}
+
+// ============================================================
+// ⭐ HISOBNI O'CHIRISH
+// ============================================================
 function deleteAccount() {
-    if (confirm(I18N.t('delete_account_warning'))) {
-        if (confirm('Haqiqatan ham hisobingizni o\'chirmoqchimisiz?')) {
+    if (confirm('Haqiqatan ham hisobingizni o\'chirmoqchimisiz?')) {
+        if (confirm('Bu amal qaytarib bo\'lmaydi! Davom etmoqchimisiz?')) {
             alert('Bu funksiya hali ishlab chiqilmoqda.');
         }
     }
@@ -122,26 +243,28 @@ function loadSettings() {
         
         console.log('👤 User ma\'lumotlari:', user);
         
-        const nameInput = document.getElementById('settingsName');
-        const emailInput = document.getElementById('settingsEmail');
-        const phoneInput = document.getElementById('settingsPhone');
+        document.getElementById('settingsName').value = user.fullName || '';
+        document.getElementById('settingsPhone').value = user.phone || '';
+        document.getElementById('settingsSchool').value = user.schoolName || '';
         
-        if (nameInput) nameInput.value = user.fullName || '';
-        if (emailInput) emailInput.value = user.email || '';
-        if (phoneInput) phoneInput.value = user.phone || '';
+        document.getElementById('profileNameDisplay').textContent = user.fullName || '-';
+        document.getElementById('profileEmailDisplay').textContent = user.email || '-';
+        document.getElementById('profilePhoneDisplay').textContent = user.phone || '-';
         
-        const nameDisplay = document.getElementById('profileNameDisplay');
-        const emailDisplay = document.getElementById('profileEmailDisplay');
-        const phoneDisplay = document.getElementById('profilePhoneDisplay');
+        document.getElementById('userName').textContent = user.fullName || 'Admin';
+        document.getElementById('userInitial').textContent = (user.fullName || 'A').charAt(0).toUpperCase();
         
-        if (nameDisplay) nameDisplay.textContent = user.fullName || '-';
-        if (emailDisplay) emailDisplay.textContent = user.email || '-';
-        if (phoneDisplay) phoneDisplay.textContent = user.phone || '-';
+        // ⭐ TIL SELECTOR NI YANGILASH
+        const languageContainer = document.getElementById('languageSelector');
+        if (languageContainer && typeof I18N !== 'undefined') {
+            languageContainer.innerHTML = '';
+            const selector = I18N.createLanguageSelector();
+            languageContainer.appendChild(selector);
+            I18N.updateUI();
+        }
         
-        const userName = document.getElementById('userName');
-        const userInitial = document.getElementById('userInitial');
-        if (userName) userName.textContent = user.fullName || 'Admin';
-        if (userInitial) userInitial.textContent = (user.fullName || 'A').charAt(0).toUpperCase();
+        // ⭐ THEME UI YANGILASH
+        updateThemeUI();
         
         console.log('✅ Settings yuklandi');
     } catch (error) {
@@ -149,20 +272,4 @@ function loadSettings() {
     }
 }
 
-function showError(msg) {
-    const div = document.createElement('div');
-    div.style.cssText = `position:fixed;top:20px;right:20px;z-index:9999;padding:14px 18px;background:#fef2f2;border:1px solid #fecaca;border-radius:10px;color:#dc2626;max-width:400px;box-shadow:0 10px 40px rgba(0,0,0,0.1);display:flex;align-items:center;gap:10px;font-size:0.85rem;`;
-    div.innerHTML = `<i class="fas fa-exclamation-circle"></i><span>${msg}</span><button onclick="this.parentElement.remove()" style="margin-left:auto;background:none;border:none;color:#dc2626;cursor:pointer;font-size:1.1rem;">×</button>`;
-    document.body.appendChild(div);
-    setTimeout(() => div.remove(), 5000);
-}
-
-function showSuccess(msg) {
-    const div = document.createElement('div');
-    div.style.cssText = `position:fixed;top:20px;right:20px;z-index:9999;padding:14px 18px;background:#ecfdf5;border:1px solid #a7f3d0;border-radius:10px;color:#065f46;max-width:400px;box-shadow:0 10px 40px rgba(0,0,0,0.1);display:flex;align-items:center;gap:10px;font-size:0.85rem;`;
-    div.innerHTML = `<i class="fas fa-check-circle"></i><span>${msg}</span><button onclick="this.parentElement.remove()" style="margin-left:auto;background:none;border:none;color:#065f46;cursor:pointer;font-size:1.1rem;">×</button>`;
-    document.body.appendChild(div);
-    setTimeout(() => div.remove(), 5000);
-}
-
-console.log('✅ settings.js yuklandi (Real-time sinxronizatsiya bilan)');
+console.log('✅ settings.js yuklandi');
