@@ -222,7 +222,7 @@ function showProfileMessage(msg, type) {
 // ============================================================
 async function loadDevices() {
     try {
-        const response = await API.get('/auth/sessions');
+        const response = await api.get('/api/auth/sessions');
         if (response.success) {
             renderDevices(response.data, response.currentSessionId);
         } else {
