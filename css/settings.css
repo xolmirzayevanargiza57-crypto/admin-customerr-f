@@ -1,0 +1,187 @@
+/* ============================================================
+   DEVICES (SESSIONS) STYLES
+   ============================================================ */
+
+.device-card {
+    background: var(--bg-hover);
+    border-radius: var(--radius-sm);
+    padding: 14px 18px;
+    margin-bottom: 10px;
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+}
+
+.device-card:hover {
+    border-color: var(--text-muted);
+}
+
+.device-card.current {
+    border-color: #007aff;
+    background: var(--bg-active);
+}
+
+.device-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.device-icon {
+    font-size: 1.4rem;
+    width: 40px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.device-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.device-name {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.badge-current {
+    font-size: 0.6rem;
+    background: #007aff;
+    color: white;
+    padding: 1px 10px;
+    border-radius: 10px;
+    font-weight: 500;
+}
+
+.device-details {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+.device-actions {
+    display: flex;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+.btn-rename, .btn-terminate {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    transition: all 0.3s ease;
+    color: var(--text-muted);
+}
+
+.btn-rename:hover {
+    background: var(--bg-active);
+    color: var(--text-primary);
+}
+
+.btn-terminate:hover {
+    background: #fef2f2;
+    color: var(--color-danger);
+}
+
+[data-theme="dark"] .btn-terminate:hover {
+    background: #3a1a1a;
+    color: #ff3b30;
+}
+
+.device-footer {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid var(--border-color);
+    font-size: 0.7rem;
+    color: var(--text-muted);
+}
+
+.device-footer span {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.device-divider {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 16px 0 12px 0;
+    padding: 8px 0;
+    border-top: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-muted);
+}
+
+.btn-terminate-all {
+    background: none;
+    border: 1px solid var(--color-danger);
+    color: var(--color-danger);
+    padding: 4px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.7rem;
+    transition: all 0.3s ease;
+}
+
+.btn-terminate-all:hover {
+    background: var(--color-danger);
+    color: white;
+}
+
+.device-footer-note {
+    margin-top: 16px;
+    padding: 12px 16px;
+    background: var(--bg-hover);
+    border-radius: var(--radius-sm);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 768px) {
+    .device-header {
+        flex-wrap: wrap;
+    }
+
+    .device-actions {
+        margin-left: auto;
+    }
+
+    .device-footer {
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .device-divider {
+        flex-direction: column;
+        gap: 8px;
+        align-items: stretch;
+        text-align: center;
+    }
+
+    .device-details {
+        flex-direction: column;
+        gap: 2px;
+    }
+}
