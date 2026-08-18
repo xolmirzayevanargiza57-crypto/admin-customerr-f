@@ -4,7 +4,7 @@
 
 function getApiBaseURL() {
     if (typeof window === 'undefined') {
-        return 'https://admin-customerr.onrender.com';
+        return 'https://admin-customerr-production.up.railway.app';
     }
 
     const override = window.__API_BASE_URL__ || window.API_BASE_URL || window.__ENV__?.API_BASE_URL || document.querySelector('meta[name="api-base-url"]')?.getAttribute('content');
@@ -20,7 +20,7 @@ function getApiBaseURL() {
         return window.location.origin.replace(/\/$/, '');
     }
 
-    return 'https://admin-customerr.onrender.com';
+    return 'https://admin-customerr-production.up.railway.app';
 }
 
 const API = {
